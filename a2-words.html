@@ -1,0 +1,682 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#9fdcff">
+<meta name="format-detection" content="telephone=no">
+<title>Тренажёр слов A2 · 10 частых слов</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#233a57; --ink-soft:#5d6f88; --ink-dim:#98a6b8;
+  --paper-2:#f4f9ff; --line:#dbe7f3; --rule:#e6eef7; --shadow:#d3e1ef;
+  --tide:#38b6ff; --signal:#ff5a5f; --moss:#4cc25a; --accent:#2f95f0;
+  --ui:Rubik,"Trebuchet MS",sans-serif; --story:Nunito,"Trebuchet MS",sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:#cfeeff;overflow-x:hidden}
+body{margin:0;min-height:100vh;min-height:100dvh;overflow-x:clip;color:var(--ink);font-family:var(--story);font-size:17px;font-weight:600;line-height:1.5;
+  background:
+    radial-gradient(ellipse 22% 9% at 12% 16%,rgba(255,255,255,.9),transparent 70%),
+    radial-gradient(ellipse 18% 7% at 78% 10%,rgba(255,255,255,.85),transparent 70%),
+    linear-gradient(180deg,#9fdcff 0%,#d8f2ff 45%,#fff6e0 100%);background-attachment:fixed}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+h1,h2,h3{margin:0;font-family:var(--ui);font-weight:800;line-height:1.1}
+p{margin:0 0 10px}
+[hidden]{display:none!important}
+
+.wrap{max-width:1100px;margin:0 auto;padding:18px 18px 60px}
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;background:#fff;border:2px solid var(--line);border-radius:24px;box-shadow:0 6px 0 var(--shadow)}
+.top .mark{display:inline-block;padding:3px 10px;font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.12em;color:#fff;background:var(--accent);border-radius:999px}
+.top h1{margin-top:6px;font-size:clamp(26px,4vw,38px)}
+.top p{margin:4px 0 0;font-size:15px;color:var(--ink-soft)}
+.top-side{display:flex;flex-direction:column;align-items:flex-start;gap:8px}
+.total{font-family:var(--ui);font-size:14px;font-weight:700;color:var(--ink-soft)}
+.total b{font-size:24px;color:#e59400}
+.back{display:inline-flex;align-items:center;min-height:40px;padding:6px 14px;font-family:var(--ui);font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;background:#fff;border:2px solid var(--line);border-radius:14px;box-shadow:0 3px 0 var(--shadow)}
+
+.section-k{margin:24px 4px 10px;font-family:var(--ui);font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--ink-soft)}
+.chips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
+.chip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:64px;padding:10px 12px;text-align:left;background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:0 4px 0 var(--shadow)}
+.chip b{font-family:var(--ui);font-size:18px;font-weight:800}
+.chip span{font-size:13.5px;color:var(--ink-soft)}
+.chip.weak{border-color:#ffb3b5;box-shadow:0 4px 0 #ffd0d2}
+.chip:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shadow)}
+
+.modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mode{display:grid;grid-template-columns:44px 1fr;gap:10px;align-items:center;min-height:70px;padding:10px 12px;text-align:left;background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:0 4px 0 var(--shadow);transition:transform .1s}
+.mode i{display:grid;place-items:center;width:44px;height:44px;font-style:normal;font-size:22px;background:var(--paper-2);border-radius:14px}
+.mode b{display:block;font-family:var(--ui);font-size:16px;font-weight:800;line-height:1.15}
+.mode span{font-size:13px;color:var(--ink-soft)}
+.mode .stars{color:#dbe4ee;letter-spacing:1px}
+.mode .stars em{font-style:normal;color:#ffc21a}
+.mode:hover{border-color:var(--accent)}
+.mode.on{color:#fff;background:var(--accent);border-color:color-mix(in srgb,var(--accent) 75%,#000);box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 65%,#000)}
+.mode.on span{color:rgba(255,255,255,.9)}
+.mode.on i{background:rgba(255,255,255,.25)}
+.mode.on .stars{color:rgba(255,255,255,.45)}
+
+.stage{margin-top:22px;padding:26px;background:#fff;border:2px solid var(--line);border-radius:26px;box-shadow:0 7px 0 var(--shadow)}
+.stage-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding-bottom:14px;margin-bottom:18px;border-bottom:2px dashed var(--line)}
+.stage-head h2{font-size:clamp(24px,3vw,32px)}
+.stage-head p{margin:4px 0 0;font-size:15px;color:var(--ink-soft)}
+.count{padding:6px 12px;font-family:var(--ui);font-size:13px;font-weight:800;color:#fff;background:var(--accent);border-radius:999px}
+.meter{height:10px;margin:-6px 0 18px;background:var(--rule);border-radius:10px;overflow:hidden}
+.meter i{display:block;height:100%;background:linear-gradient(90deg,#5ddc6a,#2eb84a);border-radius:10px;transition:width .3s}
+
+.btn{min-height:46px;padding:10px 20px;font-family:var(--ui);font-size:15px;font-weight:800;color:#fff;background:var(--tide);border:0;border-radius:16px;box-shadow:0 5px 0 color-mix(in srgb,var(--tide) 70%,#000);transition:transform .1s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 color-mix(in srgb,var(--tide) 70%,#000)}
+.btn.ghost{color:var(--ink);background:#fff;border:2px solid var(--line);box-shadow:0 4px 0 var(--shadow)}
+.btn.go{background:linear-gradient(180deg,#5ddc6a,#35c04a);box-shadow:0 5px 0 #248a37}
+.btn.warn{background:#ff8a3d;box-shadow:0 5px 0 #c85f1c}
+.btn.small{min-height:40px;padding:6px 13px;font-size:13.5px;border-radius:13px}
+.btn:disabled{opacity:.4}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.center{justify-content:center}
+.note{font-size:14.5px;color:var(--ink-soft)}
+.field{width:100%;min-height:52px;padding:11px 14px;font-size:20px;font-weight:700;text-align:center;color:var(--ink);background:#f6faff;border:2px solid var(--line);border-radius:16px}
+.field:focus{outline:none;border-color:var(--accent);background:#fff}
+.fb{min-height:26px;margin-top:12px;font-size:16px;font-weight:700;text-align:center;color:var(--ink-soft)}
+.fb.ok{color:#2e9e3c}
+.fb.no{color:var(--signal)}
+.fb small{display:block;margin-top:4px;font-size:14.5px;font-weight:600;color:var(--ink-soft)}
+
+/* карточки */
+.flip{display:block;width:min(520px,100%);min-height:240px;margin:0 auto;padding:26px;text-align:center;background:linear-gradient(160deg,#fff,#eef8ff);border:3px solid #bfe3ff;border-radius:26px;box-shadow:0 7px 0 #bfe3ff}
+.flip .big{margin:6px 0;font-family:var(--ui);font-size:clamp(34px,6vw,48px);font-weight:800;color:var(--ink)}
+.flip .ipa{font-size:16px;color:var(--ink-soft)}
+.flip .hint{margin-top:18px;font-size:14px;color:var(--ink-dim)}
+.flip .ex{margin:14px 0 0;padding:10px 12px;font-style:italic;background:#fff;border-radius:14px}
+.flip .ex span{display:block;font-style:normal;font-size:14px;color:var(--ink-soft)}
+.flip .tip{margin-top:10px;font-size:14.5px;color:#8a4a00;background:#fff3cf;border-radius:12px;padding:8px 10px}
+
+/* выбор */
+.q{margin:6px 0 18px;font-family:var(--ui);font-size:clamp(22px,3.4vw,32px);font-weight:800;line-height:1.25;text-align:center}
+.q small{display:block;margin-bottom:6px;font-family:var(--story);font-size:14px;font-weight:700;color:var(--ink-soft)}
+.q .gap{display:inline-block;min-width:90px;border-bottom:3px solid var(--accent);color:var(--accent)}
+.q-ru{margin:-8px 0 16px;text-align:center;font-size:15px;color:var(--ink-soft)}
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opts.one{grid-template-columns:1fr}
+.opt{display:grid;grid-template-columns:30px 1fr;gap:12px;align-items:center;min-height:58px;padding:10px 14px;text-align:left;font-family:var(--ui);font-size:17px;font-weight:700;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:0 5px 0 var(--shadow)}
+.opt span{display:grid;place-items:center;width:30px;height:30px;font-size:14px;color:#fff;background:var(--accent);border-radius:50%}
+.opt:hover{border-color:var(--accent)}
+.opt:active{transform:translateY(4px);box-shadow:0 1px 0 var(--shadow)}
+.opt.hit{color:#fff;background:var(--moss);border-color:#2ea343;box-shadow:0 5px 0 #248a37}
+.opt.miss{color:#fff;background:var(--signal);border-color:#d8383e;box-shadow:0 5px 0 #b82c31}
+.opt.hit span,.opt.miss span{color:var(--ink);background:#fff}
+
+/* пары */
+.match{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.match-col{display:grid;gap:10px;align-content:start}
+.tile{min-height:56px;padding:10px 12px;font-family:var(--ui);font-size:17px;font-weight:700;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
+.tile.sel{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,#fff)}
+.tile.done{visibility:hidden}
+.tile.bad{color:#fff;background:var(--signal);border-color:#d8383e}
+.tile.good{color:#fff;background:var(--moss);border-color:#2ea343}
+
+/* буквы */
+.slots{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;min-height:58px;margin:4px 0 16px}
+.slot{display:grid;place-items:center;width:44px;height:52px;font-family:var(--ui);font-size:24px;font-weight:800;text-transform:lowercase;background:var(--paper-2);border:2px dashed var(--line);border-radius:12px}
+.slot.full{background:#fff;border-style:solid;border-color:var(--accent)}
+.slots.ok .slot{color:#fff;background:var(--moss);border-color:#2ea343}
+.slots.no .slot{color:#fff;background:var(--signal);border-color:#d8383e}
+.letters{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.letter{width:50px;height:54px;font-family:var(--ui);font-size:24px;font-weight:800;background:#ffe9b8;border:2px solid #e8b04a;border-radius:14px;box-shadow:0 4px 0 #d99a2a}
+.letter:disabled{visibility:hidden}
+.letter:active{transform:translateY(3px);box-shadow:0 1px 0 #d99a2a}
+
+/* на слух */
+.ear{display:grid;place-items:center;width:120px;height:120px;margin:0 auto 14px;font-size:48px;background:radial-gradient(circle at 35% 30%,#8fd8ff,#38b6ff 70%);border:4px solid #fff;border-radius:50%;box-shadow:0 7px 0 #1f8fd6,0 0 0 8px rgba(56,182,255,.2)}
+.ear:active{transform:translateY(4px);box-shadow:0 2px 0 #1f8fd6}
+.listen-box{max-width:460px;margin:0 auto}
+
+/* итог */
+.result{max-width:520px;margin:0 auto;text-align:center}
+.result .medal{font-size:64px;line-height:1}
+.result .big-stars{margin:8px 0;font-size:40px;letter-spacing:4px;color:#dbe4ee}
+.result .big-stars em{font-style:normal;color:#ffc21a;text-shadow:0 2px 0 #e59400}
+.result h3{font-size:30px}
+.result .weak{margin:14px 0;padding:12px;background:#fff0f0;border:2px solid #ffd0d2;border-radius:16px;font-size:15px}
+.review-list{display:grid;gap:8px;margin-top:14px;text-align:left}
+.review-list div{padding:10px 12px;background:var(--paper-2);border-radius:14px;font-size:15px}
+.review-list b{font-family:var(--ui)}
+
+.toast{position:fixed;left:50%;bottom:24px;z-index:50;max-width:min(440px,calc(100vw - 32px));padding:12px 18px;font-size:15.5px;font-weight:700;color:#fff;background:var(--ink);border-radius:16px;box-shadow:0 5px 0 rgba(0,0,0,.2);transform:translate(-50%,14px);opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.shake{animation:shake .38s linear}
+@keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+.pop{animation:pop .4s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+
+@media (max-width:900px){
+  .chips{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .modes{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:600px){
+  .wrap{padding:10px 10px 40px}
+  .top{padding:14px;border-radius:18px}
+  .stage{padding:16px;border-radius:20px}
+  .opts{grid-template-columns:1fr}
+  .mode{grid-template-columns:36px 1fr;min-height:62px;padding:8px 10px}
+  .mode i{width:36px;height:36px;font-size:18px}
+  .mode b{font-size:14.5px}
+  .tile{font-size:15px;padding:8px}
+  .letter{width:44px;height:50px}
+  .slot{width:36px;height:46px;font-size:21px}
+  input.field{font-size:18px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <span class="mark">WORDS · A2</span>
+      <h1>10 самых частых слов A2</h1>
+      <p>Семь тренажёров на одни и те же слова. Пройди все — и слово закрепится и в памяти, и на слух, и в предложении.</p>
+    </div>
+    <div class="top-side">
+      <span class="total">Звёзд собрано: <b id="totalStars">0</b> / 21</span>
+      <a class="back" href="index-3.html">← К уроку Treasure Island</a>
+    </div>
+  </header>
+
+  <p class="section-k">СЛОВА · нажми, чтобы услышать</p>
+  <div class="chips" id="chips"></div>
+
+  <p class="section-k">ТРЕНАЖЁРЫ</p>
+  <nav class="modes" id="modes" aria-label="Тренажёры"></nav>
+
+  <main class="stage" id="stage" aria-live="polite"></main>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ============ слова ============ */
+const WORDS = [
+  { en:'already',  ipa:'/ɔːlˈredi/',   ru:'уже',
+    ex:'I have already done my homework.', exRu:'Я уже сделал домашнее задание.',
+    tip:'Часто с Present Perfect и стоит перед смысловым глаголом: have already done.' },
+  { en:'still',    ipa:'/stɪl/',       ru:'всё ещё, до сих пор',
+    ex:'She still lives with her parents.', exRu:'Она до сих пор живёт с родителями.',
+    tip:'Стоит перед обычным глаголом, но после to be: He is still here.' },
+  { en:'enough',   ipa:'/ɪˈnʌf/',      ru:'достаточно',
+    ex:'We don’t have enough time.', exRu:'У нас недостаточно времени.',
+    tip:'Перед существительным (enough money), но после прилагательного (old enough).' },
+  { en:'during',   ipa:'/ˈdjʊərɪŋ/',   ru:'во время',
+    ex:'I fell asleep during the film.', exRu:'Я уснул во время фильма.',
+    tip:'После during — существительное. Перед целым предложением нужно while.' },
+  { en:'however',  ipa:'/haʊˈevə/',    ru:'однако',
+    ex:'The hotel was expensive. However, the room was great.', exRu:'Отель был дорогим. Однако номер был отличным.',
+    tip:'Обычно начинает новое предложение и отделяется запятой.' },
+  { en:'probably', ipa:'/ˈprɒbəbli/',  ru:'вероятно, наверное',
+    ex:'It will probably rain tomorrow.', exRu:'Завтра, наверное, будет дождь.',
+    tip:'Ставится после will, но перед won’t: I’ll probably come / I probably won’t come.' },
+  { en:'decide',   ipa:'/dɪˈsaɪd/',    ru:'решать, принимать решение',
+    ex:'We decided to stay at home.', exRu:'Мы решили остаться дома.',
+    tip:'decide + to + глагол: decide to go, decide to buy.' },
+  { en:'believe',  ipa:'/bɪˈliːv/',    ru:'верить, считать',
+    ex:'I don’t believe him.', exRu:'Я ему не верю.',
+    tip:'believe somebody — верить человеку; believe in — верить в существование (believe in ghosts).' },
+  { en:'worry',    ipa:'/ˈwʌri/',      ru:'волноваться, беспокоиться',
+    ex:'Don’t worry about me.', exRu:'Не волнуйся за меня.',
+    tip:'worry about somebody / something — а не worry for.' },
+  { en:'arrive',   ipa:'/əˈraɪv/',     ru:'прибывать, приезжать',
+    ex:'We arrived in London at six.', exRu:'Мы приехали в Лондон в шесть.',
+    tip:'arrive in (город, страна) / arrive at (здание, аэропорт). Никогда не arrive to.' }
+];
+
+const GAPS = [
+  { w:'already',  s:'Hurry up! The train has ___ left.', ru:'Поторопись! Поезд уже ушёл.' },
+  { w:'still',    s:'It’s eleven o’clock and he is ___ at work.', ru:'Уже одиннадцать, а он всё ещё на работе.' },
+  { w:'enough',   s:'Is there ___ milk for everyone?', ru:'Хватит ли молока на всех?' },
+  { w:'during',   s:'Please don’t use your phone ___ the lesson.', ru:'Пожалуйста, не пользуйтесь телефоном во время урока.' },
+  { w:'however',  s:'I wanted to go for a walk. ___, it was raining.', ru:'Я хотел пойти погулять. Однако шёл дождь.' },
+  { w:'probably', s:'Take an umbrella. It will ___ rain later.', ru:'Возьми зонт. Позже, наверное, пойдёт дождь.' },
+  { w:'decide',   s:'We can’t ___ where to go on holiday.', ru:'Мы не можем решить, куда поехать в отпуск.' },
+  { w:'believe',  s:'Do you ___ in ghosts?', ru:'Ты веришь в привидения?' },
+  { w:'worry',    s:'My parents ___ about me when I come home late.', ru:'Родители волнуются, когда я поздно прихожу домой.' },
+  { w:'arrive',   s:'What time does your plane ___?', ru:'Во сколько прилетает твой самолёт?' }
+];
+
+const MISTAKES = [
+  { w:'arrive',   good:'We arrived in Paris at night.',          bad:'We arrived to Paris at night.',          why:'arrive in + город. Предлог to после arrive не ставится.' },
+  { w:'worry',    good:'Don’t worry about the test.',            bad:'Don’t worry for the test.',              why:'Волноваться о чём-то — worry about.' },
+  { w:'decide',   good:'She decided to learn Spanish.',          bad:'She decided learning Spanish.',          why:'После decide нужен to + глагол.' },
+  { w:'enough',   good:'He isn’t tall enough to play.',          bad:'He isn’t enough tall to play.',          why:'С прилагательным enough стоит после него: tall enough.' },
+  { w:'enough',   good:'I haven’t got enough money.',            bad:'I haven’t got money enough.',            why:'С существительным enough стоит перед ним: enough money.' },
+  { w:'during',   good:'I fell asleep during the film.',         bad:'I fell asleep during I watched the film.', why:'during + существительное. Перед предложением — while: while I was watching.' },
+  { w:'already',  good:'I have already seen this film.',         bad:'I have seen already this film.',         why:'already стоит между have и смысловым глаголом.' },
+  { w:'believe',  good:'Do you believe in ghosts?',              bad:'Do you believe to ghosts?',              why:'Верить в существование чего-то — believe in.' },
+  { w:'still',    good:'She still lives in Moscow.',             bad:'She lives still in Moscow.',             why:'still стоит перед обычным глаголом: still lives.' },
+  { w:'probably', good:'I will probably be late.',               bad:'I will be probably late.',               why:'probably стоит сразу после will: will probably be.' },
+  { w:'however',  good:'The room was small. However, it was clean.', bad:'However the room was small, it was clean.', why:'However связывает два предложения. «Хотя …» в начале — although.' }
+];
+
+/* ============ состояние ============ */
+const KEY = 'a2-top10-v1';
+let S = { stars:{}, miss:{} };
+try { S = { ...S, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch(e){}
+S.stars = S.stars || {}; S.miss = S.miss || {};
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+
+/* ============ помощники ============ */
+const $ = id => document.getElementById(id);
+const shuffle = a => { a = [...a]; for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const norm = s => (s || '').toLowerCase().replace(/[’']/g, "'").replace(/[^a-z']/g, '');
+const byEn = en => WORDS.find(w => w.en === en);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+function others(word, n, key){
+  return shuffle(WORDS.filter(w => w.en !== word.en)).slice(0, n).map(w => w[key]);
+}
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2200);
+}
+function speak(text, rate){
+  if(!('speechSynthesis' in window)){ toast('В этом браузере нет озвучки'); return false; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = rate || .85;
+  const v = speechSynthesis.getVoices().find(v => /^en[-_]GB/i.test(v.lang)) || speechSynthesis.getVoices().find(v => /^en/i.test(v.lang));
+  if(v) u.voice = v;
+  speechSynthesis.speak(u);
+  return true;
+}
+let actx = null;
+function blip(freq, dur, type){
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type || 'triangle'; o.frequency.value = freq;
+    g.gain.setValueAtTime(.0001, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.12, actx.currentTime + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + (dur || .18));
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + (dur || .18) + .02);
+  } catch(e){}
+}
+const good = () => { blip(660,.12); setTimeout(() => blip(990,.16), 90); };
+const bad = () => blip(180,.22,'sawtooth');
+const miss = en => { S.miss[en] = (S.miss[en] || 0) + 1; save(); renderChips(); };
+const shake = el => { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); };
+const starsOf = (score, total) => { const p = score / total; return p >= 1 ? 3 : p >= .7 ? 2 : p >= .4 ? 1 : 0; };
+const starLine = n => '<em>' + '★'.repeat(n) + '</em>' + '★'.repeat(3 - n);
+
+/* ============ список слов ============ */
+function renderChips(){
+  $('chips').innerHTML = WORDS.map(w =>
+    '<button class="chip ' + ((S.miss[w.en] || 0) >= 2 ? 'weak' : '') + '" data-say="' + w.en + '" title="' + esc(w.ex) + '">' +
+    '<b>' + w.en + '</b><span>' + w.ru + '</span></button>').join('');
+}
+$('chips').addEventListener('click', e => { const b = e.target.closest('[data-say]'); if(b) speak(b.dataset.say, .8); });
+
+/* ============ меню тренажёров ============ */
+const MODES = [
+  { id:'cards',    icon:'🃏', name:'Карточки',      sub:'значение и пример', run:cards },
+  { id:'quiz',     icon:'🎯', name:'Перевод',       sub:'выбери вариант',    run:quiz },
+  { id:'match',    icon:'🧩', name:'Пары',          sub:'соедини слово',     run:match },
+  { id:'gaps',     icon:'✏️', name:'Пропуски',      sub:'слово в предложении', run:gaps },
+  { id:'letters',  icon:'🔤', name:'Буквы',         sub:'собери слово',      run:letters },
+  { id:'listen',   icon:'🎧', name:'На слух',       sub:'услышь и напиши',   run:listen },
+  { id:'mistakes', icon:'🔍', name:'Найди ошибку',  sub:'типичные ошибки',   run:mistakes }
+];
+let current = 'cards';
+function renderModes(){
+  $('modes').innerHTML = MODES.map(m =>
+    '<button class="mode ' + (m.id === current ? 'on' : '') + '" data-mode="' + m.id + '"><i>' + m.icon + '</i><div><b>' + m.name + '</b>' +
+    '<span>' + m.sub + '</span><div class="stars">' + starLine(S.stars[m.id] || 0) + '</div></div></button>').join('');
+  $('totalStars').textContent = MODES.reduce((n, m) => n + (S.stars[m.id] || 0), 0);
+}
+$('modes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if(b) open(b.dataset.mode, true); });
+function open(id, scroll){
+  current = id; renderModes();
+  document.onkeydown = null;
+  MODES.find(m => m.id === id).run();
+  if(scroll) $('stage').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+function head(title, text, counter){
+  return '<div class="stage-head"><div><h2>' + title + '</h2><p>' + text + '</p></div>' +
+    (counter ? '<span class="count" id="counter">' + counter + '</span>' : '') + '</div>' +
+    '<div class="meter"><i id="meter" style="width:0"></i></div>';
+}
+function progress(done, total){
+  $('meter').style.width = Math.round(done / total * 100) + '%';
+  const c = $('counter'); if(c) c.textContent = Math.min(done + 1, total) + ' / ' + total;
+}
+function finish(id, score, total, weak, extra){
+  const st = starsOf(score, total);
+  if(st > (S.stars[id] || 0)){ S.stars[id] = st; save(); }
+  renderModes();
+  const idx = MODES.findIndex(m => m.id === id), next = MODES[(idx + 1) % MODES.length];
+  const medal = st === 3 ? '🏆' : st === 2 ? '🥈' : st === 1 ? '🥉' : '💪';
+  const weakList = [...new Set(weak)];
+  $('stage').innerHTML = '<div class="result pop"><div class="medal">' + medal + '</div>' +
+    '<div class="big-stars">' + starLine(st) + '</div>' +
+    '<h3>' + score + ' из ' + total + '</h3>' +
+    '<p class="note">' + (st === 3 ? 'Безупречно! Переходи к следующему тренажёру.' : st >= 2 ? 'Хороший результат. Ещё один круг — и будет три звезды.' : 'Слова пока путаются. Повтори карточки и попробуй снова.') + '</p>' +
+    (weakList.length ? '<div class="weak"><b>Повтори:</b> ' + weakList.map(w => { const x = byEn(w); return x ? w + ' — ' + x.ru : w; }).join(' · ') + '</div>' : '') +
+    (extra || '') +
+    '<div class="row center" style="margin-top:16px"><button class="btn ghost" id="again">Ещё раз</button>' +
+    '<button class="btn go" id="next">' + next.icon + ' ' + next.name + ' →</button></div></div>';
+  $('again').addEventListener('click', () => open(id));
+  $('next').addEventListener('click', () => open(next.id, true));
+  if(st === 3) good();
+}
+
+/* ============ 1. карточки ============ */
+function cards(){
+  let dir = 'en', queue = shuffle(WORDS), firstTry = new Set(WORDS.map(w => w.en)), shown = false, known = 0;
+  $('stage').innerHTML = head('Карточки', 'Вспомни значение, потом переверни карточку и честно оцени себя. «Ещё повторю» вернёт слово в конец стопки.', '1 / 10') +
+    '<div class="row center" style="margin-bottom:14px"><button class="btn ghost small" id="dir"></button></div>' +
+    '<div id="cardBox"></div>';
+  const setDir = () => { $('dir').textContent = dir === 'en' ? 'Сторона: английский → русский' : 'Сторона: русский → английский'; };
+  $('dir').addEventListener('click', () => { dir = dir === 'en' ? 'ru' : 'en'; setDir(); show(); });
+  setDir();
+  function show(){
+    const w = queue[0];
+    if(!w){ finish('cards', firstTry.size, WORDS.length, WORDS.filter(x => !firstTry.has(x.en)).map(x => x.en)); return; }
+    shown = false;
+    $('counter').textContent = 'осталось: ' + queue.length;
+    $('meter').style.width = Math.round(known / WORDS.length * 100) + '%';
+    const front = dir === 'en'
+      ? '<div class="big">' + w.en + '</div><div class="ipa">' + w.ipa + '</div>'
+      : '<div class="big" style="font-size:clamp(28px,5vw,40px)">' + w.ru + '</div>';
+    $('cardBox').innerHTML = '<button class="flip pop" id="flip">' + front + '<div class="hint">нажми, чтобы перевернуть</div></button>' +
+      '<div class="row center" style="margin-top:16px"><button class="btn ghost small" id="cardSay">🔊 Звук</button></div>' +
+      '<div class="row center" id="rate" style="margin-top:12px" hidden><button class="btn warn" id="again1">Ещё повторю</button><button class="btn go" id="know">Знаю ✓</button></div>';
+    if(dir === 'en') speak(w.en, .8);
+    $('cardSay').addEventListener('click', () => speak(w.en, .8));
+    $('flip').addEventListener('click', flip);
+    $('know').addEventListener('click', () => rate(true));
+    $('again1').addEventListener('click', () => rate(false));
+  }
+  function flip(){
+    if(shown) return;
+    shown = true;
+    const w = queue[0];
+    $('flip').innerHTML = '<div class="big" style="font-size:clamp(28px,5vw,40px)">' + (dir === 'en' ? w.ru : w.en) + '</div>' +
+      (dir === 'ru' ? '<div class="ipa">' + w.ipa + '</div>' : '') +
+      '<p class="ex">' + w.ex + '<span>' + w.exRu + '</span></p><div class="tip">💡 ' + w.tip + '</div>';
+    $('rate').hidden = false;
+    if(dir === 'ru') speak(w.en, .8);
+  }
+  function rate(ok){
+    if(!shown) return;
+    const w = queue.shift();
+    if(ok){ known++; good(); }
+    else { firstTry.delete(w.en); miss(w.en); queue.push(w); }
+    show();
+  }
+  document.onkeydown = e => {
+    if(e.key === ' ' || e.key === 'Enter'){ if(!shown){ e.preventDefault(); flip(); } }
+    else if(shown && (e.key === '1' || e.key === 'ArrowLeft')) rate(false);
+    else if(shown && (e.key === '2' || e.key === 'ArrowRight')) rate(true);
+  };
+  show();
+}
+
+/* ============ 2. перевод ============ */
+function quiz(){
+  const items = shuffle(WORDS).map((w, i) => ({ w, dir: i % 2 ? 'ru' : 'en' }));
+  let n = 0, score = 0, weak = [], locked = false;
+  $('stage').innerHTML = head('Перевод', 'Десять вопросов: то с английского, то с русского. Клавиши 1–4 тоже работают.', '1 / 10') + '<div id="qBox"></div>';
+  function show(){
+    if(n >= items.length){ finish('quiz', score, items.length, weak); return; }
+    locked = false; progress(n, items.length);
+    const { w, dir } = items[n];
+    const right = dir === 'en' ? w.ru : w.en;
+    const opts = shuffle([right, ...others(w, 3, dir === 'en' ? 'ru' : 'en')]);
+    $('qBox').innerHTML = '<p class="q pop"><small>' + (dir === 'en' ? 'Как это по-русски?' : 'Как это по-английски?') + '</small>' + (dir === 'en' ? w.en : w.ru) + '</p>' +
+      '<div class="opts">' + opts.map((o, i) => '<button class="opt" data-o="' + esc(o) + '"><span>' + (i + 1) + '</span>' + o + '</button>').join('') + '</div>' +
+      '<div class="fb" id="qFb"></div>';
+    if(dir === 'en') speak(w.en, .8);
+    $('qBox').querySelectorAll('[data-o]').forEach(b => b.addEventListener('click', () => answer(b, right, w)));
+  }
+  function answer(b, right, w){
+    if(locked) return; locked = true;
+    const ok = b.dataset.o === right;
+    if(ok){ score++; b.classList.add('hit'); good(); $('qFb').className = 'fb ok'; $('qFb').innerHTML = 'Верно! <small>' + w.ex + '</small>'; }
+    else {
+      b.classList.add('miss'); bad(); weak.push(w.en); miss(w.en);
+      $('qBox').querySelectorAll('[data-o]').forEach(x => { if(x.dataset.o === right) x.classList.add('hit'); });
+      $('qFb').className = 'fb no'; $('qFb').innerHTML = w.en + ' — ' + w.ru + '<small>' + w.ex + '</small>';
+    }
+    if(!ok || items[n].dir === 'ru') speak(w.en, .8);
+    n++; setTimeout(show, ok ? 900 : 2000);
+  }
+  document.onkeydown = e => { if(/^[1-4]$/.test(e.key)){ const b = $('qBox').querySelectorAll('[data-o]')[+e.key - 1]; b && b.click(); } };
+  show();
+}
+
+/* ============ 3. пары ============ */
+function match(){
+  const rounds = [shuffle(WORDS).slice(0, 5)];
+  rounds.push(shuffle(WORDS.filter(w => !rounds[0].includes(w))));
+  let r = 0, errors = 0, firstOk = 0, weak = [], matched = 0, pick = null;
+  $('stage').innerHTML = head('Пары', 'Нажми английское слово, потом его перевод. Два раунда по пять пар. Верная пара с первой попытки — очко.', 'раунд 1 / 2') + '<div id="mBox"></div>';
+  function show(){
+    if(r >= rounds.length){ finish('match', firstOk, WORDS.length, weak); return; }
+    $('counter').textContent = 'раунд ' + (r + 1) + ' / 2';
+    const set = rounds[r], tried = new Set();
+    pick = null;
+    $('mBox').innerHTML = '<div class="match pop"><div class="match-col">' +
+      shuffle(set).map(w => '<button class="tile" data-l="' + w.en + '">' + w.en + '</button>').join('') + '</div><div class="match-col">' +
+      shuffle(set).map(w => '<button class="tile" data-r="' + w.en + '">' + w.ru + '</button>').join('') + '</div></div>';
+    $('mBox').querySelectorAll('[data-l]').forEach(b => b.addEventListener('click', () => {
+      $('mBox').querySelectorAll('[data-l]').forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel'); pick = b; speak(b.dataset.l, .85);
+    }));
+    $('mBox').querySelectorAll('[data-r]').forEach(b => b.addEventListener('click', () => {
+      if(!pick){ toast('Сначала выбери английское слово слева'); return; }
+      const en = pick.dataset.l;
+      if(b.dataset.r === en){
+        if(!tried.has(en)) firstOk++;
+        [pick, b].forEach(x => { x.classList.remove('sel'); x.classList.add('good'); });
+        const p = pick; pick = null; matched++; good();
+        progress(matched, WORDS.length);
+        setTimeout(() => { p.classList.add('done'); b.classList.add('done');
+          if([...$('mBox').querySelectorAll('.tile')].every(x => x.classList.contains('done'))){ r++; setTimeout(show, 250); } }, 380);
+      } else {
+        errors++; tried.add(en); weak.push(en); miss(en); bad();
+        b.classList.add('bad'); shake(b); setTimeout(() => b.classList.remove('bad'), 500);
+      }
+    }));
+  }
+  show();
+}
+
+/* ============ 4. пропуски ============ */
+function gaps(){
+  const items = shuffle(GAPS);
+  let n = 0, score = 0, weak = [], locked = false;
+  $('stage').innerHTML = head('Пропуски', 'Выбери слово, которое подходит в предложение. Русский перевод можно открыть, если совсем непонятно.', '1 / 10') + '<div id="gBox"></div>';
+  function show(){
+    if(n >= items.length){ finish('gaps', score, items.length, weak); return; }
+    locked = false; progress(n, items.length);
+    const it = items[n], w = byEn(it.w);
+    const opts = shuffle([it.w, ...others(w, 3, 'en')]);
+    $('gBox').innerHTML = '<p class="q pop">' + it.s.replace('___', '<span class="gap">&nbsp;?&nbsp;</span>') + '</p>' +
+      '<p class="q-ru"><button class="btn ghost small" id="gRu">показать перевод</button></p>' +
+      '<div class="opts">' + opts.map((o, i) => '<button class="opt" data-o="' + o + '"><span>' + (i + 1) + '</span>' + o + '</button>').join('') + '</div>' +
+      '<div class="fb" id="gFb"></div>';
+    $('gRu').addEventListener('click', () => { $('gRu').parentNode.textContent = it.ru; });
+    $('gBox').querySelectorAll('[data-o]').forEach(b => b.addEventListener('click', () => answer(b, it)));
+  }
+  function answer(b, it){
+    if(locked) return; locked = true;
+    const ok = b.dataset.o === it.w;
+    const word = /(^|[.!?]\s+)___/.test(it.s) ? it.w[0].toUpperCase() + it.w.slice(1) : it.w;
+    const full = it.s.replace('___', word);
+    $('gBox').querySelector('.gap').textContent = word;
+    if(ok){ score++; b.classList.add('hit'); good(); $('gFb').className = 'fb ok'; $('gFb').innerHTML = 'Верно!<small>' + it.ru + '</small>'; }
+    else {
+      b.classList.add('miss'); bad(); weak.push(it.w); miss(it.w);
+      $('gBox').querySelectorAll('[data-o]').forEach(x => { if(x.dataset.o === it.w) x.classList.add('hit'); });
+      $('gFb').className = 'fb no'; $('gFb').innerHTML = 'Нужно: ' + it.w + ' — ' + byEn(it.w).ru + '<small>' + it.ru + '</small>';
+    }
+    speak(full, .85);
+    n++; setTimeout(show, ok ? 1500 : 2600);
+  }
+  document.onkeydown = e => { if(/^[1-4]$/.test(e.key)){ const b = $('gBox').querySelectorAll('[data-o]')[+e.key - 1]; b && b.click(); } };
+  show();
+}
+
+/* ============ 5. буквы ============ */
+function letters(){
+  const items = shuffle(WORDS);
+  let n = 0, score = 0, weak = [], typed = [], clean = true;
+  $('stage').innerHTML = head('Буквы', 'Собери английское слово из букв. Ошибся — нажми «стереть». Подсказка ставит следующую букву, но слово тогда не засчитывается.', '1 / 10') + '<div id="lBox"></div>';
+  function show(){
+    if(n >= items.length){ finish('letters', score, items.length, weak); return; }
+    progress(n, items.length);
+    const w = items[n];
+    typed = []; clean = true;
+    let mixed = shuffle(w.en.split(''));
+    if(mixed.join('') === w.en) mixed = mixed.reverse();
+    $('lBox').innerHTML = '<p class="q pop"><small>Собери слово</small>' + w.ru + '</p>' +
+      '<div class="slots" id="slots">' + w.en.split('').map(() => '<span class="slot"></span>').join('') + '</div>' +
+      '<div class="letters" id="letters">' + mixed.map((ch, i) => '<button class="letter" data-i="' + i + '" data-ch="' + ch + '">' + ch + '</button>').join('') + '</div>' +
+      '<div class="row center" style="margin-top:16px"><button class="btn ghost small" id="lDel">⌫ стереть</button><button class="btn ghost small" id="lHint">подсказка</button><button class="btn ghost small" id="lSay">🔊 звук</button></div>' +
+      '<div class="fb" id="lFb"></div>';
+    $('letters').querySelectorAll('.letter').forEach(b => b.addEventListener('click', () => put(b)));
+    $('lDel').addEventListener('click', del);
+    $('lSay').addEventListener('click', () => { clean = false; speak(w.en, .7); toast('Со звуком — без очка, но слово запомнится'); });
+    $('lHint').addEventListener('click', hint);
+  }
+  function draw(){
+    const w = items[n];
+    $('slots').querySelectorAll('.slot').forEach((s, i) => { s.textContent = typed[i] ? typed[i].dataset.ch : ''; s.classList.toggle('full', !!typed[i]); });
+    if(typed.length === w.en.length){
+      const got = typed.map(b => b.dataset.ch).join('');
+      if(got === w.en){
+        $('slots').classList.add('ok'); good(); speak(w.en, .8);
+        if(clean) score++; else weak.push(w.en);
+        $('lFb').className = 'fb ok'; $('lFb').innerHTML = (clean ? 'Верно!' : 'Собрано с подсказкой.') + '<small>' + w.ex + '</small>';
+        n++; setTimeout(show, 1500);
+      } else {
+        $('slots').classList.add('no'); bad(); clean = false; shake($('slots'));
+        if(!weak.includes(w.en)){ weak.push(w.en); miss(w.en); }
+        $('lFb').className = 'fb no'; $('lFb').textContent = 'Не то слово. Сотри лишние буквы и попробуй ещё.';
+        setTimeout(() => $('slots') && $('slots').classList.remove('no'), 600);
+      }
+    }
+  }
+  function put(b){ if(b.disabled || typed.length >= items[n].en.length) return; typed.push(b); b.disabled = true; $('lFb').textContent = ''; draw(); }
+  function del(){ const b = typed.pop(); if(b) b.disabled = false; draw(); }
+  function hint(){
+    const w = items[n]; clean = false;
+    while(typed.length && typed.map(b => b.dataset.ch).join('') !== w.en.slice(0, typed.length)) del();
+    const need = w.en[typed.length];
+    const b = [...$('letters').querySelectorAll('.letter')].find(x => !x.disabled && x.dataset.ch === need);
+    if(b) put(b);
+  }
+  document.onkeydown = e => {
+    if(!$('letters')) return;
+    if(e.key === 'Backspace'){ e.preventDefault(); del(); return; }
+    if(/^[a-z]$/i.test(e.key)){
+      const b = [...$('letters').querySelectorAll('.letter')].find(x => !x.disabled && x.dataset.ch === e.key.toLowerCase());
+      if(b) put(b);
+    }
+  };
+  show();
+}
+
+/* ============ 6. на слух ============ */
+function listen(){
+  const items = shuffle(WORDS);
+  let n = 0, score = 0, weak = [], tips = 0, tried = false;
+  const voice = 'speechSynthesis' in window;
+  $('stage').innerHTML = head('На слух', 'Послушай слово и напиши его по-английски. Можно слушать сколько угодно раз. Если звука нет — ориентируйся на транскрипцию и перевод в подсказке.', '1 / 10') + '<div id="eBox"></div>';
+  function show(){
+    if(n >= items.length){ finish('listen', score, items.length, weak); return; }
+    progress(n, items.length);
+    const w = items[n]; tips = 0; tried = false;
+    $('eBox').innerHTML = '<div class="listen-box pop">' +
+      '<button class="ear" id="ePlay" aria-label="Послушать слово">🔊</button>' +
+      '<div class="row center" style="margin-bottom:14px"><button class="btn ghost small" id="eSlow">🐢 медленно</button><button class="btn ghost small" id="eTip">подсказка</button></div>' +
+      '<input class="field" id="eIn" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="напиши слово">' +
+      '<div class="row center" style="margin-top:12px"><button class="btn go" id="eCheck">Проверить</button></div>' +
+      '<div class="fb" id="eFb">' + (voice ? '' : 'Озвучки нет — нажми «подсказка».') + '</div></div>';
+    $('ePlay').addEventListener('click', () => speak(w.en, .8));
+    $('eSlow').addEventListener('click', () => speak(w.en, .5));
+    $('eTip').addEventListener('click', () => {
+      tips++;
+      $('eFb').className = 'fb';
+      $('eFb').innerHTML = tips === 1 ? 'Транскрипция: <b>' + w.ipa + '</b>' :
+        'Значение: <b>' + w.ru + '</b> · первая буква: <b>' + w.en[0] + '</b>, букв: ' + w.en.length;
+    });
+    $('eCheck').addEventListener('click', check);
+    $('eIn').addEventListener('keydown', e => { if(e.key === 'Enter') check(); });
+    setTimeout(() => { speak(w.en, .8); try { $('eIn').focus({ preventScroll:true }); } catch(e){} }, 250);
+  }
+  function check(){
+    const w = items[n], v = norm($('eIn').value);
+    if(!v){ toast('Сначала напиши слово'); return; }
+    if(v === w.en){
+      const clean = !tried && tips < 2;
+      if(clean) score++; else if(!weak.includes(w.en)) weak.push(w.en);
+      good(); $('eIn').disabled = true; $('eCheck').disabled = true;
+      $('eFb').className = 'fb ok'; $('eFb').innerHTML = 'Верно: ' + w.en + ' — ' + w.ru + '<small>' + w.ex + '</small>';
+      n++; setTimeout(show, 1600);
+    } else if(!tried){
+      tried = true; bad(); shake($('eIn')); miss(w.en); weak.push(w.en);
+      $('eFb').className = 'fb no'; $('eFb').textContent = 'Почти. Послушай ещё раз и исправь — вторая попытка.';
+    } else {
+      bad(); $('eIn').disabled = true; $('eCheck').disabled = true;
+      $('eFb').className = 'fb no'; $('eFb').innerHTML = 'Правильно: <b>' + w.en + '</b> ' + w.ipa + ' — ' + w.ru + '<small>' + w.ex + '</small>';
+      speak(w.en, .7);
+      n++; setTimeout(show, 2600);
+    }
+  }
+  show();
+}
+
+/* ============ 7. найди ошибку ============ */
+function mistakes(){
+  const items = shuffle(MISTAKES);
+  let n = 0, score = 0, weak = [], locked = false;
+  $('stage').innerHTML = head('Найди ошибку', 'Два предложения — выбери то, в котором нет ошибки. Это самые частые ошибки русскоговорящих с этими словами.', '1 / ' + items.length) + '<div id="xBox"></div>';
+  function show(){
+    if(n >= items.length){ finish('mistakes', score, items.length, weak); return; }
+    locked = false; progress(n, items.length);
+    const it = items[n];
+    const opts = shuffle([it.good, it.bad]);
+    $('xBox').innerHTML = '<p class="q pop" style="font-size:clamp(18px,2.4vw,22px)"><small>Слово: ' + it.w + ' — ' + byEn(it.w).ru + '</small>Какое предложение правильное?</p>' +
+      '<div class="opts one">' + opts.map((o, i) => '<button class="opt" data-o="' + esc(o) + '"><span>' + (i + 1) + '</span>' + o + '</button>').join('') + '</div>' +
+      '<div class="fb" id="xFb"></div>';
+    $('xBox').querySelectorAll('[data-o]').forEach(b => b.addEventListener('click', () => answer(b, it)));
+  }
+  function answer(b, it){
+    if(locked) return; locked = true;
+    const ok = b.dataset.o === it.good;
+    $('xBox').querySelectorAll('[data-o]').forEach(x => x.classList.add(x.dataset.o === it.good ? 'hit' : 'miss'));
+    if(ok){ score++; good(); } else { bad(); weak.push(it.w); miss(it.w); }
+    $('xFb').className = 'fb ' + (ok ? 'ok' : 'no');
+    $('xFb').innerHTML = (ok ? 'Верно!' : 'Ошибка в выбранном варианте.') + '<small>💡 ' + it.why + '</small>' +
+      '<div class="row center" style="margin-top:12px"><button class="btn small" id="xNext">Дальше →</button></div>';
+    speak(it.good, .85);
+    $('xNext').addEventListener('click', () => { n++; show(); });
+    $('xNext').focus({ preventScroll:true });
+  }
+  document.onkeydown = e => {
+    if(/^[12]$/.test(e.key)){ const b = $('xBox').querySelectorAll('[data-o]')[+e.key - 1]; b && b.click(); }
+  };
+  show();
+}
+
+/* ============ запуск ============ */
+if('speechSynthesis' in window){ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices(); }
+renderChips(); renderModes(); open('cards');
+})();
+</script>
+</body>
+</html>
