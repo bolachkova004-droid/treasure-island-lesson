@@ -455,7 +455,9 @@ body.teacher .teach{display:block}
 
 
 /* ========== iPhone / iOS Safari hardening ========== */
-html,body{width:100%;max-width:100%;overflow-x:hidden}
+html{overflow-x:hidden}
+html,body{width:100%;max-width:100%}
+body{overflow-x:clip}
 html{-webkit-tap-highlight-color:transparent;overscroll-behavior-y:none}
 body{min-height:100svh;min-height:100dvh;-webkit-overflow-scrolling:touch}
 button,[role="button"],.tab,.opt,.spot,.check,label{touch-action:manipulation}
@@ -511,7 +513,7 @@ input,textarea,select{font-size:16px!important}
   <aside class="rail">
     <div class="rail-mark">LOG · 1751</div>
     <h1 class="rail-title">The Benbow<br>Ledger</h1>
-    <p class="rail-sub">Treasure Island, главы I–II<br>Уровень A2–B1 · 10 листов дела</p>
+    <p class="rail-sub">Treasure Island, главы I–II<br>Уровень A2–B1 · 11 заданий</p>
     <div class="ink-gauge"><i id="gauge"></i></div>
     <div class="gauge-copy"><span>журнал заполнен</span><span id="gaugeText">0%</span></div>
     <nav class="tabs" id="tabsDesktop" aria-label="Листы дела"></nav>
@@ -525,7 +527,7 @@ input,textarea,select{font-size:16px!important}
   </aside>
 
   <div class="mob">
-    <div><b>The Benbow Ledger</b><span id="mobStep">Лист 1 из 10</span></div>
+    <div><b>The Benbow Ledger</b><span id="mobStep">Лист 1 из 12</span></div>
     <button id="mobBtn" aria-expanded="false">Листы</button>
   </div>
   <div class="mobnav" id="mobNav">
@@ -568,7 +570,7 @@ input,textarea,select{font-size:16px!important}
             <div><b>would / Past Simple</b>привычка против одного события</div>
             <div><b>1 вывод</b>устное решение с двумя доказательствами</div>
           </div>
-          <div class="teach">Порядок листов рабочий, но не обязательный. Минимум на один урок: листы 2, 4, 5, 8, 10. Листы 6 (диктовка) и 7 (переписывание) можно отдать домой, если группа медленная. Глава II — отдельная домашняя миссия на листе 9.</div>
+          <div class="teach">Порядок заданий рабочий, но не обязательный. Минимум на один урок: задания 1, 3, 5, 10, 11. Задания 7 (диктовка) и 8 (переписывание) можно отдать домой, если группа медленная. Глава II — отдельная домашняя миссия в конце задания 11.</div>
         </div>
         <div class="cover-art">
           <svg viewBox="0 0 420 560" role="img" aria-label="Ночь у трактира «Адмирал Бенбоу»: море, корабль на горизонте и человек с сундуком на дороге">
@@ -757,7 +759,7 @@ input,textarea,select{font-size:16px!important}
         </div>
         <div class="status" id="chainStatus" aria-live="polite"></div>
         <div class="talk" data-talk="chain"></div>
-        <div class="teach">После проверки попросите пересказать цепочку вслух: first / then / after that / in the end. Во время пересказа не исправляйте — запишите две ошибки и вернитесь к ним на листе 8.</div>
+        <div class="teach">После проверки попросите пересказать цепочку вслух: first / then / after that / in the end. Во время пересказа не исправляйте — запишите две ошибки и вернитесь к ним в задании 8.</div>
       </div>
     </section>
 
@@ -935,7 +937,7 @@ input,textarea,select{font-size:16px!important}
         </div>
         <div class="grid2">
           <div>
-            <p class="task">Впиши без словаря и без листа 4. Форму слова менять можно.</p>
+            <p class="task">Впиши без словаря и без карточек задания 3. Форму слова менять можно.</p>
             <div class="rows" id="gapList"></div>
             <div class="row" style="margin-top:12px"><button class="btn flag" id="gapCheck">Поставить печать</button></div>
           </div>
@@ -1003,7 +1005,7 @@ input,textarea,select{font-size:16px!important}
 
   <div class="foot">
     <button class="btn ghost" id="prevBtn">← Назад</button>
-    <span class="mid" id="footLabel">Обложка дела · 1 / 10</span>
+    <span class="mid" id="footLabel">Главное меню · 1 / 12</span>
     <button class="btn" id="nextBtn">Дальше →</button>
   </div>
 </div>
@@ -1726,8 +1728,9 @@ function renderTabs(){
   }));
 }
 function go(i){
-  S.page = Math.max(0, Math.min(pages.length-1, i)); save(); render();
-  window.scrollTo({ top:0, behavior:'smooth' });
+  S.page = Math.max(0, Math.min(pages.length-1, Number(i) || 0)); save(); render();
+  try { history.replaceState(null, '', '#page-' + (S.page+1)); } catch(e){}
+  window.scrollTo(0, 0);
 }
 function render(){
   pages.forEach((p,i) => p.classList.toggle('on', i===S.page));
@@ -2061,9 +2064,9 @@ function checkGaps(){
     row.classList.toggle('ok', ok); row.classList.toggle('no', !ok);
   });
   $('finalScore').textContent = score + '/' + gaps.length;
-  const rank = score >= 6 ? 'Дело закрыто — можно брать B1-набор' : score >= 4 ? 'Печать поставлена, повтор через сутки' : 'Слишком рано: вернись к листу 4';
+  const rank = score >= 6 ? 'Дело закрыто — можно брать B1-набор' : score >= 4 ? 'Печать поставлена, повтор через сутки' : 'Слишком рано: вернись к заданию 3';
   $('rankLine').textContent = rank;
-  stamp('exit');
+  if(score >= 4) stamp('exit');
 }
 
 /* ============ глава II ============ */
@@ -2233,6 +2236,8 @@ function toggle(key, msg){
 
 /* ============ запуск ============ */
 function init(){
+  const fromHash = location.hash.match(/^#page-(\d+)$/);
+  if(fromHash) S.page = Math.max(0, Math.min(pages.length-1, +fromHash[1] - 1));
   $('agentInput').value = S.agent || '';
   $('agentSave').addEventListener('click', () => {
     S.agent = $('agentInput').value.trim() || 'ведущая дела'; save(); renderBar(); toast('Имя вписано в журнал');
@@ -2340,7 +2345,7 @@ function init(){
   window.addEventListener('scroll', hideTr, { passive:true });
   document.addEventListener('keydown', e => {
     if(e.key !== 'Escape') return;
-    hideTr(); $('fileBg').classList.remove('open'); $('wordsBg').classList.remove('open');
+    hideTr(); document.querySelectorAll('.drawer-bg.open').forEach(d => d.classList.remove('open'));
   });
 
   $('swA2').addEventListener('click', () => toggle('a2','Режим опор A2'));
@@ -2470,10 +2475,11 @@ function init(){
       (saved > 0 ? '<button class="main" data-m="continue">Продолжить <small>' + (pages[saved] ? pages[saved].dataset.tab : '') + '</small></button>' : '') +
       '<button class="' + (saved > 0 ? '' : 'main') + '" data-m="new">Новая игра <small>осмотр берега</small></button>' +
       '<button data-m="rapid">Скоростной рейс <small>60 секунд</small></button>' +
+      '<button data-m="words">Тренажёр слов A2 <small>10 самых частых слов</small></button>' +
       '<button data-m="settings">Настройки <small>сложность и подсказки</small></button></nav>');
     $('mainMenu').addEventListener('click', e => {
       const b = e.target.closest('[data-m]'); if(!b) return;
-      ({ continue:() => goTab(saved), new:() => goTab(1), rapid:() => goTab(byName('Скоростной рейс')), settings:openSettings })[b.dataset.m]();
+      ({ continue:() => goTab(saved), new:() => goTab(1), rapid:() => goTab(byName('Скоростной рейс')), words:() => { location.href = 'a2-words.html'; }, settings:openSettings })[b.dataset.m]();
     });
   }
 
@@ -2550,7 +2556,7 @@ function init(){
     const b = $(id); if(!b || id === 'rfStart' || id === 'clockStart') return;
     b.addEventListener('click', () => setTimeout(() => {
       const scope = b.closest('.folio') || document;
-      const ok = scope.querySelectorAll('.ok').length, bad = scope.querySelectorAll('.no');
+      const ok = scope.querySelectorAll('.ok:not(.status)').length, bad = scope.querySelectorAll('.no:not(.status)');
       if(!ok && !bad.length) return;
       bad.forEach(el => { el.classList.remove('shake'); void el.offsetWidth; el.classList.add('shake'); });
       const fail = ok === 0;
@@ -2604,78 +2610,6 @@ if(document.readyState === 'loading') document.addEventListener('DOMContentLoade
 else init();
 })();
 
-</script>
-<script>
-(() => {
-  'use strict';
-  const q = s => document.querySelector(s);
-  const qa = s => Array.from(document.querySelectorAll(s));
-
-  function activeIndex(){
-    const pages = qa('.page');
-    const i = pages.findIndex(p => p.classList.contains('on'));
-    return i < 0 ? 0 : i;
-  }
-
-  function showPage(i){
-    const pages = qa('.page');
-    if(!pages.length) return;
-    i = Math.max(0, Math.min(pages.length - 1, Number(i) || 0));
-    pages.forEach((p,n) => p.classList.toggle('on', n === i));
-    qa('.tab').forEach(t => t.classList.toggle('on', Number(t.dataset.i) === i));
-    const prev=q('#prevBtn'), next=q('#nextBtn'), label=q('#footLabel'), step=q('#mobStep');
-    if(prev) prev.disabled = i === 0;
-    if(next) next.textContent = i === pages.length - 1 ? 'В начало ↺' : 'Дальше →';
-    if(label) label.textContent = (pages[i].dataset.tab || 'Лист') + ' · ' + (i + 1) + ' / ' + pages.length;
-    if(step) step.textContent = 'Лист ' + (i + 1) + ' из ' + pages.length;
-    try { history.replaceState(null,'','#page-' + (i + 1)); } catch(e) {}
-    requestAnimationFrame(() => {
-      try { window.scrollTo(0,0); } catch(e) {}
-      document.documentElement.scrollTop = 0;
-      document.body.scrollTop = 0;
-    });
-  }
-
-  function targetFromEvent(e){
-    return e.target && e.target.closest ? e.target.closest('#nextBtn,#prevBtn,[data-go],.tab') : null;
-  }
-
-  document.addEventListener('click', e => {
-    const el = targetFromEvent(e);
-    if(!el) return;
-    const pages=qa('.page');
-    if(!pages.length) return;
-    const current=activeIndex();
-    let target=current;
-    if(el.id === 'nextBtn') target = current === pages.length - 1 ? 0 : current + 1;
-    else if(el.id === 'prevBtn') target = Math.max(0,current - 1);
-    else if(el.classList.contains('tab')) target = Number(el.dataset.i);
-    else if(el.hasAttribute('data-go')) target = Number(el.dataset.go);
-    else return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    showPage(target);
-  }, true);
-
-  let touchStart=null;
-  document.addEventListener('touchstart', e => {
-    const el=targetFromEvent(e);
-    touchStart = el ? {el, x:e.touches[0].clientX, y:e.touches[0].clientY} : null;
-  }, {passive:true,capture:true});
-  document.addEventListener('touchend', e => {
-    if(!touchStart) return;
-    const t=e.changedTouches[0];
-    const dx=Math.abs(t.clientX-touchStart.x), dy=Math.abs(t.clientY-touchStart.y);
-    const el=touchStart.el; touchStart=null;
-    if(dx>12 || dy>12) return;
-    if(el && typeof el.focus==='function') { try{el.focus({preventScroll:true});}catch(_){el.focus();} }
-  }, {passive:true,capture:true});
-
-  document.addEventListener('DOMContentLoaded', () => {
-    const m=location.hash.match(/^#page-(\d+)$/);
-    if(m) showPage(Number(m[1])-1);
-  });
-})();
 </script>
 </body>
 </html>
