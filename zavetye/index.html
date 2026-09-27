@@ -1,0 +1,2069 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Заветье</title>
+<meta name="description" content="Заветье: Лес хранит несбывшееся. Славянский фолк-хоррор и детектив о памяти. Пролог и первое дело.">
+<meta name="theme-color" content="#0e1714">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=Caveat:wght@500;700&family=PT+Mono&family=Ruslan+Display&display=swap" rel="stylesheet">
+<style>
+/* Заветье — один визуальный мир: ночная деревня и бумажная тетрадь в клетку.
+   Тема намеренно одна (тёмная), фон и все цвета заданы явно. */
+:root{
+  color-scheme:dark;
+  --night:#0e1714;      /* ельник ночью */
+  --night-2:#16221e;
+  --night-3:#1e2c27;
+  --line-n:#2c3b35;
+  --text:#e6e1d2;       /* береста */
+  --text-dim:#a2aa9c;
+  --birch:#ebe5d4;      /* бумага тетради */
+  --birch-2:#e0d8c3;
+  --grid:rgba(90,120,150,.16);
+  --ink:#1f2622;
+  --ink-soft:#5a6158;
+  --violet:#4b3f8f;     /* фиолетовые школьные чернила */
+  --rowan:#b3322a;      /* красная нить */
+  --rowan-soft:rgba(179,50,42,.14);
+  --ember:#e39a52;      /* свет печи */
+  --lichen:#8fae7c;
+  --water:#79a2ad;
+  --glow:rgba(227,154,82,.10);
+  --display:"Ruslan Display","Alegreya",Georgia,serif;
+  --body:"Alegreya",Georgia,"Times New Roman",serif;
+  --hand:"Caveat","Segoe Print","Comic Sans MS",cursive;
+  --mono:"PT Mono",ui-monospace,Menlo,Consolas,monospace;
+  --bar-h:56px;
+}
+body[data-phase="0"]{--glow:rgba(170,190,200,.08)}
+body[data-phase="1"]{--glow:rgba(230,215,160,.09)}
+body[data-phase="2"]{--glow:rgba(227,140,70,.12)}
+body[data-phase="3"]{--glow:rgba(90,120,170,.10)}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--night);color:var(--text);font:400 18px/1.62 var(--body);
+  background-image:radial-gradient(ellipse 70% 50% at 30% 0%,var(--glow),transparent 70%);background-attachment:fixed;
+  -webkit-text-size-adjust:100%;overflow-x:hidden}
+button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+[hidden]{display:none!important}
+em{font-style:italic}
+b{font-weight:700}
+
+/* ---------- верхняя полоса ---------- */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:10;height:var(--bar-h);display:flex;align-items:center;gap:14px;
+  padding-inline:16px;background:rgba(14,23,20,.92);border-bottom:1px solid var(--line-n);backdrop-filter:blur(6px)}
+.brand{font-family:var(--display);font-size:21px;letter-spacing:.03em;color:var(--text);white-space:nowrap}
+.clock{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.clock b{font-weight:500;font-size:15px;color:var(--text)}
+.clock span{font-size:13px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.signal{display:flex;align-items:flex-end;gap:2px;height:14px;margin-left:2px}
+.signal i{display:block;width:3px;background:var(--text-dim);opacity:.25;border-radius:1px}
+.signal i:nth-child(1){height:5px}.signal i:nth-child(2){height:8px}.signal i:nth-child(3){height:11px}.signal i:nth-child(4){height:14px}
+.signal i.on{opacity:1}
+.bar-sp{flex:1}
+.tb{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:1px solid var(--line-n);border-radius:3px;background:var(--night-2);font-size:15px;position:relative}
+.tb:hover{border-color:var(--ember)}
+.tb .dot{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--rowan);color:#fff;font:700 11px/18px var(--body);text-align:center}
+.tb svg{width:16px;height:16px}
+.tb-book{display:none}
+
+/* ---------- сцена ---------- */
+.stage{display:grid;grid-template-columns:minmax(0,1fr) minmax(360px,460px);max-width:1440px;margin:0 auto;width:100%}
+.scene{padding:22px clamp(16px,4vw,52px) 64px;min-width:0}
+.art-wrap{position:relative;max-width:900px}
+.art{display:block;width:100%;max-width:100%;aspect-ratio:21/8;border-radius:2px;background:#0a110f}
+.art-wrap::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 60px rgba(0,0,0,.55)}
+.place{margin:18px 0 6px;font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--ember)}
+.scene h1{margin:0 0 14px;font-family:var(--body);font-weight:500;font-size:clamp(26px,3.2vw,34px);line-height:1.15;text-wrap:balance}
+.text{max-width:64ch}
+.text p{margin:0 0 .85em}
+.text .dl{padding-left:1.1em;border-left:2px solid var(--line-n)}
+.text .who{color:var(--text-dim);font-size:.9em}
+.text ul{margin:0 0 1em;padding-left:1.2em}
+.text li{margin:.2em 0}
+.text .rule{font-style:italic;color:var(--text-dim)}
+.text .gain{display:block;margin:.4em 0 1em;padding:6px 12px;border-left:2px solid var(--rowan);background:var(--rowan-soft);font-size:15px;color:var(--text)}
+.text .change{display:block;margin:.6em 0 1em;padding:10px 14px;border:1px dashed var(--lichen);color:var(--text);font-size:16px}
+.text .change::before{content:"Заветье изменилось";display:block;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--lichen);margin-bottom:2px}
+.envelope{display:inline-block;margin:.2em 0 1em;padding:14px 20px;background:var(--birch);color:var(--ink);font:500 26px/1.2 var(--hand);transform:rotate(-1.2deg);box-shadow:0 8px 24px rgba(0,0,0,.45)}
+.note{display:block;margin:.4em 0 1.1em;padding:12px 18px;max-width:46ch;background:var(--birch);color:var(--ink);box-shadow:0 8px 24px rgba(0,0,0,.4);transform:rotate(.6deg)}
+.note .en{font:500 24px/1.25 var(--hand);color:var(--violet)}
+
+/* английский текст и перевод */
+.en{font-family:var(--hand);font-size:1.3em;line-height:1.2;color:#c9c0ff}
+.book .en,.note .en{color:var(--violet)}
+.enw{display:inline}
+.tr{display:block;font:italic 400 15px/1.4 var(--body);color:var(--text-dim);margin-top:2px}
+.book .tr,.note .tr{color:var(--ink-soft)}
+.trb{margin-left:8px;padding:0 8px;height:24px;border:1px solid currentColor;border-radius:12px;background:none;font:500 12px/22px var(--body);color:var(--text-dim);vertical-align:middle;opacity:.8}
+.book .trb,.note .trb{color:var(--ink-soft)}
+
+.choices{display:flex;flex-direction:column;gap:8px;max-width:64ch;margin-top:22px}
+.ch{display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;padding:12px 16px;border:1px solid var(--line-n);border-radius:3px;background:var(--night-2);line-height:1.35;transition:border-color .15s,background .15s}
+.ch:hover{border-color:var(--ember);background:var(--night-3)}
+.ch .mk{flex:none;width:14px;color:var(--ember);font-size:14px}
+.ch.say{font-style:italic}
+.ch.say .mk{color:var(--rowan)}
+.ch .tx{flex:1}
+.ch .sub{display:block;font-size:14px;font-style:normal;color:var(--text-dim);margin-top:2px}
+.ch .cost{flex:none;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-dim);white-space:nowrap}
+.ch[disabled]{opacity:.45;cursor:not-allowed}
+.ch[disabled]:hover{border-color:var(--line-n);background:var(--night-2)}
+.go-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px;max-width:64ch}
+.go-row .lbl{width:100%;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim)}
+.go{padding:6px 12px;border:1px solid var(--line-n);border-radius:20px;background:none;font-size:15px;color:var(--text)}
+.go:hover{border-color:var(--ember)}
+.go.here{border-color:var(--rowan);color:var(--text-dim);cursor:default}
+
+/* ---------- тетрадь ---------- */
+.book{color-scheme:light;position:sticky;top:calc(var(--bar-h) + env(safe-area-inset-top,0px));height:calc(100vh - var(--bar-h) - env(safe-area-inset-top,0px));overflow:auto;
+  background-color:var(--birch);color:var(--ink);
+  background-image:linear-gradient(90deg,transparent 46px,rgba(179,50,42,.55) 46px,rgba(179,50,42,.55) 48px,transparent 48px),
+    linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:100% 100%,22px 22px,22px 22px;border-left:1px solid #000;box-shadow:-10px 0 30px rgba(0,0,0,.35)}
+.book-in{padding:16px 18px 40px 62px}
+.book-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.book-title{font:500 26px/1 var(--hand);color:var(--ink)}
+.book-close{display:none;margin-left:auto;height:34px;padding:0 12px;border:1px solid var(--ink-soft);border-radius:3px;background:var(--birch);color:var(--ink);font-size:15px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px 14px;margin:0 0 16px;padding-bottom:8px;border-bottom:1px solid rgba(31,38,34,.2)}
+.tab{padding:2px 0;border:0;background:none;color:var(--ink-soft);font-size:16px;border-bottom:2px solid transparent}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--rowan)}
+.tab .n{font-size:12px;color:var(--rowan);margin-left:3px}
+.book h3{margin:18px 0 6px;font:700 13px/1.3 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.book h3:first-child{margin-top:0}
+.book p{margin:0 0 .7em;font-size:16px;line-height:1.5}
+.case-h{font:500 30px/1.05 var(--hand);color:var(--ink);margin:0 0 4px}
+.case-q{font-style:italic;color:var(--ink-soft);font-size:16px;margin-bottom:14px}
+.empty{color:var(--ink-soft);font-style:italic;font-size:15px}
+
+.clue{position:relative;margin:0 0 12px;padding:10px 12px 10px 14px;background:rgba(255,255,255,.55);border:1px solid rgba(31,38,34,.14);border-radius:2px}
+.clue.doubt{opacity:.55}
+.clue.doubt h5{text-decoration:line-through;text-decoration-color:var(--rowan)}
+.clue.blank .en,.clue.blank .tr{color:transparent;text-shadow:none;user-select:none}
+.clue-meta{display:flex;gap:8px;flex-wrap:wrap;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft)}
+.clue-meta .k{color:var(--rowan)}
+.clue h5{margin:3px 0 4px;font:700 17px/1.25 var(--body);color:var(--ink)}
+.clue p{margin:0 0 6px;font-size:15.5px}
+.clue .en{font-size:22px;display:block}
+.clue .red{font:500 20px/1.2 var(--hand);color:var(--rowan)}
+.clue-foot{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:6px}
+.lens-q{width:100%;font-size:13px;color:var(--ink-soft)}
+.pill{padding:3px 10px;border:1px solid rgba(31,38,34,.3);border-radius:14px;background:transparent;color:var(--ink);font-size:14px;line-height:1.3}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--birch);border-color:var(--ink)}
+.pill:hover{border-color:var(--ink)}
+.tip{width:100%;margin-top:4px;padding:6px 10px;border-left:2px solid var(--violet);background:rgba(75,63,143,.08);font-size:14px;line-height:1.4}
+.doubt-b{margin-left:auto;padding:2px 8px;border:0;background:none;color:var(--ink-soft);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+
+.slot{margin:0 0 18px;padding:12px 12px 10px;background:rgba(255,255,255,.5);border:1px solid rgba(31,38,34,.14)}
+.slot h4{margin:0 0 8px;font:700 16px/1.3 var(--body)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.meter{display:flex;align-items:center;gap:10px;margin:10px 0 6px;font-size:14px;color:var(--ink-soft)}
+.meter .track{flex:1;height:6px;background:rgba(31,38,34,.12);border-radius:3px;overflow:hidden;position:relative}
+.meter .track i{display:block;height:100%;background:var(--ink-soft);transition:width .3s}
+.meter .track b{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--rowan)}
+.meter.ok .track i{background:var(--rowan)}
+.att{list-style:none;margin:6px 0 0;padding:0}
+.att li{display:flex;align-items:flex-start;gap:8px;padding:4px 0;border-top:1px dotted rgba(31,38,34,.2);font-size:15px;line-height:1.35}
+.att input{margin-top:4px;accent-color:var(--rowan);width:16px;height:16px;flex:none}
+.att label{flex:1;cursor:pointer}
+.att .tag{font-size:12px;white-space:nowrap}
+.att .tag.pro{color:#2f6b3a}.att .tag.con{color:var(--rowan)}.att .tag.nil{color:var(--ink-soft)}
+.sentence{margin:8px 0 10px;padding:12px 14px;background:var(--birch-2);font:500 21px/1.35 var(--hand);color:var(--ink);border-left:3px solid var(--rowan)}
+.hint-line{font-size:14px;color:var(--ink-soft);font-style:italic}
+
+.nt{margin:0 0 14px;padding:10px 14px;background:rgba(255,255,255,.55);border:1px solid rgba(31,38,34,.14);transform:rotate(-.3deg)}
+.nt:nth-child(even){transform:rotate(.4deg)}
+.nt .src{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.nt .ann{margin-top:6px;font:500 19px/1.2 var(--hand);color:var(--rowan)}
+.nt ul{margin:4px 0 0;padding-left:1.1em;font-size:15.5px}
+.chg{margin:0 0 10px;padding-left:12px;border-left:2px solid #2f6b3a;font-size:15.5px}
+.chg small{display:block;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.ppl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:15.5px}
+.ppl dt{font-weight:700}
+.ppl dd{margin:0;color:var(--ink-soft)}
+.gram{width:100%;border-collapse:collapse;font-size:15px}
+.gram th,.gram td{text-align:left;padding:6px 6px;border-bottom:1px solid rgba(31,38,34,.16);vertical-align:top}
+.gram th{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.gram td:first-child{font:500 19px/1.2 var(--hand);color:var(--violet);white-space:nowrap}
+.gram-wrap{overflow-x:auto}
+
+/* ---------- карта ---------- */
+.ov{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(5,9,8,.78)}
+.map-card{position:relative;width:min(920px,100%);max-height:100%;overflow:auto;background:var(--birch);color:var(--ink);padding:14px 16px 16px;box-shadow:0 20px 60px rgba(0,0,0,.6)}
+.map-card h2{margin:0;font:500 30px/1 var(--hand)}
+.map-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.map-head .sp{flex:1}
+.map-sub{font-size:14px;color:var(--ink-soft)}
+.map-close{height:34px;padding:0 12px;border:1px solid var(--ink-soft);border-radius:3px;background:var(--birch);color:var(--ink);font-size:15px}
+.map-svg{display:block;width:100%;height:auto}
+.map-svg .node{cursor:pointer}
+.map-svg .node:focus-visible circle{stroke:var(--ember);stroke-width:1.2}
+.map-svg .node text{font:500 4.1px var(--body);fill:var(--ink)}
+.map-svg .node .note-t{font:italic 400 3px var(--body);fill:var(--ink-soft)}
+.map-svg .node:hover circle.hit{fill:rgba(179,50,42,.12)}
+
+/* ---------- титульный экран и финал ---------- */
+.screen{position:fixed;inset:0;z-index:40;overflow:auto;background:var(--night);padding:max(24px,env(safe-area-inset-top,0px)) 16px 32px}
+.screen canvas{position:fixed;inset:0;width:100%;height:100%;z-index:-1}
+.screen-in{position:relative;max-width:760px;margin:0 auto;padding-top:min(12vh,110px)}
+.t-title{margin:0;font:400 clamp(54px,11vw,112px)/.95 var(--display);color:var(--text);letter-spacing:.01em;text-shadow:0 4px 30px rgba(0,0,0,.6)}
+.t-sub{margin:10px 0 0;font:italic 400 clamp(20px,2.6vw,26px)/1.3 var(--body);color:var(--text-dim)}
+.thread{display:block;width:100%;max-width:520px;height:26px;margin:22px 0 26px}
+.thread path{fill:none;stroke:var(--rowan);stroke-width:2.2;stroke-linecap:round;stroke-dasharray:640;stroke-dashoffset:640;animation:draw 2.4s .3s ease-out forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.t-lead{max-width:56ch;color:var(--text);font-size:18px}
+.diff{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:22px 0 18px}
+.diff button{text-align:left;padding:14px 14px 12px;border:1px solid var(--line-n);border-radius:3px;background:rgba(22,34,30,.85);line-height:1.35}
+.diff button:hover{border-color:var(--ember)}
+.diff button[aria-pressed="true"]{border-color:var(--rowan);box-shadow:inset 0 0 0 1px var(--rowan)}
+.diff b{display:block;font-size:19px;font-weight:500;margin-bottom:3px}
+.diff span{font-size:14.5px;color:var(--text-dim)}
+.t-actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{height:46px;padding:0 22px;border:1px solid var(--rowan);border-radius:3px;background:var(--rowan);color:#fff;font-size:17px;font-weight:500}
+.btn:hover{background:#c43d34}
+.btn.ghost{background:transparent;color:var(--text);border-color:var(--line-n)}
+.btn.ghost:hover{border-color:var(--ember)}
+.t-foot{margin-top:28px;font-size:14px;color:var(--text-dim);max-width:60ch}
+.end-list{list-style:none;margin:18px 0;padding:0;display:grid;gap:8px}
+.end-list li{padding:10px 14px;background:rgba(22,34,30,.85);border-left:2px solid var(--rowan);font-size:16px}
+.end-list li small{display:block;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--text-dim)}
+.teaser{margin-top:24px;padding:16px 18px;border:1px dashed var(--line-n);color:var(--text-dim);font-size:16px}
+.teaser b{display:block;font-family:var(--display);font-weight:400;font-size:22px;color:var(--text);margin-bottom:4px}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));z-index:50;transform:translate(-50%,20px);opacity:0;pointer-events:none;
+  max-width:min(520px,calc(100% - 32px));padding:10px 16px;background:var(--birch);color:var(--ink);border-left:4px solid var(--rowan);box-shadow:0 10px 30px rgba(0,0,0,.5);font-size:15.5px;transition:opacity .25s,transform .25s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.menu{position:absolute;right:16px;top:calc(var(--bar-h) - 4px);z-index:12;min-width:220px;padding:6px;background:var(--night-2);border:1px solid var(--line-n);box-shadow:0 12px 30px rgba(0,0,0,.5)}
+.menu button{display:block;width:100%;text-align:left;padding:9px 12px;border:0;background:none;font-size:15.5px;border-radius:2px}
+.menu button:hover{background:var(--night-3)}
+.menu .mdiff{padding:6px 12px;font-size:13px;color:var(--text-dim)}
+
+@media (max-width:1020px){
+  .stage{grid-template-columns:minmax(0,1fr)}
+  .tb-book{display:inline-flex}
+  .book{position:fixed;inset:0;top:0;height:100%;z-index:25;transform:translateY(102%);transition:transform .3s ease;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+  .book.open{transform:none}
+  .book-close{display:inline-block}
+}
+@media (max-width:640px){
+  body{font-size:17px}
+  .brand{font-size:18px}
+  .clock span{max-width:36vw}
+  .tb .lbl{display:none}
+  .art{aspect-ratio:16/8}
+  .diff{grid-template-columns:1fr}
+  .book-in{padding-left:56px;padding-right:14px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .thread path{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body data-phase="2">
+<div id="app">
+  <header class="bar">
+    <div class="brand">Заветье</div>
+    <div class="clock" aria-live="polite"><b id="clkDay">Вторник · вечер</b><span id="clkPlace">Дорога</span></div>
+    <div class="signal" id="signal" title="Связь" aria-label="Связь"><i></i><i></i><i></i><i></i></div>
+    <div class="bar-sp"></div>
+    <button class="tb" id="bMap" type="button" aria-label="Карта"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M1.5 3.5l4-1.5 5 2 4-1.5v10l-4 1.5-5-2-4 1.5z"/><path d="M5.5 2v10.5M10.5 4v10.5"/></svg><span class="lbl">Карта</span></button>
+    <button class="tb tb-book" id="bBook" type="button" aria-label="Тетрадь"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="2.5" y="1.5" width="11" height="13" rx="1"/><path d="M5 1.5v13M7.5 5h4M7.5 7.5h4"/></svg><span class="lbl">Тетрадь</span><span class="dot" id="bookDot" hidden>0</span></button>
+    <button class="tb" id="bMenu" type="button" aria-label="Меню" aria-haspopup="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M2.5 4h11M2.5 8h11M2.5 12h11"/></svg></button>
+    <div class="menu" id="menu" hidden>
+      <div class="mdiff" id="menuDiff"></div>
+      <button type="button" data-m="diff">Сменить сложность</button>
+      <button type="button" data-m="title">На титульный экран</button>
+      <button type="button" data-m="restart">Начать заново</button>
+    </div>
+  </header>
+  <main class="stage">
+    <section class="scene" id="scene" aria-live="polite">
+      <div class="art-wrap"><canvas class="art" id="art" aria-hidden="true"></canvas></div>
+      <div class="place" id="place"></div>
+      <h1 id="stitle"></h1>
+      <div class="text" id="stext"></div>
+      <div class="choices" id="choices"></div>
+      <div class="go-row" id="goRow"></div>
+    </section>
+    <aside class="book" id="book" aria-label="Тетрадь Аглаи">
+      <div class="book-in">
+        <div class="book-top"><div class="book-title">Тетрадь</div><button class="book-close" id="bookClose" type="button">Закрыть</button></div>
+        <div class="tabs" role="tablist" id="tabs"></div>
+        <div id="bookBody"></div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div class="ov" id="mapOv" hidden>
+  <div class="map-card" role="dialog" aria-modal="true" aria-labelledby="mapH">
+    <div class="map-head"><h2 id="mapH">Заветье</h2><span class="map-sub" id="mapSub"></span><span class="sp"></span><button class="map-close" id="mapClose" type="button">Закрыть</button></div>
+    <svg class="map-svg" id="mapSvg" viewBox="0 0 160 100" role="group" aria-label="Карта деревни"></svg>
+  </div>
+</div>
+
+<div class="screen" id="titleScr" hidden>
+  <canvas id="titleArt" aria-hidden="true"></canvas>
+  <div class="screen-in">
+    <h1 class="t-title">Заветье</h1>
+    <p class="t-sub">Лес хранит несбывшееся</p>
+    <svg class="thread" viewBox="0 0 520 26" aria-hidden="true"><path d="M2 14 C60 2 90 24 150 13 S250 3 300 14 S400 25 440 12 C470 4 490 20 518 10"/></svg>
+    <p class="t-lead">Анна разбирает вещи умершей матери и находит посылку, которую мама прятала семнадцать лет. Внутри ключ, красная нить, ветка рябины и записка от женщины, которой, по словам семьи, никогда не было.</p>
+    <div class="diff" id="diffPick">
+      <button type="button" data-d="easy" aria-pressed="false"><b>Лёгкая</b><span>Английский с переводом. Тетрадь подсказывает, о чём говорит каждая улика.</span></button>
+      <button type="button" data-d="normal" aria-pressed="true"><b>Обычная</b><span>Перевод по нажатию. Грамматику улик разбираете сами.</span></button>
+      <button type="button" data-d="hard" aria-pressed="false"><b>Высокая</b><span>Только оригинал. Разница между «wanted» и «was going to» — ваша улика.</span></button>
+    </div>
+    <div class="t-actions">
+      <button class="btn" id="bNew" type="button">Начать</button>
+      <button class="btn ghost" id="bCont" type="button" hidden>Продолжить</button>
+    </div>
+    <p class="t-foot">Пролог и первое дело из полной игры, примерно 40–60 минут. Решения не делятся на правильные и неправильные: лес примет любую версию, если вы достаточно крепко её докажете. Прогресс сохраняется в этом браузере.</p>
+  </div>
+</div>
+
+<div class="screen" id="endScr" hidden>
+  <canvas id="endArt" aria-hidden="true"></canvas>
+  <div class="screen-in" id="endBody"></div>
+</div>
+
+<div class="toast" id="toast" role="status"></div>
+<script>
+'use strict';
+/* =====================================================================
+   ЗАВЕТЬЕ — движок
+   Состояние, время, улики, версии. Сцены — в SCENES ниже.
+   ===================================================================== */
+const SAVE_KEY = 'zavetye.save.v1';
+const WEEK = ['Понедельник','Вторник','Среда','Четверг','Пятница','Суббота','Воскресенье'];
+const PHASES = ['утро','полдень','вечер','ночь'];
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let st = null;
+
+function fresh(diff){
+  return { v:1, diff, day:0, phase:2, loc:'road', scene:'p_flat', flags:{}, clues:{}, order:[], notes:[],
+    changes:[], people:[], rel:{grisha:0,grunya:0,varya:0,nina:0}, signal:3, unseen:0, morningDue:false,
+    ver:{A:null,B:null,C:null,att:{A:[],B:[],C:[]}}, outcome:null };
+}
+const dayName = d => WEEK[(1 + d) % 7];
+const F = k => !!(st && st.flags[k]);
+const setF = (k, v = true) => { st.flags[k] = v; };
+const isPhase = (...p) => p.includes(st.phase);
+
+/* ---------- сохранение ---------- */
+function save(){ try{ localStorage.setItem(SAVE_KEY, JSON.stringify(st)); }catch(e){} }
+function loadSave(){ try{ const s = localStorage.getItem(SAVE_KEY); if(!s) return null; const o = JSON.parse(s); return o && o.v === 1 ? o : null; }catch(e){ return null; } }
+function wipeSave(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
+
+/* ---------- время ---------- */
+function pass(n){
+  for(let i = 0; i < n; i++){
+    st.phase++;
+    if(st.phase > 3){ st.phase = 0; st.day++; st.morningDue = true; st.loc = 'house'; }
+  }
+}
+function sleep(){ st.day++; st.phase = 0; st.morningDue = true; st.loc = 'house'; }
+
+/* ---------- английский и перевод ---------- */
+function en(s, ru){
+  const e = `<span class="en" lang="en">${s}</span>`;
+  if(!st || st.diff === 'easy') return `<span class="enw">${e}<span class="tr">${ru}</span></span>`;
+  if(st.diff === 'normal') return `<span class="enw">${e}<button type="button" class="trb" data-tr="${esc(ru)}">перевод</button></span>`;
+  return e;
+}
+
+/* =====================================================================
+   УЛИКИ
+   sup — чему улика служит опорой: слот.вариант → вес (минус — противоречит).
+   Английские записи получают опору через «линзу» — то, как игрок прочёл грамматику.
+   ===================================================================== */
+const KIND = { thing:'Вещь', word:'Слова', rec:'Запись', vision:'Видение', en:'Запись по-английски', being:'Сущность' };
+
+const CLUES = {
+  c_saturday:{ kind:'word', src:'Гриша', t:'«В субботу уеду»',
+    text:'Гриша говорит это при каждой встрече, радостно и совершенно искренне. Кажется, он не помнит, что говорил то же самое вчера.',
+    sup:{'A.plan':.5,'A.empty':.5} },
+  c_suitcase:{ kind:'thing', src:'Двор Лаптевых', t:'Чемодан у двери',
+    text:'Старый, с ремнями. Бирка «Лаптев Г., Тверь» выцвела. Внутри вещи двадцатилетней давности: джинсовая куртка, кассетный плеер, аттестат в файлике. Пыль лежит ровно, а ручка чистая: чемодан часто берут в руки.',
+    sup:{'A.plan':1,'A.empty':-.5} },
+  c_timetable:{ kind:'thing', src:'Дом Лаптевых', t:'Расписание автобуса, лето 2004',
+    text:'Под треснувшим стеклом у вешалки: «Заветье — Тверь. Сб 06:40». Число 12.06 обведено карандашом, и обводили его много раз.',
+    sup:{'A.plan':1} },
+  c_journal:{ kind:'rec', src:'Старая школа', t:'Классный журнал 2003/04',
+    text:'«Лаптев Григорий. Аттестат выдан 11.06.2004». За день до субботнего автобуса.',
+    sup:{'A.plan':.5} },
+  c_nina:{ kind:'word', src:'Нина Петровна', t:'«Проспал он»',
+    text:'«Проспал он тогда. А потом сам передумал. Я его не держала: чего держать, взрослый. Он и мечтал-то больше языком». Всё это время она не смотрит в сторону бани.',
+    sup:{'B.accident':1,'B.self':1,'A.dream':.5,'A.empty':.5} },
+  c_grunya:{ kind:'word', src:'Груня', t:'«Сам раздумал»',
+    text:'«Проспал тогда свой автобус, говорят, а потом сам раздумал. Мать болела. Остался, и правильно. Пусть собирается, никому не мешает».',
+    sup:{'B.accident':.5,'B.self':1,'A.empty':.5} },
+  c_varya:{ kind:'word', src:'Варя', t:'Щеколда по субботам',
+    text:'«Папа каждую пятницу собирает чемодан, а в субботу вечером разбирает. А бабушка каждую субботу с утра задвигает щеколду на бане. Снаружи. Даже когда там никого нет. Говорит — привычка».',
+    sup:{'B.forced':1} },
+  c_banya:{ kind:'thing', src:'Двор Лаптевых', t:'Засов на бане',
+    text:'Тяжёлый засов с наружной стороны двери. Внутри, на косяке, на уровне глаз, гвоздём процарапано: «12.06 ВЫПУСТИТЕ». Царапины старые, потемневшие.',
+    sup:{'B.forced':2,'B.self':-1,'B.accident':-1,'C.mother':1} },
+  c_noon:{ kind:'vision', src:'Полудница', t:'Шесть сорок, двенадцатое июня',
+    text:'Туман. Женщина в платке задвигает засов на бане, руки у неё дрожат. Изнутри стучат. У калитки стоит вторая тень, невысокая, в тёмном, и напевает колыбельную без последней строки. За полем гудит автобус и уходит.',
+    sup:{'B.forced':2,'B.accident':-1,'C.mother':1,'C.advice':1} },
+  c_lullaby:{ kind:'word', src:'Груня', t:'Колыбельная без последней строки',
+    text:'Моя посуду, Груня напевает ту самую мелодию, что звучала у калитки в видении. «Колыбельная. Её тут все знают», — говорит она, не оборачиваясь.',
+    sup:{'C.advice':1} },
+  c_kiki_chant:{ kind:'being', src:'Кикимора', t:'«Сам. Сам. Все знают — сам»',
+    text:'Сухой голос в сенях Лаптевых повторяет одно и то же, будто веретено крутит.',
+    sup:{'B.self':1,'A.empty':.5} },
+  c_kiki:{ kind:'being', src:'Кикимора', t:'Кто сказал первым',
+    text:'«Не сам… Так сказали. Матери сказали, мать сказала всем. А матери сказала та, что нитки вяжет. Красные».',
+    sup:{'C.advice':2,'B.forced':1,'B.self':-1} },
+  c_threads:{ kind:'thing', src:'Изба Груни', t:'Красные нитки в комоде',
+    text:'В нижнем ящике лежат десятки мотков красной нити, каждый перехвачен бумажной биркой. Почти все надписи выцвели. На одной можно разобрать «Л. Г. 12.06». На другой — «Б. В.».',
+    sup:{'C.advice':2} },
+  c_water:{ kind:'vision', src:'Водяной', t:'Мастерская «Мото · Лаптев»',
+    text:'В воде город. Гаражная мастерская, вывеска «МОТО · ЛАПТЕВ». Гриша, такой же, как сейчас, только спокойнее, говорит по телефону: «Мам, в субботу приеду!»',
+    sup:{'A.plan':1} },
+  c_young:{ kind:'word', src:'Гриша на лесной остановке', t:'«Мама сама сказала — езжай»',
+    text:'«Мама болеет. Но она сказала — езжай. Сама сказала, вчера вечером. Потом к ней кто-то приходил, я уже спал».',
+    sup:{'C.advice':1,'A.plan':1,'B.self':-.5} },
+  c_forged:{ kind:'rec', src:'Вложено в тетрадь Гриши', t:'Записка «Сам так решил»', fake:true,
+    text:'Листок между страницами: «Никуда я не поеду. Сам так решил. Г.». Синяя шариковая ручка, хотя вся тетрадь написана фиолетовыми чернилами.',
+    sup:{'B.self':2,'A.empty':1} },
+
+  /* записи по-английски: опора зависит от прочтения */
+  e1:{ kind:'en', src:'Школа, стенгазета «What will I be?», сентябрь 2003', t:'Стенгазета',
+    en:'I want to leave Zavetye. I want to repair motorbikes in a big city.',
+    ru:'Я хочу уехать из Заветья. Я хочу чинить мотоциклы в большом городе.', lens:'desire' },
+  e2:{ kind:'en', src:'Тетрадь Гриши, январь 2004', t:'«When I am eighteen»',
+    en:'I will leave Zavetye when I am eighteen.',
+    ru:'Я уеду из Заветья, когда мне исполнится восемнадцать.', lens:'decision' },
+  e3:{ kind:'en', src:'Тетрадь Гриши, май 2004, тема «Plans»', t:'«Plans»', red:'Good! — A.K.',
+    en:'I am going to leave on Saturday, the 12th of June. I have bought a ticket. I have packed my suitcase.',
+    ru:'Я уезжаю в субботу, 12 июня. Я купил билет. Я собрал чемодан.', lens:'plan' },
+  e4:{ kind:'en', src:'Тетрадь Гриши, май 2004', t:'Обещание',
+    en:'I promised my mother I would come back every summer.',
+    ru:'Я пообещал маме, что буду приезжать каждое лето.', lens:'promise' },
+  e5:{ kind:'en', src:'Тетрадь Гриши, последняя страница, почерк Аглаи', t:'Красные чернила',
+    en:'12 June. Grisha was not at the bus stop. He would have left.',
+    ru:'12 июня. Гриши не было на остановке. Он бы уехал.', lens:'counter' },
+};
+
+const LENSES = {
+  desire:  { label:'хотел',        form:'want to',                tip:'<b>want to</b> + глагол — желание. Мечта, у которой ещё нет даты.', sup:{'A.dream':2,'A.empty':-.5} },
+  decision:{ label:'решил',        form:'will',                   tip:'<b>will</b> — решение или обещание самому себе. Твёрдое, но пока без билета.', sup:{'A.plan':1,'A.dream':1,'A.empty':-1} },
+  plan:    { label:'готовился',    form:'be going to · have done',tip:'<b>be going to</b> — план, решённый заранее. <b>have bought, have packed</b> — шаги, которые уже сделаны.', sup:{'A.plan':2,'A.dream':-.5,'A.empty':-1} },
+  promise: { label:'обещал',       form:'promised … would',       tip:'<b>promised (that) I would</b> — обещание, данное кому-то. Посмотрите, что именно обещано: приезжать может только тот, кто уехал.', sup:{'A.plan':1,'A.empty':-.5} },
+  counter: { label:'не случилось', form:'would have + V3',        tip:'<b>would have left</b> — «уехал бы». Намерение было настоящим, но что-то ему помешало.', sup:{'B.forced':1,'B.accident':.5,'B.self':-1} },
+};
+
+function supOf(id){
+  const c = CLUES[id], s = st.clues[id];
+  if(!c || !s || s.doubt || s.blank) return {};
+  if(c.kind === 'en') return s.lens ? LENSES[s.lens].sup : {};
+  return c.sup || {};
+}
+const has = id => !!st.clues[id];
+
+function gain(id, silent){
+  if(has(id)) return '';
+  const c = CLUES[id];
+  st.clues[id] = { lens: (c.kind === 'en' && st.diff === 'easy') ? c.lens : null, doubt:false, blank:false };
+  st.order.push(id);
+  st.unseen++;
+  if(!silent) toast('В тетрадь: ' + c.t);
+  return `<span class="gain">В тетрадь: ${c.t}</span>`;
+}
+
+/* ---------- записки Аглаи и прочие записи ---------- */
+const NOTES = {
+  n1:{ src:'Посылка, 2009', en:'When the stove is warm, do not greet the house.', ru:'Когда печь тёплая, не здоровайся с домом.' },
+  n2:{ src:'Под чашкой на столе', en:'Grunya will feed you. Eat.', ru:'Груня тебя накормит. Ешь.' },
+  n3:{ src:'В печурке, за спичками', en:'Do not answer the kikimora.', ru:'Не отвечай кикиморе.' },
+  n4:{ src:'Обложка тетради Гриши, изнутри', en:'The forest does not lie. People retell.', ru:'Лес не лжёт. Лгут пересказы.' },
+  n5:{ src:'Ящик учительского стола', en:'Look for what nobody retells. Nobody retells homework.', ru:'Ищи то, что никто не пересказывает. Домашние задания не пересказывает никто.' },
+  rules:{ src:'Со слов Груни', ru:true, items:['Ночью в лес не ходи.','В полдень в поле не стой.','К воде низко не наклоняйся.','Если за печкой шепчутся — не отвечай, пока не спросят.','Вечером заходи — покормлю.'] },
+  legends:{ src:'Со слов Груни', ru:true, title:'Четыре сказки Заветья', items:['Невеста, что идёт по дороге и никак не дойдёт.','Кузнец, который куёт клинок и не может его докончить.','Мельникова дочь, забывшая последнюю строку колыбельной.','Охотник, что вечно целится в золотого оленя.'] },
+};
+const NOTE_ANN = {
+  n3: () => F('kikiTruth') ? 'Аглая ошиблась. Или не хотела, чтобы я узнала, кто сказал первым?' : '',
+  n1: () => F('greeted') ? 'Я поздоровалась. Теперь я здесь гостья.' : (F('silentEntry') ? 'Я промолчала. Домовой зовёт меня хозяйкой. Кто-то в углу с ним не согласен.' : ''),
+  legends: () => F('legendHint') ? 'Одна мелодия. Колыбельная без последней строки звучала у калитки Лаптевых.' : '',
+};
+function note(id){
+  if(st.notes.includes(id)) return '';
+  st.notes.push(id); st.unseen++;
+  toast('Записка в тетради');
+  return '';
+}
+
+/* ---------- изменения Заветья и люди ---------- */
+function change(text){ st.changes.push({ day:st.day, phase:st.phase, text }); return `<span class="change">${text}</span>`; }
+const PEOPLE = {
+  grunya:{ n:'Груня', d:'Аграфена Кузьминична, деревенская повитуха. Кормит, лечит, объясняет правила.' },
+  grisha:{ n:'Гриша', d:'Григорий Лаптев, лет сорока. Чинит «Яву». Каждый день собирается уехать в субботу.' },
+  varya:{ n:'Варя', d:'Дочь Гриши, двенадцать лет. Замечает всё, что взрослые привыкли не замечать.' },
+  nina:{ n:'Нина Петровна', d:'Мать Гриши. Говорит, что никого никогда не держала.' },
+  domovoi:{ n:'Домовой', d:'Живёт за печью в доме Аглаи. Правило: хозяйке отдаёт, гостье одалживает.' },
+  kiki:{ n:'Кикимора', d:'Прядёт удобную ложь, пока её повторяют. Спотыкается о то, чего никто не пересказывал.' },
+  noon:{ n:'Полудница', d:'Приходит в поле ровно в полдень. Отвечает только на вопрос «когда».' },
+  leshy:{ n:'Леший', d:'Ведёт туда, куда ты на самом деле хочешь. Словами его не обмануть.' },
+  water:{ n:'Водяной', d:'Показывает жизнь, которая могла быть прожита. Берёт плату вещью из той жизни.' },
+  young:{ n:'Гриша, 18 лет', d:'Сидит на лесной остановке. На его часах всегда 6:38.' },
+};
+function meet(id){ if(!st.people.includes(id)) st.people.push(id); }
+
+/* =====================================================================
+   ВЕРСИЯ
+   ===================================================================== */
+const SLOTS = {
+  A:{ q:'Что было у Гриши?', need:3, opts:{
+      dream:{ l:'Мечта', s:'Гриша мечтал уехать, но всерьёз не готовился.' },
+      plan:{ l:'План', s:'Гриша собирался уехать: был билет, дата, чемодан.' },
+      empty:{ l:'Пустые слова', s:'Гриша никогда всерьёз не собирался уезжать.' } } },
+  B:{ q:'Что случилось 12 июня 2004 года?', need:3, opts:{
+      self:{ l:'Сам передумал', s:'Двенадцатого июня он сам передумал.' },
+      forced:{ l:'Его удержали', s:'Двенадцатого июня ему не дали уехать.' },
+      accident:{ l:'Случайность', s:'Двенадцатого июня он проспал автобус.' } } },
+  C:{ q:'Кто решил за него?', need:2, opts:{
+      mother:{ l:'Мать', s:'Его заперла мать, Нина Петровна.' },
+      advice:{ l:'Мать, по чужому слову', s:'Его заперла мать, но решение ей подсказали.' },
+      none:{ l:'Не называть', s:'Кто это сделал, не сказано.' } } },
+};
+function activeSlots(){ return st.ver.B === 'forced' ? ['A','B','C'] : ['A','B']; }
+function strength(slot){
+  const opt = st.ver[slot]; if(!opt) return 0;
+  if(slot === 'C' && opt === 'none') return SLOTS.C.need;
+  let s = 0;
+  for(const id of st.ver.att[slot]){ if(!has(id)) continue; s += (supOf(id)[slot + '.' + opt] || 0); }
+  return Math.round(s * 10) / 10;
+}
+function sentence(){
+  const parts = activeSlots().map(k => st.ver[k] ? SLOTS[k].opts[st.ver[k]].s : '…');
+  return parts.join(' ');
+}
+function verdict(){
+  const A = st.ver.A, B = st.ver.B;
+  if(!A || !B) return null;
+  if(B === 'forced') return A === 'plan' ? 'truth' : 'half';
+  if(B === 'self') return A === 'empty' ? 'erase' : 'convenient';
+  return 'loop';
+}
+function qual(s, need){
+  if(s <= 0) return 'лес не слышит';
+  if(s < need * .5) return 'шёпот';
+  if(s < need) return 'почти слышно';
+  return 'лес слышит';
+}
+
+/* ---------- мелочи интерфейса ---------- */
+let toastT = null;
+function toast(msg){
+  const t = $('toast'); t.textContent = msg; t.classList.add('on');
+  clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('on'), 2600);
+}
+/* =====================================================================
+   СЦЕНЫ
+   Сцена — функция, которая возвращает {art, place, title, text[], choices[]}.
+   Текст вычисляется один раз при входе и кешируется, поэтому эффекты
+   в теле сцены (gain, note, meet, setF) обязаны быть идемпотентными.
+   Время и отношения меняются только в fn выбора.
+   ===================================================================== */
+const S = {};
+const say = (t, o = {}) => ({ t, say:true, ...o });
+const act = (t, o = {}) => ({ t, ...o });
+const back = (t = 'Дальше') => ({ t, go:'loc' });
+const noteCard = id => {
+  note(id);
+  const n = NOTES[id];
+  return `<span class="note">${en(n.en, n.ru)}</span>`;
+};
+const dash = s => `<p class="dl">${s}</p>`;
+function chg(key, text){ if(F('ch_' + key)) return `<span class="change">${text}</span>`; setF('ch_' + key); return change(text); }
+
+const LOCS = {
+  house:     { n:'Дом Аглаи',        art:'house',      x:40,  y:68 },
+  grunya:    { n:'Изба Груни',       art:'grunya',     x:66,  y:62 },
+  grisha:    { n:'Двор Лаптевых',    art:'grisha',     x:86,  y:70 },
+  school:    { n:'Старая школа',     art:'school',     x:76,  y:46 },
+  field:     { n:'Поле',             art:'field',      x:52,  y:32 },
+  river:     { n:'Река Кромка',      art:'river',      x:110, y:82 },
+  edge:      { n:'Опушка',           art:'edge',       x:34,  y:22 },
+  road:      { n:'Старая дорога',    art:'road',       x:128, y:46 },
+  forestroad:{ n:'Лесная остановка', art:'forestroad', x:16,  y:10, hidden:true },
+};
+
+/* ------------------------------ ПРОЛОГ ------------------------------ */
+S.p_flat = () => ({ art:'flat', place:'Город · квартира матери', title:'Посылка',
+  text:[
+    'Сорок дней прошли тихо. Анна разбирает мамин шкаф: пальто, которые никто не будет носить, коробки с квитанциями, открытки без подписей.',
+    'На самой верхней полке, за зимними шапками, лежит посылка. Нераспечатанная. Картон размяк от времени, на штемпеле 2009 год.',
+    'Адресована не маме, а Анне.',
+    '<span class="envelope">Анне. Когда всё снова начнётся.</span>',
+    'Обратный адрес: д. Заветье, ул. Нижняя, 7. Отправитель — Аглая К.',
+  ],
+  choices:[ act('Открыть посылку', { go:'p_parcel' }) ] });
+
+S.p_parcel = () => ({ art:'flat', place:'Город · квартира матери', title:'Четыре вещи',
+  text:[
+    'Внутри четыре вещи, уложенные аккуратно, как в дорогу.',
+    '<ul><li>Ключ: тяжёлый, железный, бородка вырезана в виде ели.</li><li>Красная шерстяная нить, свёрнутая восьмёркой.</li><li>Сухая ветка рябины. Ягоды почернели, но не осыпались.</li><li>Записка. Почерк учительский, круглый. Почему-то по-английски.</li></ul>',
+    noteCard('n1'),
+    'Мама никогда не говорила ни о какой Аглае. Мама вообще мало говорила о том, откуда она родом.',
+  ],
+  choices:[
+    act('Повязать красную нить на запястье', { fn:() => { setF('thread','wrist'); }, go:'p_call' }),
+    act('Убрать нить в карман', { fn:() => { setF('thread','pocket'); }, go:'p_call' }),
+  ] });
+
+S.p_call = () => ({ art:'flat', place:'Город · квартира матери', title:'Тётя Люда',
+  text:[
+    'Анна звонит тёте Люде, маминой двоюродной сестре. Больше из маминой родни никого не осталось.',
+    dash('— Аглая? — Тётя долго молчит в трубку. — Нет, Анечка. Не было у нас никакой Аглаи. Ни в маминой родне, ни в папиной. Я бы знала.'),
+    dash('— А Заветье?'),
+    dash('— Это откуда мама твоя уехала. Давно, ещё до тебя. Да ничего там уже нет, наверное. А ты зачем спрашиваешь?'),
+    'Анна смотрит на штемпель. Посылку отправили, когда ей было тринадцать. Мама её получила и прятала семнадцать лет.',
+  ],
+  choices:[ act('Поехать в Заветье', { go:'p_bus', fn:() => { st.signal = 3; } }) ] });
+
+S.p_bus = () => ({ art:'bus', place:'Трасса · сороковой километр', title:'Обратно в воскресенье',
+  text:[
+    'Два поезда и рейсовый автобус. Последние сорок километров автобус едет по дороге, которую будто забыли доасфальтировать.',
+    'Он останавливается посреди ничего: лес слева, лес справа, бетонная плита на обочине и ржавый указатель «ЗАВЕТЬЕ 2».',
+    dash('— Приехали, — говорит водитель. — Обратно в воскресенье.'),
+  ],
+  choices:[
+    say('«А раньше?»', { go:'p_bus2', fn:() => { setF('askedDriver'); st.signal = 2; } }),
+    act('Кивнуть и выйти', { go:'p_road', fn:() => { st.signal = 1; } }),
+  ] });
+
+S.p_bus2 = () => ({ art:'bus', place:'Трасса · сороковой километр', title:'Раньше чего?',
+  text:[
+    dash('— А раньше?'),
+    'Водитель смотрит на неё странно. Без раздражения, как будто она спросила, какого цвета вторник.',
+    dash('— Раньше чего?'),
+    'Двери закрываются. Автобус уходит, и звук мотора висит над лесом дольше, чем должен.',
+  ],
+  choices:[ act('Пойти к деревне', { go:'p_road', fn:() => { st.signal = 1; } }) ] });
+
+S.p_road = () => ({ art:'road', place:'Старая дорога', title:'Нет сети',
+  text:[
+    'Телефон показывает одну полоску, потом ни одной. «Нет сети», — вежливо сообщает экран, как будто это ненадолго.',
+    'Из плиты на обочине торчат четыре ржавых болта: когда-то здесь что-то стояло. Навес? Остановка? Сейчас на плите только ромашка. Её кто-то положил сегодня.',
+    'Дорога уходит вниз, к деревне. В нескольких окнах горит свет, над крышами поднимается дым.',
+  ],
+  choices:[ act('Найти Нижнюю, 7', { go:'p_house_out', fn:() => { st.signal = 0; } }) ] });
+
+S.p_house_out = () => ({ art:'house_old', place:'Нижняя улица, 7', title:'Дом у самого леса',
+  text:[
+    'Дом номер семь стоит последним, у самого леса. Ставни заколочены крест-накрест, крыльцо по пояс заросло иван-чаем, дверь затянута паутиной.',
+    'Здесь давно никто не живёт. Это видно сразу.',
+    'Ключ входит в замок так, будто его ждали, и поворачивается без скрипа.',
+  ],
+  choices:[ act('Войти', { go:'p_house_in' }) ] });
+
+S.p_house_in = () => ({ art:'house_in', place:'Дом Аглаи', title:'Печь тёплая',
+  text:[
+    'Внутри тепло.',
+    'Не просто теплее, чем на улице: здесь по-настоящему тепло. Пахнет берёзовыми дровами и чем-то хлебным. Анна кладёт ладонь на бок печи. Печь горячая.',
+    'На столе стоит одна чашка. На дне чаинки, край ещё влажный, будто из неё пили минут десять назад.',
+    'В доме никого нет. Где-то тикает старый будильник.',
+    'Анна вспоминает записку.',
+    noteCard('n1'),
+    'А слова уже сами поднимаются к губам. Те, что все говорят, входя в чужой дом.',
+  ],
+  choices:[
+    say('«Есть кто дома?»', { go:'p_greet', fn:() => { setF('greeted'); } }),
+    act('Промолчать', { go:'p_silent', fn:() => { setF('silentEntry'); } }),
+  ] });
+
+S.p_greet = () => { meet('domovoi'); return { art:'house_in', place:'Дом Аглаи', title:'Хозяин есть',
+  text:[
+    dash('— Есть кто дома?'),
+    'Тишина. Потом из-за печи кто-то негромко кашляет, так близко, что Анна вздрагивает. Старческий, сухой звук.',
+    dash('— Есть, — говорит голос. — Хозяин есть. А ты, значит, в гости.'),
+    'Больше голос ничего не говорит. Но на лавке, которая только что была пустой, лежит сложенное одеяло. А рядом с первой чашкой стоит вторая.',
+    'Гостей в этом доме принимают хорошо. Только гостям не всё показывают.',
+  ],
+  choices:[ act('Лечь спать', { fn:() => { sleep(); } , go:'loc' }) ] }; };
+
+S.p_silent = () => { meet('domovoi'); return { art:'house_in', place:'Дом Аглаи', title:'Тишина',
+  text:[
+    'Анна молчит.',
+    'Тишина в доме меняется. Она уже не пустая, а внимательная, будто кто-то за печью привстал.',
+    'Через минуту чашку на столе тихонько, по сантиметру, двигают в сторону Анны. Как хозяйке.',
+    'А из тёмного угла, где стоит прялка без кудели, раздаётся короткий женский смешок. Сухой, как шелест соломы.',
+    dash('— Не хозяйка, — шепчет угол. — Чужая. Чужая в хозяйском.'),
+    'Печь потрескивает и заглушает шёпот. Кому-то в этом доме Анна пришлась ко двору, а кому-то нет.',
+  ],
+  choices:[ act('Лечь спать', { fn:() => { sleep(); }, go:'loc' }) ] }; };
+
+/* ------------------------------ УТРО ------------------------------ */
+S.m_wed = () => { meet('grunya'); return { art:'house', place:'Дом Аглаи · утро', title:'Груня',
+  text:[
+    'Утром Анну будит стук. На крыльце стоит невысокая старушка в сером платке, с корзиной под полотенцем.',
+    dash('— Проснулась? Я Аграфена Кузьминична. Груня, если по-простому, меня тут все так зовут. Повитуха я. Была, пока было кого принимать. — Она улыбается, и морщины у глаз собираются лучиками. — В деревне всё слышно: вечером автобус прошёл, а в седьмом доме дымок. Кто ж это, думаю, к Аглае? Пирогов вот принесла. С капустой, с яйцом.'),
+    'Она проходит в дом, не спрашивая разрешения, но и не хозяйничая. Смотрит на печь. На чашки. ' + (F('thread') === 'wrist'
+      ? 'Потом долго, дольше, чем на всё остальное, смотрит на красную нить у Анны на запястье. «Нитку-то кто повязал? Сама? Ну-ну. Не снимай пока».'
+      : 'Потом на Аннины руки, будто ищет на них что-то и не находит.'),
+    dash('— Аглаю знала? — Груня не ждёт ответа и качает головой. — Хорошая была женщина. Только слишком долго в лес смотрела.'),
+    'Перед уходом она перечисляет правила так буднично, будто диктует рецепт:',
+    '<ul class="rule"><li>Ночью в лес не ходи.</li><li>В полдень в поле не стой.</li><li>К воде низко не наклоняйся.</li><li>Если за печкой шепчутся — не отвечай, пока не спросят.</li><li>Вечером заходи — покормлю.</li></ul>',
+    noteSilent('rules'),
+    'Уже с крыльца она оборачивается:',
+    dash('— Надолго к нам?'),
+  ],
+  choices:[
+    say('«До воскресенья.»', { go:'m_wed2', fn:() => { setF('pie'); } }),
+    say('«Пока не узнаю, кто такая Аглая.»', { go:'m_wed2', fn:() => { setF('pie'); setF('toldGoal'); } }),
+  ] }; };
+function noteSilent(id){ if(!st.notes.includes(id)){ st.notes.push(id); st.unseen++; } return ''; }
+
+S.m_wed2 = () => { meet('grisha'); return { art:'house', place:'Нижняя улица · утро', title:'В субботу уеду',
+  text:[
+    F('toldGoal')
+      ? dash('— Узнаешь — расскажешь, — говорит Груня. Улыбка у неё тёплая, только глаза в ней не участвуют. Она уходит, не оглядываясь.')
+      : dash('— До воскресенья, — повторяет Груня. — Ну, это смотря какого. — И смеётся, как будто пошутила.'),
+    'Через час под окнами громко чихает мотор. По улице мужчина лет сорока в промасленной куртке катит мотоцикл «Ява» без бокового зеркала. Мотор заводиться не хочет.',
+    dash('— Здрасьте! Вы к Аглае? А я Гриша, Лаптев. — Он машет рукой, не отпуская руль. — В субботу уеду!'),
+    'Он сообщает это так радостно, будто это главная новость в деревне. И катит мотоцикл дальше.',
+    gain('c_saturday', true),
+  ],
+  choices:[ back('Осмотреться в Заветье') ] }; };
+
+function morningScene(){
+  const d = st.day, T = [];
+  const wd = dayName(d);
+  const lead = {
+    2:'Четверг. За ночь кто-то вымел сени и поставил веник в угол, вверх прутьями.',
+    3:'Пятница. С Нижней улицы доносится стук: Гриша прибивает к чемодану новый ремень.',
+    4:'Суббота. В шесть сорок Анна просыпается сама, будто её толкнули. Где-то за полем гудит мотор автобуса. Гул приближается, стоит на месте ровно столько, сколько стоят на остановке, и уходит. По субботам здесь никаких автобусов нет.',
+  }[d] || (wd + '. Ещё один день в Заветье.');
+  T.push(lead);
+  if(F('greeted')) T.push('Ночью кто-то подкладывал дрова. В доме тепло, как бывает у хороших хозяев для хороших гостей.');
+  else T.push('Ночью в углу, где стоит прялка, до рассвета что-то шуршало.');
+  if(F('silentEntry') && F('hasNotebook') && !has('c_forged') && !st.outcome){
+    T.push('Тетрадь Гриши лежит не там, где Анна её оставила. Из неё торчит листок, которого вчера не было.');
+    T.push(gain('c_forged', true));
+  }
+  if(F('grunyaNoticed') && !F('basket')){
+    setF('basket');
+    T.push('На крыльце стоит корзинка: пироги и записка от Груни печатными буквами. «ЕШЬ». Больше ничего.');
+  }
+  return { art:'house', place:'Дом Аглаи · ' + wd.toLowerCase(), title:'Утро', text:T, choices:[ back() ] };
+}
+S.morning = () => (st.day === 1 ? S.m_wed() : morningScene());
+
+/* ------------------------------ ХАБ ------------------------------ */
+S.loc = () => (HUB[st.loc] || HUB.house)();
+
+const wait = () => act('Подождать', { sub:'Время пройдёт', cost:1 });
+const HUB = {};
+
+HUB.house = () => {
+  const T = [];
+  T.push(['Утро. Печь тёплая, хотя её никто не топил.','Полдень. В доме тихо, только тикает будильник.','Вечер. За окном темнеет лес, печь светится ярче.','Ночь. За печью кто-то ворочается, устраиваясь поудобнее.'][st.phase]);
+  T.push(F('greeted') ? 'На столе две чашки, как будто здесь ждут гостей.' : 'На столе одна чашка. Кто-то каждое утро её моет.');
+  if(F('searchedHouse') && !F('hasNotebook')) T.push('На полке стоят тетради учеников Аглаи. Щель с наклейкой «Лаптев Г.» по-прежнему пустая.');
+  if(F('hasNotebook')) T.push('Тетрадь Гриши лежит на столе, под лампой. ' + (F('greeted') ? 'Одолженная.' : 'Хозяйская.'));
+  const C = [];
+  if(!F('searchedHouse') && st.phase <= 2) C.push(act('Осмотреть дом', { go:'h_search', cost:1 }));
+  if(st.phase === 3) C.push(act('Позвать домового', { go:'dom' }));
+  else if(!F('hasNotebook') && F('searchedHouse')) C.push(act('Позвать домового', { dis:true, sub:'Домовой откликается только ночью' }));
+  if(st.phase === 3 && F('greeted') && F('domovoiAsked') && F('milk') && !F('hasNotebook')) C.push(act('Поставить у печи молоко и пирог', { go:'dom_gift' }));
+  if(st.outcome && st.day < 5) C.push(act('Дождаться воскресенья', { sub:'Дело закрыто. Остаётся автобус', fn:() => { st.day = 5; st.phase = 0; st.morningDue = false; } }));
+  if(st.phase >= 2) C.push(act('Лечь спать', { fn:() => { sleep(); } }));
+  else C.push(wait());
+  return { art: st.phase >= 2 ? 'house_in' : 'house', title:'Дом Аглаи', text:T, choices:C };
+};
+
+S.h_search = () => { setF('searchedHouse'); return { art:'house_in', place:'Дом Аглаи', title:'Полка с тетрадями',
+  text:[
+    'Анна обходит дом: две комнаты, сени, лестница на чердак. Всё чисто, будто хозяйка вышла ненадолго. Только календарь в сенях открыт на 2011 годе.',
+    'Под чашкой на столе лежит листок, сложенный вчетверо. Тот же круглый почерк:',
+    noteCard('n2'),
+    'В печурке, за коробком спичек, ещё одна записка:',
+    noteCard('n3'),
+    'В горнице висит полка с тетрадями, аккуратно подписанными: «11 класс, 2003–2004». Анна считает: девять. Между ними щель, куда поместилась бы десятая, и бумажная наклейка на полке: «Лаптев Г.».',
+    'Эти тетради годами никто не брал: на корешках лежит пыль. А щель чистая.',
+    F('greeted') ? 'Из-за печи доносится покашливание: гостья, мол, пусть смотрит, но руками не трогает.' : 'Из-за печи доносится довольное сопение: хозяйка проверяет порядок.',
+  ], choices:[ back() ] }; };
+
+S.dom = () => {
+  const T = [], C = [];
+  if(F('silentEntry')){
+    if(!F('hasNotebook')){
+      T.push(dash('— Хозяйка зовёт? — Голос из-за печи ворчливый, но довольный. — Тетрадку лаптевскую? Аглая велела беречь, пока новая хозяйка не спросит. Ты спрашиваешь?'));
+      C.push(say('«Спрашиваю.»', { go:'dom_give' }));
+      C.push(say('«Кто ты такой?»', { go:'dom_who' }));
+    } else {
+      setF('hintThreads');
+      T.push(dash('— Хозяйке скажу, — ворчит голос. — К Груне ходи, ешь. А в комод к ней не лезь. Не твоё пока.'));
+    }
+  } else {
+    if(F('hasNotebook')){
+      setF('hintThreads');
+      T.push(dash('— Та, что с пирогами, — говорит голос, помолчав. — Нитки у неё в комоде красные. Много. Это я так, к слову.'));
+    } else if(!F('domovoiAsked')){
+      T.push(dash('— Гостья зовёт, — голос из-за печи вежливый и чуть насмешливый. — Гостье чай, постель, тепло. А хозяйское — хозяйке.'));
+      C.push(say('«Мне нужна тетрадь Гриши Лаптева.»', { go:'dom_ask' }));
+      C.push(say('«Кто ты такой?»', { go:'dom_who' }));
+    } else {
+      T.push(dash('— Уговор помнишь? — спрашивает голос. — Молоко не магазинное. Хлеб, чужими руками печённый.'));
+      if(!F('milk')) T.push('Молоко в деревне держит только Груня.');
+    }
+  }
+  C.push(act('Отойти от печи', { go:'loc' }));
+  return { art:'house_in', place:'Дом Аглаи · ночь', title:'За печью', text:T, choices:C };
+};
+S.dom_who = () => ({ art:'house_in', place:'Дом Аглаи · ночь', title:'За печью',
+  text:[ dash('— Кто, кто… — ворчит голос. — Кто за печью живёт, тот и есть. Дом без меня — изба. Со мной — дом. Аглая понимала.'),
+    F('greeted') ? dash('— А ты, гостья, поздоровалась. Вежливая. Вежливым всё и одалживают, а дарят своим.') : dash('— А ты промолчала, как Аглая велела. Значит, своя. Хоть в углу и не все согласны.') ],
+  choices:[ act('Вернуться к разговору', { go:'dom' }) ] });
+S.dom_ask = () => { setF('domovoiAsked'); return { art:'house_in', place:'Дом Аглаи · ночь', title:'Уговор',
+  text:[ dash('— Нужна, — соглашается голос. — Гость, коли с уважением, не просит. Гость приносит. Молоко не магазинное. Хлеб, чужими руками печённый. Тогда поговорим.'),
+    'Пироги Груни давно съедены. Молоко в деревне держит только она.' ],
+  choices:[ back('Отойти от печи') ] }; };
+
+function notebookText(){
+  setF('hasNotebook'); meet('domovoi');
+  return [
+    'Это тонкая тетрадь в клеёнчатой обложке: «Тетрадь по английскому языку ученика 11 класса Лаптева Григория».',
+    'Фиолетовые чернила, ровный мальчишеский почерк. На полях красные пометки учительницы. На внутренней стороне обложки:',
+    noteCard('n4'),
+    gain('e2', true) + gain('e3', true) + gain('e4', true) + gain('e5', true),
+    st.diff === 'easy' ? 'Английские записи в тетради уже разобраны: видно, что каждая из них доказывает.' : 'Каждую английскую запись нужно прочитать внимательно. В тетради можно отметить, что она доказывает: желание, решение, план, обещание или то, что так и не случилось.',
+  ];
+}
+S.dom_give = () => ({ art:'house_in', place:'Дом Аглаи · ночь', title:'Лаптевская тетрадь',
+  text:[ 'Скрипит половица. На лавку ложится тетрадь.', ...notebookText() ],
+  choices:[ back() ] });
+S.dom_gift = () => { setF('hintThreads'); return { art:'house_in', place:'Дом Аглаи · ночь', title:'Одолжено',
+  text:[ 'Анна ставит у печи кринку Груниного молока и кладёт пирог. Сначала ничего не происходит. Потом из-за печи тянется тень рукава и забирает пирог.',
+    dash('— Уважила, гостья, — говорит голос. — Бери. Только помни: одалживаю, а не дарю.'),
+    ...notebookText(),
+    dash('— И вот ещё, — добавляет голос. — Та, что с пирогами… нитки у неё в комоде красные. Много. Это я так, к слову.') ],
+  choices:[ back() ] }; };
+
+/* ------------------------------ ГРУНЯ ------------------------------ */
+HUB.grunya = () => {
+  if(st.phase === 3) return { art:'grunya', title:'Изба Груни', text:['Окна тёмные. Ночью к Груне не стучат, это Анна уже поняла.'], choices:[] };
+  const T = [[
+    'Изба Груни стоит у колодца. Под навесом сушатся травы: зверобой, пижма и что-то серое, пушистое, чего Анна не знает. Груня перебирает их, не глядя на руки.',
+    'Груня толчёт в ступке сухие коренья. Пахнет горько и тепло.',
+    'Окна светятся. Пахнет щами и печёным хлебом. Груня машет с крыльца: заходи.'][st.phase]];
+  const C = [ act('Поговорить с Груней', { go:'gr_talk' }) ];
+  if(st.phase === 2) C.push(act('Поужинать у Груни', { go:'gr_dinner', cost:1 }));
+  if(F('greeted') && F('domovoiAsked') && !F('milk')) C.push(say('«Можно у вас молока попросить?»', { go:'gr_milk' }));
+  C.push(wait());
+  return { art: st.phase === 2 ? 'grunya_in' : 'grunya', title:'Изба Груни', text:T, choices:C };
+};
+S.gr_talk = () => {
+  const C = [
+    say('«Какой была Аглая?»', { go:'gr_aglaya' }),
+    say('«Что вы знаете про Гришу?»', { go:'gr_grisha' }),
+    say('«Напомните правила.»', { go:'gr_rules' }),
+    say('«Здесь рассказывают какие-нибудь легенды?»', { go:'gr_legends' }),
+  ];
+  if(!F('toldMother')) C.push(say('«Мою маму звали Вера Белова. Она отсюда.»', { go:'gr_mother', fn:() => { setF('toldMother'); } }));
+  if(st.outcome && !F('grunyaAfter')) C.push(say('«Я была у Лаптевых.»', { go:'gr_after', fn:() => { setF('grunyaAfter'); } }));
+  C.push(act('Попрощаться', { go:'loc' }));
+  return { art:'grunya_in', place:'Изба Груни', title:'Спрашивай, пока я добрая',
+    text:['Груня усаживает Анну на лавку и ставит перед ней кружку с чем-то травяным.', dash('— Спрашивай, пока я добрая.')], choices:C };
+};
+const toTalk = { t:'Спросить о другом', go:'gr_talk' };
+S.gr_aglaya = () => ({ art:'grunya_in', place:'Изба Груни', title:'Аглая',
+  text:[ dash('— Учительница была, — Груня дует на кружку. — Английскому учила, хотя кому он тут… Не наша была. То есть наша, да не совсем. Упрямая. Детей любила, чужих больше, чем надо.'),
+    dash('— А куда она делась?'),
+    dash('— В лес и ушла. Лет пятнадцать тому. Искали, да что толку. Кто в нашем лесу ищет, тот возвращается с полными карманами шишек.'),
+    F('photo') ? 'Анна думает о фотографии из школы, о мамином подбородке и маминой манере держать голову. И ничего не говорит.' : '' ],
+  choices:[ toTalk ] });
+S.gr_grisha = () => ({ art:'grunya_in', place:'Изба Груни', title:'Гриша',
+  text:[ dash('— Гриша-то? Добрый. Руки золотые. В школе всё мечтал: уеду, уеду. — Груня вздыхает. — Проспал тогда свой автобус, говорят, а потом сам раздумал. Мать у него одна, болела. Остался, и правильно. Пусть собирается, никому не мешает.'), gain('c_grunya', true) ],
+  choices:[ toTalk ] });
+S.gr_rules = () => ({ art:'grunya_in', place:'Изба Груни', title:'Правила',
+  text:[ dash('— Да какие правила, — отмахивается Груня. — Обычные. Ночью в лес не ходи. В полдень в поле не стой. К воде низко не наклоняйся. За печкой шепчутся — не отвечай, пока не спросят.'),
+    dash('— А почему?'),
+    dash('— А почему хлеб со стола не смахивают? Так живут. Кто так живёт, тот и живёт.'), noteSilent('rules') ],
+  choices:[ toTalk ] });
+S.gr_legends = () => { setF('legends'); noteSilent('legends'); return { art:'grunya_in', place:'Изба Груни', title:'Четыре сказки',
+  text:[ dash('— Легенды? Да какие легенды… Ну, про невесту, что по дороге идёт и дойти не может. Про кузнеца: клинок куёт, а докончить не может. Про мельникову дочку, что колыбельную забыла, последнюю строчку. Про охотника, что в золотого оленя целит.'),
+    dash('— Детям на ночь рассказывают. Все четыре — сказки. — Она отворачивается к печи. — Разные сказки.'),
+    'Анна замечает, что про «разные» Груня сказала раньше, чем её спросили.' ],
+  choices:[ toTalk ] }; };
+S.gr_mother = () => ({ art:'grunya_in', place:'Изба Груни', title:'Верина дочь',
+  text:[ 'Ложка в руке Груни останавливается над чугунком.',
+    dash('— Верина, — говорит Груня тихо. Это не вопрос.'),
+    'Она смотрит на Анну так, будто пересчитывает. Потом говорит ровно, без злости:',
+    dash('— Тебя здесь быть не должно.'),
+    'Пауза. Потом Груня будто вспоминает, как улыбаться.',
+    dash('— В смысле, не ждали мы тебя, Анечка. Вера-то уехала, как отрезала. Ни письма, ни весточки. Ешь давай.') ],
+  choices:[ toTalk ] });
+S.gr_after = () => {
+  const o = st.outcome, T = [];
+  if(o === 'truth' && st.flags.cEff === 'advice'){
+    T.push(dash('— Была у Лаптевых? — Груня ставит перед Анной тарелку, как всегда. — Правду сказала?'));
+    T.push(dash('— Правда, Анечка, как кипяток. Полезная, пока в чашке. А ты им на руки плеснула.'));
+    T.push(dash('— Кто стоял у калитки, Аграфена Кузьминична?'));
+    T.push('Груня долго на неё смотрит.');
+    T.push(dash('— Ешь. Остынет.'));
+  } else if(o === 'truth'){
+    T.push(dash('— Слышала, Гриша чемодан разобрал и заново собрал, — говорит Груня. — По-новому. Ну, пусть.'));
+    T.push('В её голосе нет ни злости, ни радости. Одна усталость.');
+  } else if(o === 'half'){
+    T.push(dash('— Говорят, на старой дороге остановка объявилась. Ржавая. — Груня пожимает плечами. — У нас всё так: вроде есть, а ехать некуда.'));
+  } else if(o === 'convenient' || o === 'erase'){
+    T.push(dash('— Гриша-то, говорят, успокоился. — Груня улыбается тепло и совершенно искренне. — Вот и хорошо. Доброе ты дело сделала, Анечка.'));
+    T.push(dash('— Не всякий понимает: человеку иногда полезнее потерять неправильное будущее.'));
+  } else {
+    T.push(dash('— Гриша опять в субботу собирается? — Груня качает головой. — Ну, пусть собирается. Никому не мешает.'));
+  }
+  return { art:'grunya_in', place:'Изба Груни', title:'После', text:T, choices:[ toTalk ] };
+};
+S.gr_milk = () => { setF('milk'); return { art:'grunya', place:'Изба Груни', title:'Молоко',
+  text:[ dash('— Молока? — Груня прищуривается. — Домовому, небось? Поздоровалась, значит, с домом. — Она вздыхает. — Ну ничего. Гостье тоже жить можно.'),
+    'Она наливает кринку и заворачивает в полотенце пирог.',
+    dash('— Не пролей по дороге. И не спрашивай у него лишнего. Он хоть и за печкой, а памятливый.') ],
+  choices:[ back() ] }; };
+S.gr_dinner = () => {
+  const T = [ 'Щи, хлеб, солёные грузди. Груня кормит молча и основательно, как кормят тех, кого собираются лечить.' ];
+  if(st.notes.includes('n2')) T.push('Анна вспоминает записку под чашкой: «Груня тебя накормит. Ешь». Хоть здесь Аглая не ошиблась.');
+  const C = [];
+  if(F('heardTune') && !has('c_lullaby')){
+    setF('legendHint');
+    T.push('Потом Груня встаёт к лохани мыть посуду и начинает тихонько напевать. Анна узнаёт мелодию раньше, чем успевает испугаться: так пела тень у калитки в видении. Песня обрывается на том же месте. Последней строки нет.');
+    T.push(dash('— Что это за песня?'));
+    T.push(dash('— Колыбельная. Её тут все знают, — отвечает Груня, не оборачиваясь.'));
+    T.push(gain('c_lullaby', true));
+  }
+  if(F('hintThreads') && !F('snoopDecided')){
+    T.push(dash('— Пойду в погреб, огурцов достану, — говорит Груня и уходит с фонарём.'));
+    T.push('Комод стоит у самой двери. Нижний ящик задвинут неплотно.');
+    C.push(act('Открыть нижний ящик комода', { go:'gr_snoop', fn:() => { setF('snoopDecided'); setF('snooped'); setF('grunyaNoticed'); st.rel.grunya--; } }));
+    C.push(act('Сидеть и ждать', { go:'gr_wait', fn:() => { setF('snoopDecided'); st.rel.grunya++; } }));
+  } else C.push(back('Поблагодарить и уйти'));
+  return { art:'grunya_in', place:'Изба Груни · вечер', title:'Ужин', text:T, choices:C };
+};
+S.gr_snoop = () => ({ art:'grunya_in', place:'Изба Груни · вечер', title:'Нижний ящик',
+  text:[ 'В ящике лежат десятки мотков красной нити, и каждый перехвачен бумажной биркой. Почти все надписи выцвели.',
+    'На одной бирке Анна разбирает: «Л. Г. 12.06». На другой: «Б. В.».',
+    F('thread') === 'wrist' ? 'Анна машинально трогает нить на своём запястье. Та же шерсть. Тот же цвет.' : 'Анна вспоминает нить из посылки, которая лежит у неё в кармане. Та же шерсть. Тот же цвет.',
+    'Б. В. Белова Вера.',
+    gain('c_threads', true),
+    'На лестнице погреба уже слышны шаги. Анна задвигает ящик. Груня входит с банкой огурцов и смотрит на комод. Всего на секунду дольше, чем нужно.',
+    dash('— Ешь, — говорит она. — Остынет.') ],
+  choices:[ back('Доесть и уйти') ] });
+S.gr_wait = () => ({ art:'grunya_in', place:'Изба Груни · вечер', title:'Огурцы',
+  text:[ 'Груня возвращается с банкой огурцов, ставит её на стол и вдруг смотрит на Анну с чем-то похожим на нежность.',
+    dash('— Хорошая ты, — говорит она. — По чужим углам не шаришь. Аглая шарила.') ],
+  choices:[ back('Поблагодарить и уйти') ] });
+
+/* ------------------------------ ЛАПТЕВЫ ------------------------------ */
+HUB.grisha = () => {
+  const T = [ 'Двор за покосившимся забором. Под навесом стоит старая «Ява» без бокового зеркала, над дверью дома прибита подкова, в глубине двора чернеет баня.' ];
+  const o = st.outcome;
+  if(!o){
+    if(st.day === 4 && st.phase <= 1) T.push('Сегодня суббота. Гриша стоит у калитки с чемоданом и смотрит в сторону дороги. Он улыбается.');
+    else if(st.day === 4 && st.phase === 2) T.push('Чемодан снова стоит у двери. Гриша разбирает его вещь за вещью и улыбается: «В следующую субботу точно».');
+    else T.push([ 'Гриша копается в моторе. Нина Петровна развешивает бельё и делает вид, что не видит Анну.',
+      'Из-под «Явы» торчат Гришины ноги. На качелях из покрышки сидит девочка с книжкой.',
+      'Варя сидит на крыльце. В окне кухни видна Нина Петровна. Из сеней доносится ровный шорох, будто кто-то прядёт.',
+      'Окна тёмные. Из сеней по-прежнему доносится шорох веретена.' ][st.phase]);
+  } else {
+    T.push({
+      truth:'Чемодан стоит открытым посреди двора. Гриша сидит рядом на корточках и перекладывает вещи, как будто укладывает их впервые.',
+      half:'Гриша сидит на крыльце и смотрит на дорогу. Чемодана у двери нет. Мотоцикл завёлся, но никуда не едет.',
+      convenient:'У двери пусто. Мотоцикла под навесом нет: говорят, Гриша его продал. Он колет дрова и насвистывает.',
+      erase:'У двери пусто. Гриша колет дрова и насвистывает. Мотоцикла нет, и никто не помнит, чтобы он был.',
+      loop:'Чемодан у двери. Гриша смазывает цепь «Явы». «В субботу уеду!» — кричит он Анне через двор, и ему снова двадцать лет, а не сорок.',
+    }[o]);
+  }
+  const C = [];
+  if(st.phase <= 1) C.push(act('Поговорить с Гришей', { go:'gs_talk' }));
+  if(st.phase === 0 || st.phase === 2) C.push(act('Поговорить с Ниной Петровной', { go:'nina_talk' }));
+  if(st.phase === 1 || st.phase === 2) C.push(act('Поговорить с Варей', { go:'varya_talk' }));
+  if((F('talkedNina') || F('talkedVarya')) && !has('c_timetable') && st.phase <= 2) C.push(act('Зайти в дом', { go:'ls_inside' }));
+  if(st.phase <= 2) C.push(act('Осмотреть баню', { go:'banya' }));
+  if(st.phase >= 2 && !F('kikiDone')) C.push(act('Прислушаться к шороху в сенях', { go:'kiki' }));
+  if(st.phase <= 2) C.push(wait());
+  return { art:'grisha', title:'Двор Лаптевых', text:T, choices:C };
+};
+
+S.gs_talk = () => {
+  const first = !F('talkedGrisha'); setF('talkedGrisha'); meet('grisha');
+  const T = [];
+  if(st.outcome){
+    T.push({
+      truth: dash('— Анна. — Гриша не улыбается, но и не хмурится. — Я всё думаю. Двадцать два года «в субботу уеду». Как пластинку заело.'),
+      half: dash('— Я, кажется, чего-то хотел, — говорит Гриша и трёт висок. — Когда-то. Не помню чего. Но меня тогда не пустили, да?'),
+      convenient: dash('— В субботу? — смеётся Гриша. — А куда мне ехать-то? Я здешний.'),
+      erase: dash('— Уехать? — Гриша смотрит на Анну с вежливым недоумением. — Зачем? Я никогда никуда не собирался.'),
+      loop: dash('— В субботу уеду! — радостно сообщает Гриша.'),
+    }[st.outcome]);
+    return { art:'grisha', place:'Двор Лаптевых', title:'Гриша', text:T, choices:[ back() ] };
+  }
+  T.push(first
+    ? dash('— О, городская! — Гриша вытирает руки ветошью. — Как вам у Аглаи, не дует? Я бы окна подбил, да некогда: в субботу уеду.')
+    : dash('— В субботу уеду, — сообщает Гриша вместо приветствия, так же радостно, как вчера.'));
+  T.push(gain('c_saturday', true));
+  const C = [
+    say('«Куда вы уезжаете?»', { go:'gs_where' }),
+    say('«А почему не уехали раньше?»', { go:'gs_earlier' }),
+    say('«Вы знали Аглаю?»', { go:'gs_aglaya' }),
+  ];
+  if(!has('c_suitcase')) C.push(say('«Можно посмотреть ваш чемодан?»', { go:'gs_suitcase', fn:() => { setF('token'); } }));
+  if(F('hasNotebook') && !F('showedGrisha')) C.push(act('Показать Грише его школьную тетрадь', { go:'gs_notebook', fn:() => { setF('showedGrisha'); st.rel.grisha++; } }));
+  C.push(act('Попрощаться', { go:'loc' }));
+  return { art:'grisha', place:'Двор Лаптевых', title:'Гриша', text:T, choices:C };
+};
+const toGrisha = { t:'Спросить о другом', go:'gs_talk' };
+S.gs_where = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Тверь',
+  text:[ dash('— В Тверь. К дядьке, у него гараж. Мотоциклы, машины… Руки у меня откуда надо растут, работы там полно.'),
+    dash('— А дядька знает, что вы приедете?'),
+    dash('— А как же. Я ему… — Гриша замолкает, держа в руке гаечный ключ. — Ну, напишу. В пятницу напишу.') ],
+  choices:[ toGrisha ] });
+S.gs_earlier = () => { setF('earlier'); return { art:'grisha', place:'Двор Лаптевых', title:'Раньше чего?',
+  text:[ 'Гриша смотрит на неё с вежливым недоумением.', dash('— Раньше чего?'),
+    'Он улыбается и возвращается к мотору.',
+    F('askedDriver') ? 'Анна вспоминает водителя автобуса. Та же интонация. Слово в слово.' : 'Анна почему-то думает о водителе автобуса. Он смотрел на неё точно так же.' ],
+  choices:[ toGrisha ] }; };
+S.gs_aglaya = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Англичанка',
+  text:[ dash('— Аглаю Константиновну? А то. Англичанка. Строгая, но по-хорошему. Говорила мне: «Лаптев, пиши по-английски что хочешь, всё равно никто, кроме меня, не прочтёт». Я и писал.'),
+    dash('— Он смеётся. — Двойки ставила за артикли. А за мечты, говорила, оценок не ставят.') ],
+  choices:[ toGrisha ] });
+S.gs_suitcase = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Чемодан',
+  text:[ dash('— Смотрите, не жалко. Всё уложено, по списку.'),
+    'Чемодан старый, с ремнями, бирка выцвела: «Лаптев Г., Тверь». Внутри лежат джинсовая куртка, какую носили в начале двухтысячных, кассетный плеер с наушниками на проводке и аттестат в прозрачном файле.',
+    'Вещи сорокалетнего человека так не собирают. Так собирают вещи восемнадцатилетнего.',
+    gain('c_suitcase', true),
+    'В боковом кармане лежит автобусный талон, серый, с дыркой от компостера: «Заветье — Тверь». Анна берёт его в руки. Гриша не возражает. Кажется, он вообще этого не замечает.' ],
+  choices:[ toGrisha ] });
+S.gs_notebook = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Мой почерк',
+  text:[ 'Гриша берёт тетрадь двумя пальцами, как чужую. Читает первую страницу, шевеля губами:',
+    '<p>' + en('I will leave Zavetye when I am eighteen.', 'Я уеду из Заветья, когда мне исполнится восемнадцать.') + '</p>',
+    dash('— Мой почерк, — медленно говорит он. — Смешно. Не помню, чтобы писал.'),
+    'Он возвращает тетрадь и долго смотрит на чемодан, словно видит его впервые. Потом моргает.',
+    dash('— В субботу уеду, — говорит он. Но уже не так уверенно.') ],
+  choices:[ toGrisha ] });
+
+S.nina_talk = () => {
+  const first = !F('talkedNina'); setF('talkedNina'); meet('nina');
+  const T = [];
+  if(first){
+    T.push('Нина Петровна сухая и прямая, в вязаной кофте, застёгнутой на все пуговицы. На запястье у неё выцветшая красная нитка.');
+    T.push(dash('— К Аглае приехали? Родня, что ли? — Ответа она не ждёт. — Нечего тут искать.'));
+  } else T.push(dash('— Опять вы, — говорит Нина Петровна. — Ну спрашивайте, раз пришли.'));
+  if(st.outcome) return ninaAfter();
+  const C = [ say('«Гриша говорит, что в субботу уедет.»', { go:'nina_lie' }), say('«Что у вас на запястье?»', { go:'nina_thread' }) ];
+  if(has('c_banya') || has('c_noon')) C.push(say('«Кто задвигает засов на бане?»', { go:'nina_banya', fn:() => { st.rel.nina--; } }));
+  C.push(act('Уйти', { go:'loc' }));
+  return { art:'grisha', place:'Двор Лаптевых', title:'Нина Петровна', text:T, choices:C };
+};
+const toNina = { t:'Спросить о другом', go:'nina_talk' };
+S.nina_lie = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Проспал',
+  text:[ dash('— Уедет, как же. — Нина Петровна встряхивает простыню. — Проспал он тогда. А потом сам передумал. Я его не держала: чего держать, взрослый. Он и мечтал-то больше языком.'),
+    'Всё это время она не смотрит в сторону бани. Так старательно не смотрит, что Анна оборачивается сама.', gain('c_nina', true) ],
+  choices:[ toNina ] });
+S.nina_thread = () => { setF('ninaThread'); return { art:'grisha', place:'Двор Лаптевых', title:'Нитка',
+  text:[ dash('— Нитка. От сглаза. — Она одёргивает рукав. — Груня повязала, давно ещё. Тут у многих такие.') ], choices:[ toNina ] }; };
+S.nina_banya = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Засов',
+  text:[ dash('— Баня как баня.'), 'Нина Петровна смотрит Анне прямо в глаза, и это страшнее, чем если бы она отвела взгляд.',
+    dash('— Засов старый. Мало ли кто его когда задвигал. Ступайте, Анна. Ступайте.') ],
+  choices:[ back() ] });
+function ninaAfter(){
+  const c = st.flags.cEff, T = [];
+  if(st.outcome === 'truth' && c === 'mother') T.push('Нина Петровна не поднимает глаз. — Я боялась, — говорит она. — Мне всю жизнь говорили: уедет, как Верка Белова, и не вернётся. Никогда. А он у меня один был.');
+  else if(st.outcome === 'truth' && c === 'advice') T.push('Нина Петровна трогает нитку на запястье. — Не спрашивай, кто сказал, — говорит она. — Я обещала. Я всю жизнь это обещание держу, как тот засов.');
+  else if(st.outcome === 'convenient' || st.outcome === 'erase') T.push('— Спасибо тебе, дочка, — говорит Нина Петровна, и глаза у неё мокрые от облегчения. — Сам он передумал. Сам. Я всегда знала.');
+  else T.push('Нина Петровна молча развешивает бельё. Засов на бане задвинут.');
+  return { art:'grisha', place:'Двор Лаптевых', title:'Нина Петровна', text:T, choices:[ back() ] };
+}
+
+S.varya_talk = () => {
+  const first = !F('talkedVarya'); setF('talkedVarya'); meet('varya');
+  const T = [];
+  if(first) T.push('На качелях из автомобильной покрышки сидит девочка лет двенадцати, в резиновых сапогах, с книжкой. Смотрит на Анну поверх страниц.', dash('— Вы в Аглаином доме живёте. Там печка сама топится, да? А мне бабушка не верит.'));
+  else T.push(dash('— Опять вы, — говорит Варя с явным удовольствием.'));
+  if(st.outcome){
+    T.push({
+      truth: dash('— Папа сказал, что вспомнил, — Варя крутит в руках книжку. — Сказал, что если бы тогда уехал, меня бы не было. Это он зачем мне сказал?'),
+      half: dash('— Папа теперь говорит «когда-нибудь». Раньше говорил «в субботу». Не знаю, что хуже.'),
+      convenient: dash('— Папа больше не собирает чемодан, — говорит Варя. — Он теперь вообще ничего не собирает.'),
+      erase: dash('— А папа разве куда-то собирался? — Варя морщит лоб. — Вы что-то путаете.'),
+      loop: dash('— В субботу папа опять не уедет, — говорит Варя. — Я уже привыкла.'),
+    }[st.outcome]);
+    return { art:'grisha', place:'Двор Лаптевых', title:'Варя', text:T, choices:[ back() ] };
+  }
+  const C = [ say('«Твой папа правда уедет в субботу?»', { go:'varya_dad' }), say('«Как попасть в старую школу?»', { go:'varya_school' }) ];
+  if(has('c_forged') && !F('forgedChecked')) C.push(act('Показать Варе записку «Сам так решил»', { go:'varya_forged', fn:() => { setF('forgedChecked'); st.clues.c_forged.doubt = true; } }));
+  if(F('heardTune')) C.push(say('«Ты знаешь такую песню?» — напеть', { go:'varya_song' }));
+  C.push(act('Попрощаться', { go:'loc' }));
+  return { art:'grisha', place:'Двор Лаптевых', title:'Варя', text:T, choices:C };
+};
+const toVarya = { t:'Спросить о другом', go:'varya_talk' };
+S.varya_dad = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Каждую субботу',
+  text:[ dash('— Не уедет, — спокойно, по-взрослому говорит Варя. — Он каждую субботу не уезжает. Я привыкла.'),
+    dash('— Он каждую пятницу собирает чемодан, а в субботу вечером разбирает. А бабушка каждую субботу с утра задвигает щеколду на бане. Снаружи. Даже когда там никого нет. Я спрашивала. Говорит, привычка.'),
+    gain('c_varya', true),
+    dash('— А ещё у нас в сенях по вечерам кто-то прядёт. Бабушка говорит, мышь. Мыши не прядут.') ],
+  choices:[ toVarya ] });
+S.varya_school = () => { setF('schoolWay'); return { art:'grisha', place:'Двор Лаптевых', title:'Первое окно',
+  text:[ dash('— В окно, как все. Первое от крыльца, там стекла нет. Только в учительскую не ходите, там пол проваливается.'),
+    dash('— А ты откуда знаешь?'), dash('— А я там читаю. Там никто не мешает.') ], choices:[ toVarya ] }; };
+S.varya_forged = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Не папин почерк',
+  text:[ 'Варя смотрит на листок, потом на Анну.',
+    dash('— Это моя ручка. Я её в школу брала и потеряла на прошлой неделе. И это не папин почерк. Папа «д» пишет с хвостиком вниз, а тут петелька.'),
+    'Анна зачёркивает записку в тетради. Кто-то очень хотел, чтобы Гриша передумал «сам». Так хотел, что подбросил доказательство.' ],
+  choices:[ toVarya ] });
+S.varya_song = () => ({ art:'grisha', place:'Двор Лаптевых', title:'Колыбельная',
+  text:[ 'Анна напевает мелодию с поля. Варя слушает, наклонив голову.',
+    dash('— Не-а. Хотя… Бабушка такую пела, когда я маленькая была. А потом перестала. Сказала, что последнюю строчку забыла, а без неё нельзя.') ],
+  choices:[ toVarya ] });
+
+S.ls_inside = () => ({ art:'grisha', place:'Дом Лаптевых', title:'Расписание',
+  text:[ 'В доме пахнет валокордином и яблоками. У вешалки под треснувшим стеклом висит автобусное расписание.',
+    '<p style="font-family:var(--mono);font-size:15px;line-height:1.5;padding:10px 14px;background:var(--night-2);border:1px solid var(--line-n)">РАСПИСАНИЕ ДВИЖЕНИЯ · ЛЕТО 2004 г.<br>Заветье — Тверь&nbsp;&nbsp;&nbsp;Сб 06:40<br>Тверь — Заветье&nbsp;&nbsp;&nbsp;Вс 17:10</p>',
+    'Число 12.06 обведено карандашом. Обводили его много раз: бумага под грифелем продавлена почти насквозь.',
+    dash(F('talkedVarya') ? '— Это папино, — говорит Варя у Анны за спиной. — Он по нему сверяется.' : '— Гришино, — говорит Нина Петровна у Анны за спиной. — Пусть висит.'),
+    'Автобуса «Заветье — Тверь» нет уже лет пятнадцать. Анна проверяла ещё в поезде.',
+    gain('c_timetable', true) ],
+  choices:[ back() ] });
+
+S.banya = () => {
+  const T = [];
+  if(has('c_banya')) T.push('Засов. Надпись на косяке. Анна не хочет смотреть на неё второй раз.');
+  else if(has('c_varya') || has('c_noon')){
+    T.push('Анна подходит к бане. Засов снаружи толстый, кованый, новее самой двери. Его смазывают: он ходит легко, без скрипа.');
+    T.push('Анна открывает дверь. Внутри темно и пахнет старым дымом. На внутренней стороне косяка, на уровне глаз, гвоздём процарапано:');
+    T.push('<p style="font-family:var(--mono);letter-spacing:.2em;font-size:20px">12.06 ВЫПУСТИТЕ</p>');
+    T.push(gain('c_banya', true));
+  } else {
+    setF('sawBanya');
+    T.push('Обычная деревенская баня: низкая дверь, мох в пазах. Засов почему-то снаружи. Может, чтобы ветром не открывало.');
+  }
+  return { art:'grisha', place:'Двор Лаптевых', title:'Баня', text:T, choices:[ back() ] };
+};
+
+/* ------------------------------ КИКИМОРА ------------------------------ */
+S.kiki = () => {
+  meet('kiki');
+  const T = [ 'В сенях темно, пахнет пылью и сушёной мятой. Из-за старой голландки, которую давно не топят, доносится ровный шорох. Так крутится веретено. И голос, сухой, как солома:',
+    dash('— Сам передумал. Сам. Сам. Все знают — сам.'), gain('c_kiki_chant', true) ];
+  if(F('silentEntry')) T.push('Анна узнаёт этот голос. Тот же шелест звучал в углу дома Аглаи: «Чужая в хозяйском».');
+  if(st.notes.includes('n3')) T.push('«Не отвечай кикиморе», — писала Аглая.');
+  const C = [ act('Уйти молча', { go:'loc' }), say('«Неправда.»', { go:'kiki_bare' }) ];
+  for(const id of ['e1','e2','e3','e4','e5']) if(has(id) && !st.clues[id].blank) C.push(say('Прочитать вслух: ' + CLUES[id].en.split('.')[0] + '…', { go:'kiki_show' }));
+  const other = st.order.filter(id => CLUES[id].kind !== 'en' && id !== 'c_kiki_chant');
+  if(other.length) C.push(act('Показать ей другую улику', { go:'kiki_fail' }));
+  return { art:'kiki', place:'Сени Лаптевых', title:'Веретено', text:T, choices:C };
+};
+S.kiki_bare = () => {
+  const T = [ 'Шорох обрывается.', dash('— Неправда? — Голос радуется, как ребёнок подарку. — Неправда, неправда… — Он пробует слово на вкус и наматывает на веретено. — Отдай-ка, пригодится.') ];
+  if(!F('kikiTangled')){
+    setF('kikiTangled');
+    const pool = st.order.filter(id => CLUES[id].kind !== 'en' && !CLUES[id].fake && !st.clues[id].doubt && id !== 'c_kiki_chant');
+    if(pool.length){
+      const id = pool[pool.length - 1]; st.clues[id].doubt = true;
+      T.push(`В тетради что-то путается. Одна из записей вдруг выглядит неубедительно, будто Анна сама её выдумала: ${CLUES[id].t}. Чтобы снова на неё опираться, придётся вернуть ей доверие вручную.`);
+    }
+  } else T.push('Больше у Анны ничего не берут. Но и отвечать больше не хочется.');
+  return { art:'kiki', place:'Сени Лаптевых', title:'Чужое слово', text:T, choices:[ back('Уйти') ] };
+};
+S.kiki_show = () => { setF('kikiTruth'); setF('kikiDone'); return { art:'kiki', place:'Сени Лаптевых', title:'Кто сказал первым',
+  text:[ 'Анна читает вслух, медленно, по-английски. Слова, которых никто в Заветье не пересказывал.',
+    'Веретено спотыкается.',
+    dash('— Не… — Голос сбивается. — Этого не пересказывали. Этого я не пряла.'),
+    'Долгая пауза. А потом торопливо, будто кто-то тянет нитку у неё из пальцев:',
+    dash('— Не сам… Так сказали. Матери сказали, мать сказала всем. А матери сказала та, что нитки вяжет. Красные.'),
+    'Шорох стихает. В сенях никого нет.',
+    gain('c_kiki', true),
+    'Аглая писала: не отвечай кикиморе. Может, она боялась, что кикимора возьмёт твоё слово. А может, не хотела, чтобы кто-то услышал ответ.' ],
+  choices:[ back() ] }; };
+S.kiki_fail = () => ({ art:'kiki', place:'Сени Лаптевых', title:'Слышала',
+  text:[ dash('— Слышала, — равнодушно отзывается голос. — Это я уже слышала. Это уже пересказали.'), 'Веретено крутится дальше.' ],
+  choices:[ act('Вернуться', { go:'kiki' }) ] });
+
+/* ------------------------------ ШКОЛА ------------------------------ */
+HUB.school = () => {
+  const T = [ 'Двухэтажная деревянная школа с облупившейся голубой краской. На двери висит замок и табличка «Закрыто с 01.09.2011».' ];
+  const C = [];
+  if(!F('schoolDone')){
+    T.push(F('schoolWay') ? 'Первое окно от крыльца без стекла, как и говорила Варя.' : 'Одно из окон первого этажа, кажется, без стекла.');
+    if(st.phase <= 2) C.push(act('Забраться в окно', { go:'school_in', cost:1 }));
+    else T.push('Ночью лезть в пустую школу Анна не станет.');
+  } else if(st.phase <= 2) C.push(act('Зайти в кабинет английского', { go:'school_again' }));
+  if(st.phase <= 2) C.push(wait());
+  return { art:'school', title:'Старая школа', text:T, choices:C };
+};
+S.school_in = () => { setF('schoolDone'); setF('photo'); return { art:'school_in', place:'Старая школа', title:'What will I be?',
+  text:[ 'Внутри пахнет мелом и мышами. Коридор, стенд «Наши медалисты», пустые рамки. Кабинет английского на первом этаже, дверь приоткрыта.',
+    'На стене висит стенгазета «What will I be?»: фотографии выпускников и подписи от руки. Над снимком вихрастого худого парня со свечой зажигания в руке написано фиолетовыми чернилами:',
+    '<p>' + en(CLUES.e1.en, CLUES.e1.ru) + '</p>', gain('e1', true),
+    'В шкафу стоит классный журнал за 2003/04 учебный год. Напротив фамилии Лаптев стоит отметка: «Аттестат выдан 11.06.2004».', gain('c_journal', true),
+    'В ящике учительского стола, под стопкой чистых бланков, лежит записка:', noteCard('n5'),
+    'И ещё фотография, выпуск 2004 года. Рядом с учениками стоит учительница в тёмном платье, строгая, с убранными волосами. Анна подносит снимок к окну, и у неё холодеет затылок.',
+    'У Аглаи мамин подбородок. И мамина манера держать голову.' ],
+  choices:[ back() ] }; };
+S.school_again = () => ({ art:'school_in', place:'Старая школа', title:'Кабинет английского',
+  text:[ 'Стенгазета, журнал, пустой учительский стол. На доске кто-то когда-то написал мелом и не стёр:',
+    '<p>' + en('Present Perfect. I have lost. I have found.', 'Настоящее совершённое. Я потерял. Я нашёл.') + '</p>' ],
+  choices:[ back() ] });
+
+/* ------------------------------ ПОЛЕ ------------------------------ */
+HUB.field = () => {
+  const T = [], C = [];
+  if(st.phase === 1 && !F('noonDone')){
+    T.push('Полдень. Воздух над рожью дрожит, и так тихо, что слышно, как трутся колосья.');
+    T.push('Груня говорила: в полдень в поле не стой.');
+    C.push(act('Остаться в поле', { go:'noon' }));
+  } else if(st.phase === 1) T.push('Полдень. Поле пустое. Только там, где стояла Полудница, выгорел ровный белый круг.');
+  else {
+    T.push('Рожь по пояс, тропинка через поле к опушке. Никого.');
+    if(!F('noonDone')) T.push('Говорят, в полдень здесь кто-то ходит.');
+  }
+  if(st.phase <= 2) C.push(wait());
+  return { art:'field', title:'Поле', text:T, choices:C };
+};
+S.noon = () => {
+  meet('noon');
+  const knows = has('c_timetable') || has('e3');
+  const C = [ say('«Полдень.»', { go:'noon_fail', cost:1 }), say('«Не знаю.»', { go:'noon_fail', cost:1 }) ];
+  if(knows) C.push(say('«Шесть сорок. Двенадцатое июня две тысячи четвёртого года.»', { go:'noon_vision', cost:1 }));
+  C.push(act('Отвернуться', { go:'noon_fail', cost:1 }));
+  return { art:'noon', place:'Поле · полдень', title:'Который час?',
+    text:[ 'Сначала Анна видит только марево. Потом в нём проступает женщина: очень высокая, в белой рубахе до земли, с серпом на плече. Лица не разобрать. На него больно смотреть, как на солнце.',
+      dash('— Который час? — спрашивает она. Голос звучит отовсюду сразу.'),
+      F('noonTried') ? 'Анна помнит слово, выложенное колосками: КОГДА. Полуднице нужен не этот час, а тот самый.' : '' ],
+    choices:C };
+};
+S.noon_fail = () => { setF('noonTried'); return { art:'field', place:'Поле', title:'КОГДА',
+  text:[ dash('— Все так говорят, — Полудница наклоняется ближе, и жар накрывает Анну с головой.'),
+    'Когда Анна приходит в себя, солнце уже низко, а во рту вкус полыни. Рядом на земле кто-то выложил колосками одно слово: КОГДА.',
+    'Полуднице нужен не этот час, а тот самый. Точный.' ],
+  choices:[ back() ] }; };
+S.noon_vision = () => { setF('noonDone'); setF('heardTune'); return { art:'vision', place:'Поле · полдень', title:'Шесть сорок',
+  text:[ 'Полудница замирает. Потом медленно кивает, как кивают, когда в документе наконец назвали правильную дату.',
+    'Поле исчезает.',
+    'Туман. Двор Лаптевых, только забор ещё прямой, а «Ява» новая, блестит. Женщина в платке, молодая Нина Петровна, задвигает засов на бане. Руки у неё дрожат. Изнутри стучат, сначала кулаком, потом ладонью, потом тише.',
+    'У калитки стоит вторая тень, невысокая, в тёмном. Лица не видно. Тень тихо напевает колыбельную. На последней строке мелодия обрывается, будто её никогда и не было.',
+    'За полем гудит автобус. Шесть сорок. Гул стоит на месте ровно столько, сколько стоят на остановке, и уходит.',
+    dash('— Вот когда, — говорит Полудница. — Остальное не моё.'),
+    gain('c_noon', true),
+    'Анна приходит в себя на краю поля. Солнце сдвинулось. Колосья вокруг неё выгорели добела ровным кругом.' ],
+  choices:[ back() ] }; };
+
+/* ------------------------------ РЕКА ------------------------------ */
+HUB.river = () => {
+  const T = [ 'Река Кромка узкая и тёмная, с медленным течением. У мостков вода стоит неподвижно, как стекло.' ];
+  if(!F('reflection')) T.push('На досках мостков давно вырезано ножом: «ВОДА БЕРЁТ ВЕЩЬ — ОТДАЁТ ЖИЗНЬ».');
+  const C = [];
+  if(!F('reflection')) C.push(act('Посмотреть в воду', { go:'river_look' }));
+  if(F('token') && !has('c_water') && st.phase <= 2) C.push(act('Бросить в воду автобусный талон', { go:'river_water', cost:1 }));
+  else if(!F('token') && F('reflection') && !has('c_water')) C.push(act('Бросить что-нибудь в воду', { dis:true, sub:'Нужна вещь из той жизни, которую хочешь увидеть' }));
+  if(has('c_water')) C.push(act('Посмотреть в воду ещё раз', { go:'river_again' }));
+  if(st.phase <= 2) C.push(wait());
+  return { art:'river', title:'Река Кромка', text:T, choices:C };
+};
+S.river_look = () => { setF('reflection'); return { art:'river', place:'Река Кромка', title:'Полсекунды',
+  text:[ 'Анна наклоняется над мостками, не слишком низко: она помнит Грунино правило. В воде её лицо, небо, ветки ивы.',
+    'Анна поправляет волосы. Отражение поправляет волосы тоже. На полсекунды позже.',
+    'Анна замирает. Отражение замирает вместе с ней. Вовремя.',
+    'Показалось.' ],
+  choices:[ back() ] }; };
+S.river_water = () => { meet('water'); return { art:'water', place:'Река Кромка', title:'Мото · Лаптев',
+  text:[ 'Талон падает на воду и не тонет. Течение медленно уносит его к середине, туда, где вода темнеет и становится глубокой. Там он останавливается. Вода вокруг талона светлеет, как окно.',
+    'В окне город. Гаражная мастерская, над воротами вывеска «МОТО · ЛАПТЕВ». Внутри стоит Гриша, такой же, как сейчас, только спокойнее. Руки в масле, телефон прижат плечом к уху.',
+    dash('— Мам, в субботу приеду! Да. Точно. Каждое лето, я же обещал.'),
+    'Он смеётся. В этой жизни «в субботу» значит «приеду», а не «уеду».',
+    gain('c_water', true),
+    'Круги расходятся, и в воде снова только Анна. Она очень внимательно смотрит на своё отражение. Отражение тоже смотрит. Слишком внимательно.' ],
+  choices:[ back() ] }; };
+S.river_again = () => ({ art:'river', place:'Река Кромка', title:'Отражение',
+  text:[ 'В воде Анна. Просто Анна. Она ждёт, не шевелясь, целую минуту.', 'Отражение моргает первым.' ], choices:[ back() ] });
+
+/* ------------------------------ ОПУШКА И ЛЕШИЙ ------------------------------ */
+HUB.edge = () => {
+  const T = [], C = [];
+  if(st.phase === 3){
+    T.push('Ночью лес стоит сплошной стеной. Груня говорила: ночью в лес не ходи.');
+    C.push(act('Всё равно войти в лес', { go:'forest_night' }));
+    return { art:'edge', title:'Опушка', text:T, choices:C };
+  }
+  T.push('Тропинка через поле упирается в ельник. Деревья стоят плотно, как люди в очереди. На нижней ветке крайней ели повязана выцветшая красная нить.');
+  C.push(act(F('metLeshy') ? 'Позвать Лешего' : 'Войти в лес', { go:'leshy' }));
+  if(F('foundRoad') && (!st.outcome || st.outcome === 'loop')) C.push(act('Пойти к лесной остановке', { sub:'Леший теперь знает, кого ты ищешь', go:'fr' }));
+  if(st.phase <= 2) C.push(wait());
+  return { art:'edge', title:'Опушка', text:T, choices:C };
+};
+S.leshy = () => { const first = !F('metLeshy'); setF('metLeshy'); meet('leshy'); return { art:'leshy', place:'Ельник', title:'Куда идёшь?',
+  text:[ first
+      ? 'Анна делает десять шагов в ельник, и деревня за спиной исчезает, как не было. Тропинка раздваивается. Потом растраивается. На пне у развилки сидит мужик в тулупе, застёгнутом на левую сторону. Тени у него нет.'
+      : 'На пне у развилки опять сидит мужик в тулупе, застёгнутом на левую сторону.',
+    dash('— Куда идёшь? — спрашивает он без всякого интереса.') ],
+  choices:[
+    say('«Ищу Гришу.»', { go:'leshy_grisha' }),
+    say('«К Аглае.»', { go:'leshy_aglaya' }),
+    say('«Домой.»', { go:'leshy_home', cost:1, fn:() => { st.loc = 'house'; } }),
+    say('«Просто гуляю.»', { go:'leshy_lie' }),
+  ] }; };
+S.leshy_grisha = () => {
+  const knows = has('c_timetable') || has('e3');
+  if(!knows) return { art:'leshy', place:'Ельник', title:'Которого?',
+    text:[ dash('— Гришу? — Леший чешет бороду. — Он дома, у мотоцикла. Иди.'),
+      'Три шага, и Анна стоит у забора Лаптевых. Солнце заметно сдвинулось.',
+      'Уже потом она понимает: Леший привёл её туда, куда она просила. Она искала Гришу и сама не знала, какого.' ],
+    choices:[ act('Дальше', { go:'loc', cost:1, fn:() => { st.loc = 'grisha'; } }) ] };
+  return { art:'leshy', place:'Ельник', title:'Которого?',
+    text:[ dash('— Которого? — Леший впервые смотрит на неё с интересом. — Того, что у мотоцикла? Или того, что ждёт шесть сорок?') ],
+    choices:[
+      say('«Того, что ждёт.»', { go:'fr', cost:1, fn:() => { setF('foundRoad'); } }),
+      say('«Того, что у мотоцикла.»', { go:'loc', cost:1, fn:() => { st.loc = 'grisha'; } }),
+    ] };
+};
+S.leshy_aglaya = () => { setF('askedAglaya'); return { art:'leshy', place:'Ельник', title:'Другое место',
+  text:[ dash('— К Аглае ты пока не хочешь, — говорит Леший. — Ты хочешь, чтобы тебе объяснили. Это другое место. Туда дороги нет.'),
+    'Тропинка сама выводит Анну обратно на опушку.' ],
+  choices:[ back() ] }; };
+S.leshy_home = () => ({ art:'house', place:'Нижняя улица, 7', title:'В который из?',
+  text:[ dash('— Домой? — Леший впервые улыбается. Улыбка у него не злая и не добрая: так улыбаются, когда поймали на слове. — В который из?'),
+    'Анна моргает и видит, что стоит на крыльце дома Аглаи. Печь внутри тёплая. Кто-то уже поставил чашку.' ],
+  choices:[ back() ] });
+S.leshy_lie = () => ({ art:'edge', place:'Опушка', title:'Врёшь',
+  text:[ dash('— Врёшь, — равнодушно говорит Леший. — Не мне, себе. Мне всё равно.'), 'Пень пустой. Анна стоит на опушке одна.' ],
+  choices:[ back() ] });
+S.forest_night = () => { setF('sawIzba'); return { art:'night_forest', place:'Лес · ночь', title:'Изба на порогах',
+  text:[ 'Анна входит в ночной лес. Через минуту она уже не видит собственных рук. Через пять понимает, что идёт не по тропинке, а по чему-то, что тропинкой притворяется.',
+    'Между стволами стоит изба. Она стоит не на курьих ногах, а на порогах: десятки порогов, один над другим, и каждый ведёт к своей двери. За одной из дверей горит свет. У окна женщина с убранными волосами.',
+    'Она поднимает руку. То ли машет, то ли велит уходить.',
+    'Анна просыпается на опушке. Утро, роса. В кармане лежит ветка рябины, хотя Анна точно оставила её дома.' ],
+  choices:[ act('Вернуться в деревню', { go:'loc', fn:() => { sleep(); st.loc = 'edge'; } }) ] }; };
+
+/* ------------------------------ ДОРОГА ------------------------------ */
+HUB.road = () => {
+  const T = [];
+  if(F('busstop')) T.push('На плите стоит остановка: жестяной навес, лавка, табличка «Заветье». На столбе висит расписание: «Сб 06:40». Краска свежая, а ржавчина на болтах старая, двадцатилетняя.');
+  else if(F('rustystop')) T.push('На плите стоит ржавый навес без таблички. Расписания нет. Автобусы здесь, похоже, не останавливаются.');
+  else if(F('overgrown')) T.push('Дорога заросла. Плита ушла под мох, болтов уже не видно. Ромашек здесь больше никто не оставляет.');
+  else T.push('Старая дорога. Бетонная плита на обочине, четыре ржавых болта. На плите лежит свежая ромашка.');
+  if(st.day === 4 && st.phase === 0 && !st.outcome){ setF('heardBus'); T.push('Суббота, утро. Ровно в шесть сорок где-то за поворотом гудит мотор. Звук приближается, проходит мимо и уходит. Дорога пустая. Пыль даже не поднялась.'); }
+  return { art:'road', title:'Старая дорога', text:T, choices: st.phase <= 2 ? [ wait() ] : [] };
+};
+
+/* ------------------------------ ЛЕСНАЯ ОСТАНОВКА ------------------------------ */
+S.fr = () => {
+  meet('young'); setF('foundRoad');
+  const first = !F('frSeen'); setF('frSeen');
+  const T = [];
+  if(first){
+    T.push('Лес расступается, и Анна выходит на дорогу. Асфальт здесь новый, чёрный, без единой трещины, такой, каким его клали в двухтысячных. У обочины стоит остановка: жестяной навес, лавка, табличка «Заветье».');
+    T.push('На лавке сидит парень лет восемнадцати, не больше. Джинсовая куртка ему велика, на шее наушники от кассетного плеера, у ног стоит тот самый чемодан. Только новый. Бирка ещё белая: «Лаптев Г., Тверь».');
+    T.push('Он поднимает голову.');
+    T.push(dash('— Вы тоже на шесть сорок? — Он смотрит на часы. На часах 6:38. Анна почему-то уверена, что на них всегда 6:38. — Он не опаздывает, я узнавал. Мама обещала разбудить, но я сам проснулся. Я же не проспал, да?'));
+  } else if(st.outcome === 'loop'){
+    T.push('Остановка. Парень с чемоданом. 6:38.');
+    T.push(dash('— В следующую субботу точно, — говорит он Анне, как старой знакомой.'));
+  } else {
+    T.push('Остановка на лесной дороге. Парень с чемоданом смотрит на часы: 6:38.');
+    T.push(dash('— Вы опять? Он скоро будет. Он не опаздывает.'));
+  }
+  const C = [];
+  if(st.outcome && st.outcome !== 'loop') return { art: st.outcome === 'truth' ? 'forestroad_empty' : 'edge', place:'Лесная дорога', title:'Пусто',
+    text:[ { truth:'Остановка на лесной дороге пуста. Лавка, навес, табличка. Парня нет. Следы уходят по дороге, пешком.',
+      half:'Под навесом на лавке стоит чемодан. Парня нет. Лавка медленно ржавеет.',
+      convenient:'Ельник. Никакой остановки. На обочине стоит новый чемодан с белой биркой. Его никто не заберёт.',
+      erase:'Ельник. Ни остановки, ни дороги. Анна не уверена, что здесь вообще что-то было.' }[st.outcome] ],
+    choices:[ act('Уйти', { go:'loc', fn:() => { st.loc = 'edge'; } }) ] };
+  if(st.outcome === 'loop') return { art:'forestroad', place:'Лесная остановка', title:'6:38', text:T, choices:[ act('Уйти', { go:'loc', fn:() => { st.loc = 'edge'; } }) ] };
+  C.push(say('«Нет. Ты не проспал.»', { go:'fr_ok' }));
+  C.push(say('«Чего ты ждёшь?»', { go:'fr_wait' }));
+  C.push(say('«А мама что говорит?»', { go:'fr_mom' }));
+  C.push(act('Рассказать ему, что случилось', { sub:'Версия из тетради будет закреплена', go:'fr_tell' }));
+  C.push(act('Уйти', { go:'loc', fn:() => { st.loc = 'edge'; } }));
+  return { art:'forestroad', place:'Лесная остановка', title: first ? 'Шесть тридцать восемь' : '6:38', text:T, choices:C };
+};
+const toFr = { t:'Вернуться к разговору', go:'fr' };
+S.fr_ok = () => ({ art:'forestroad', place:'Лесная остановка', title:'Не проспал',
+  text:[ dash('— Нет. Ты не проспал.'), 'Парень выдыхает, как будто держал этот воздух очень долго.', dash('— Вот и я говорю. А все потом… — Он хмурится. — А что все потом?') ], choices:[ toFr ] });
+S.fr_wait = () => ({ art:'forestroad', place:'Лесная остановка', title:'Потом — всё',
+  text:[ dash('— Автобуса. Потом Тверь, дядька, гараж. Потом посмотрим. Потом всё.'), 'Он говорит «всё» так, как говорят только в восемнадцать: будто это место на карте.' ], choices:[ toFr ] });
+S.fr_mom = () => ({ art:'forestroad', place:'Лесная остановка', title:'Сама сказала',
+  text:[ dash('— Мама болеет. Но она сказала: езжай. Сама сказала, вчера вечером. Плакала, но сказала.'), dash('— Потом к ней кто-то приходил, я уже спал. Слышал только, как пели. Колыбельную. Смешно, да? Мне восемнадцать.'),
+    gain('c_young', true) ], choices:[ toFr ] });
+S.fr_tell = () => {
+  const miss = activeSlots().filter(k => !st.ver[k]);
+  if(miss.length) return { art:'forestroad', place:'Лесная остановка', title:'Версия не собрана',
+    text:[ 'Анна открывает тетрадь. Версия ещё не собрана: нужно ответить, что было у Гриши и что случилось двенадцатого июня.', 'Раздел «Версия» в тетради.' ],
+    choices:[ act('Открыть тетрадь', { fn:() => { openBook('ver'); }, go:'fr' }), toFr ] };
+  const weak = activeSlots().filter(k => strength(k) < SLOTS[k].need && !(k === 'C'));
+  if(weak.length){
+    const lines = weak.map(k => `<li>${SLOTS[k].q} ${st.diff === 'hard' ? '' : `Опора ${fmt(strength(k))} из ${SLOTS[k].need}.`}</li>`).join('');
+    return { art:'forestroad', place:'Лесная остановка', title:'Слова не держатся',
+      text:[ 'Анна говорит, но слова рассыпаются, не долетая. Парень смотрит сквозь неё на дорогу. На часах 6:38.',
+        'Лесу нечего держать. Ему нужны не слова, а свидетельства.', `<ul>${lines}</ul>`,
+        'Приложите к версии улики в тетради. Сильнее всего то, чего никто не пересказывал.' ],
+      choices:[ act('Открыть тетрадь', { fn:() => { openBook('ver'); }, go:'fr' }), toFr ] };
+  }
+  const cWeak = st.ver.B === 'forced' && st.ver.C !== 'none' && strength('C') < SLOTS.C.need;
+  return { art:'forestroad', place:'Лесная остановка', title:'Закрепить?',
+    text:[ 'Анна открывает тетрадь на последней странице. Версия собрана:', `<p class="sentence" style="background:var(--birch)">${sentence()}</p>`,
+      cWeak ? 'Ответ на вопрос «кто» держится слабо. Лес его не услышит, и эта часть останется несказанной.' : '',
+      'Лес примет эту версию. Правильная она или нет, назад её уже не забрать.' ],
+    choices:[ say('Рассказать', { go:'res_forest', fn:resolve }), act('Ещё подумать', { go:'fr' }) ] };
+};
+const fmt = n => String(n).replace('.', ',');
+
+function resolve(){
+  const o = verdict();
+  st.outcome = o;
+  const cEff = (st.ver.B === 'forced' && st.ver.C && st.ver.C !== 'none' && strength('C') >= SLOTS.C.need) ? st.ver.C : 'none';
+  st.flags.cEff = cEff;
+  if(o === 'truth') setF('busstop');
+  if(o === 'half') setF('rustystop');
+  if(o === 'convenient' || o === 'erase') setF('overgrown');
+  if(o === 'erase') for(const id of ['e1','e2','e3','e4','e5']) if(st.clues[id]) st.clues[id].blank = true;
+  if(o === 'loop') setF('loopRoad');
+}
+
+S.res_forest = () => {
+  const o = st.outcome, c = st.flags.cEff, T = [];
+  if(o === 'truth' || o === 'half'){
+    T.push(o === 'truth'
+      ? 'Анна говорит не торопясь, как диктуют в школе. Был билет. Был чемодан. Был автобус в шесть сорок двенадцатого июня. Был засов на двери бани, задвинутый снаружи.'
+      : 'Анна говорит: он мечтал. Он только мечтал, и мечту заперли на засов, задвинутый снаружи.');
+    if(c === 'mother') T.push('И была мать, которая этот засов задвинула.');
+    else if(c === 'advice') T.push('И была мать, которая этот засов задвинула. И кто-то стоял у калитки и пел.');
+    else T.push('Кто это сделал, Анна не говорит.');
+    T.push('Парень слушает. Потом смотрит на часы. На часах 6:41.');
+    if(o === 'truth'){
+      T.push(dash('— Уехал, — удивлённо говорит он. — Автобус. Он уехал без меня.'));
+      T.push('Он не плачет. Он встаёт, берёт чемодан и впервые за двадцать два года уходит с остановки. Не в лес и не в деревню, а просто по дороге, пешком, как уходят люди, которые сами решили, куда идти.');
+      T.push('Навес остаётся стоять. Лес больше его не прячет.');
+      T.push(chg('busstop', 'На старой дороге, на бетонной плите, появилась остановка: жестяной навес, лавка, расписание «Сб 06:40».'));
+    } else {
+      T.push(dash('— Мечтал, — повторяет он, и лицо у него становится совсем детским. — Ну да. Я ж только мечтал.'));
+      T.push('Он встаёт, но с места не уходит. Постояв, ставит чемодан на лавку и уходит без него. Навес за его спиной ржавеет на глазах.');
+      T.push(chg('rustystop', 'На старой дороге появился ржавый навес без таблички и без расписания. Автобусы здесь не останавливаются.'));
+    }
+  } else if(o === 'convenient' || o === 'erase'){
+    T.push('Анна говорит: он сам передумал. Так сказали все, и так записано в тетради.');
+    T.push('Парень слушает. Кивает медленно, будто соглашается с учителем, которого не хочет расстраивать.');
+    T.push(dash('— Сам, — говорит он. — Ну да. Сам.'));
+    T.push('Он ставит чемодан на лавку и уходит в туман. Не по дороге, а в сторону от неё. Остановка у него за спиной темнеет, оседает, и через минуту на её месте один ельник.');
+    T.push('Лес принял эту версию. Лес принимает всё, что сказано достаточно крепко.');
+    T.push(chg('overgrown', 'Старая дорога заросла. Бетонная плита ушла под мох.'));
+    if(o === 'erase'){
+      T.push('Дома Анна открывает тетрадь Гриши. Страницы чистые: одни клетки и поля. Даже красные пометки Аглаи исчезли.');
+      T.push(chg('erase', 'В тетради Гриши больше ничего не написано. Даже то, чего никто не пересказывал, можно стереть, если достаточно крепко сказать обратное.'));
+    }
+  } else {
+    T.push('Анна говорит: он проспал. Так бывает. Никто не виноват.');
+    T.push(dash('— Проспал, — повторяет парень и с облегчением смеётся. — Ну, бывает. Значит, в следующую субботу.'));
+    T.push('Он садится обратно на лавку. На часах 6:38.');
+    T.push('Лес принял и это: никто не виноват, значит, и исправлять нечего.');
+    T.push(chg('loop', 'Лесная остановка теперь стоит всегда. На лавке сидит парень с чемоданом, и каждую субботу на его часах 6:38.'));
+  }
+  return { art: o === 'truth' ? 'forestroad_empty' : 'forestroad', place:'Лесная остановка', title:'Лес принял', text:T,
+    choices:[ act('Вернуться в деревню', { go:'res_village', fn:() => { st.loc = 'grisha'; } }) ] };
+};
+
+S.res_village = () => {
+  const o = st.outcome, c = st.flags.cEff, T = [], C = [];
+  if(o === 'truth'){
+    T.push('Гриша сидит на крыльце. Чемодан открыт. В руках у него кассетный плеер, и он смотрит на него, как на чужую вещь, которую почему-то узнаёт.');
+    T.push(dash('— Я вспомнил, — говорит он. — Не всё. Утро. Засов. Как я стучал. Как мама потом плакала и говорила, что я проспал. И я поверил, потому что так было легче. Двадцать два года «в субботу уеду». Господи.'));
+    if(c === 'mother') T.push('У бани стоит Нина Петровна. — Я боялась, — говорит она, ни на кого не глядя. — Мне сказали: уедет, как Верка Белова, и не вернётся. Никогда.', 'Анна слышит мамино имя и не может сдвинуться с места.');
+    if(c === 'advice') T.push('У бани стоит Нина Петровна. — Мне сказали, что так будет лучше, — тихо говорит она. — Что уедет, как Верка Белова, и не вернётся.', dash('— Кто сказал?'), 'Нина Петровна поднимает руку. На запястье у неё выцветшая красная нитка.', dash('— Не спрашивай. Я обещала.'));
+    T.push('В дверях стоит Варя.');
+    T.push('Гриша поднимает на Анну глаза.');
+    T.push(dash('— Если бы я тогда уехал, Вари бы не было. Понимаешь? Её бы не было. — Пауза. — Что мне теперь делать с этой правдой?'));
+  } else if(o === 'half'){
+    T.push('Гриша сидит на крыльце без чемодана.');
+    T.push(dash('— Я, кажется, чего-то хотел, — говорит он и трёт висок. — Когда-то. Не помню чего. Но меня тогда не пустили, да? Даже помечтать толком не дали.'));
+    T.push('Варя смотрит на него из окна.');
+    T.push(dash('— И что теперь? — спрашивает он Анну. — Хотеть дальше?'));
+  }
+  if(o === 'truth' || o === 'half'){
+    C.push(say('«Уезжай. Ты имеешь право на свою жизнь.»', { go:'res_answer', fn:() => { setF('answer','leave'); st.rel.varya--; } }));
+    C.push(say('«Оставайся. У тебя дочь.»', { go:'res_answer', fn:() => { setF('answer','stay'); st.rel.grisha--; } }));
+    C.push(say('«Не знаю. Я вернула тебе правду. Что с ней делать, решаешь ты.»', { go:'res_answer', fn:() => { setF('answer','choice'); st.rel.grisha++; } }));
+    C.push(act('Промолчать', { go:'res_answer', fn:() => { setF('answer','silence'); } }));
+    return { art:'grisha', place:'Двор Лаптевых', title:'Что мне теперь делать?', text:T, choices:C };
+  }
+  if(o === 'convenient' || o === 'erase'){
+    T.push('Во дворе Лаптевых тихо. Чемодана у двери нет: его разобрали, а вещи раздали. Мотоцикла под навесом тоже нет.');
+    T.push(dash('— В субботу? — Гриша смеётся, когда Анна спрашивает. — А куда мне ехать? Я здешний.'));
+    T.push('Он спокоен. Спокойнее, чем был за всю неделю. Как дом, из которого вынесли мебель.');
+    T.push('Нина Петровна выходит на крыльцо и смотрит на Анну с благодарностью. Это страшнее всего.');
+  } else {
+    T.push(dash('— В субботу уеду! — кричит Гриша через двор. Сегодня он веселее, чем вчера. Как человек, которому окончательно разрешили никогда не уезжать.'));
+  }
+  return { art:'grisha', place:'Двор Лаптевых', title:'Заветье', text:T, choices:[ act('Дальше', { go:'after_case' }) ] };
+};
+S.res_answer = () => {
+  const a = st.flags.answer, T = [];
+  T.push({
+    leave:'— Легко тебе говорить, — отвечает Гриша. Он смотрит на Варю. Варя уходит в дом, не хлопнув дверью. Лучше бы хлопнула.',
+    stay:'— Вот и мать так решила. За меня. — Гриша закрывает чемодан, медленно, ремень за ремнём.',
+    choice:'Гриша долго молчит. — Двадцать два года за меня решали, — говорит он наконец. — Ладно. Попробую сам. — Варя садится рядом с ним на ступеньку, и он её не прогоняет.',
+    silence:'Гриша кивает, будто услышал ответ. Какой именно, Анна не знает.',
+  }[a]);
+  T.push('У этой правды нет хорошего конца. Есть только конец, который Гриша выберет сам. Или не выберет.');
+  return { art:'grisha', place:'Двор Лаптевых', title:'Ответ', text:T.map(s => s.startsWith('—') ? dash(s) : s), choices:[ act('Дальше', { go:'after_case' }) ] };
+};
+S.after_case = () => {
+  const T = [ 'Дело Гриши закрыто. Лес больше не ждёт от Анны слов о нём. Правильных или нет.' ];
+  if(F('busDone')) return { art:'house', place:'Заветье', title:'Дело закрыто', text:T, choices:[ act('Эпилог', { fn:() => { showEnd('stay'); } }) ] };
+  T.push(st.day < 5 ? 'До воскресенья ещё есть время. Можно пройтись по Заветью и посмотреть, что изменилось. В воскресенье утром на старую дорогу придёт автобус.' : 'Наступает воскресенье.');
+  return { art:'house', place:'Заветье', title:'Дело закрыто', text:T, choices:[ back('Пройтись по Заветью') ] };
+};
+
+/* ------------------------------ ВОСКРЕСЕНЬЕ ------------------------------ */
+S.bus_sunday = () => {
+  const T = [ 'Воскресенье. Анна выходит к старой дороге. Во сколько приходит автобус, никто не сказал. Расписания нет, но все почему-то знают, когда.' ];
+  const o = st.outcome, a = st.flags.answer;
+  if(F('busstop')){
+    if(a === 'leave') T.push('Под новым навесом сидит Гриша с чемоданом. У забора стоит Варя. — Вернусь в среду, — говорит он ей через дорогу. — Честно. Варя не отвечает.');
+    else if(a === 'stay') T.push('Под новым навесом никого. Чемодан, говорят, Гриша убрал на чердак. Сам убрал.');
+    else T.push('Под новым навесом сидит Гриша. Без чемодана. — Посмотреть хотел, — говорит он. — Как это бывает: приходит автобус, а ты можешь сесть. Сегодня не сяду. Но теперь я знаю, что могу.');
+  } else if(F('rustystop')) T.push('Под ржавым навесом пусто. Анна стоит рядом с ним, не под ним.');
+  else if(F('overgrown')) T.push('Плиты под мхом не видно. Анна стоит прямо на обочине.');
+  else T.push('На плите снова лежит свежая ромашка.');
+  T.push('Автобус приходит минута в минуту. Тот же водитель.');
+  T.push(dash(F('busstop') ? '— Надо же, — говорит он, глядя на навес. — Остановку поставили. Двадцать лет тут езжу, а её не было. Или была? — Он пожимает плечами. — Ну что, обратно?' : '— Ну что, обратно?'));
+  if(!o) T.push('Дело Гриши не закрыто. Где-то в лесу парень с чемоданом смотрит на часы: 6:38.');
+  return { art:'bus', place:'Старая дорога · воскресенье', title:'Обратно?', text:T,
+    choices:[
+      act('Остаться', { fn:() => { setF('busDone'); if(st.outcome) showEnd('stay'); }, go: o ? 'bus_sunday' : 'stay_open' }),
+      act('Уехать', { fn:() => { setF('busDone'); showEnd('leave'); }, go:'bus_sunday' }),
+    ] };
+};
+S.stay_open = () => ({ art:'road', place:'Старая дорога', title:'Раньше чего',
+  text:[ 'Автобус уходит без неё. Водитель, кажется, не удивлён.', dash('— Ну, до воскресенья, — говорит он.'), dash('— Какого?'), dash('— А какого надо?'),
+    'Анна возвращается в деревню. Больше её здесь никто не торопит.' ],
+  choices:[ back('В деревню') ] });
+/* =====================================================================
+   РЕНДЕР СЦЕНЫ
+   ===================================================================== */
+let curChoices = [];
+const HUBS = new Set(['loc']);
+
+function go(id){ st.scene = id; st.view = null; render(); }
+function resolveScene(){
+  let id = st.scene;
+  if(id === 'loc'){
+    if(st.day >= 5 && !F('busDone')) id = 'bus_sunday';
+    else if(st.morningDue){ st.morningDue = false; id = 'morning'; }
+    if(id !== 'loc'){ st.scene = id; st.view = null; }
+  }
+  return id;
+}
+const wrapP = s => (s.startsWith('<') ? s : `<p>${s}</p>`);
+
+function render(){
+  if(!st) return;
+  const id = resolveScene();
+  const sc = (S[id] || S.loc)();
+  if(!st.view || st.view.id !== id){
+    st.view = { id, text: sc.text.filter(Boolean).map(wrapP).join(''), title: sc.title || '', place: sc.place || '', art: sc.art || 'house' };
+  }
+  const v = st.view, hub = HUBS.has(id);
+  document.body.dataset.phase = st.phase;
+  const prologue = id.startsWith('p_');
+  $('clkDay').textContent = prologue ? 'Пролог' : `${dayName(st.day)} · ${PHASES[st.phase]}`;
+  $('clkPlace').textContent = v.place || (LOCS[st.loc] ? LOCS[st.loc].n : '');
+  $('place').textContent = hub ? `${dayName(st.day)} · ${PHASES[st.phase]}` : v.place;
+  $('stitle').textContent = v.title;
+  $('stext').innerHTML = v.text;
+  [...$('signal').children].forEach((b, i) => b.classList.toggle('on', i < st.signal));
+  $('bMap').disabled = prologue;
+  curChoices = sc.choices || [];
+  $('choices').innerHTML = curChoices.map((c, i) =>
+    `<button type="button" class="ch${c.say ? ' say' : ''}" data-i="${i}"${c.dis ? ' disabled' : ''}><span class="mk">${c.say ? '—' : '›'}</span><span class="tx">${c.t}${c.sub ? `<span class="sub">${c.sub}</span>` : ''}</span>${c.cost ? '<span class="cost">время</span>' : ''}</button>`).join('');
+  $('goRow').innerHTML = hub ? '<span class="lbl">Пойти</span>' + Object.entries(LOCS).filter(([k, l]) => !l.hidden).map(([k, l]) =>
+    `<button type="button" class="go${k === st.loc ? ' here' : ''}" data-go="${k}"${k === st.loc ? ' aria-current="true"' : ''}>${l.n}</button>`).join('') : '';
+  paintArt($('art'), v.art, st.phase);
+  renderBook();
+  save();
+}
+
+function choose(i){
+  const c = curChoices[i]; if(!c || c.dis) return;
+  let next = c.go || 'loc';
+  if(c.fn){ const r = c.fn(); if(typeof r === 'string') next = r; }
+  if(c.cost) pass(c.cost);
+  go(next);
+  if(window.matchMedia('(max-width:1020px)').matches) $('scene').scrollIntoView({ block:'start' });
+  else window.scrollTo({ top:0 });
+}
+function travel(k){
+  if(!HUBS.has(st.scene) || !LOCS[k] || LOCS[k].hidden) return;
+  st.loc = k; closeMap(); go('loc');
+}
+
+/* =====================================================================
+   ТЕТРАДЬ
+   ===================================================================== */
+let bookTab = 'case';
+const TABS = [ ['case','Улики'], ['ver','Версия'], ['notes','Записки'], ['world','Заветье'], ['gram','Грамматика'] ];
+function openBook(tab){ if(tab) bookTab = tab; $('book').classList.add('open'); st.unseen = 0; renderBook(); }
+function closeBook(){ $('book').classList.remove('open'); }
+const bookVisible = () => !window.matchMedia('(max-width:1020px)').matches || $('book').classList.contains('open');
+
+function renderBook(){
+  if(!st) return;
+  if(bookVisible()) st.unseen = 0;
+  const dot = $('bookDot'); dot.hidden = !st.unseen; dot.textContent = st.unseen;
+  $('tabs').innerHTML = TABS.map(([k, l]) => {
+    const n = k === 'case' ? st.order.length : k === 'notes' ? st.notes.length : k === 'world' ? st.changes.length : 0;
+    return `<button type="button" class="tab" role="tab" data-tab="${k}" aria-selected="${k === bookTab}">${l}${n ? `<span class="n">${n}</span>` : ''}</button>`;
+  }).join('');
+  $('bookBody').innerHTML = ({ case:caseUI, ver:verUI, notes:notesUI, world:worldUI, gram:gramUI })[bookTab]();
+}
+
+function caseUI(){
+  let h = '<div class="case-h">Дело первое</div><div class="case-q">Гриша, который уедет в субботу. Какую историю мне рассказывают неправильно?</div>';
+  if(!st.order.length) return h + '<p class="empty">Пока здесь пусто. Улики появятся, когда Анна начнёт разговаривать с людьми и осматривать дома.</p>';
+  const enIds = st.order.filter(id => CLUES[id].kind === 'en'), rest = st.order.filter(id => CLUES[id].kind !== 'en');
+  if(enIds.length) h += '<h3>Записи по-английски</h3>' + enIds.map(clueCard).join('');
+  if(rest.length) h += '<h3>Свидетельства</h3>' + rest.slice().reverse().map(clueCard).join('');
+  return h;
+}
+function clueCard(id){
+  const c = CLUES[id], s = st.clues[id];
+  let h = `<article class="clue${s.doubt ? ' doubt' : ''}${s.blank ? ' blank' : ''}"><div class="clue-meta"><span class="k">${KIND[c.kind]}</span><span>${c.src}</span></div><h5>${c.t}</h5>`;
+  if(c.kind === 'en'){
+    if(s.blank) h += '<p><em>Страница пуста. Здесь было что-то написано.</em></p>';
+    else {
+      h += `<p>${en(c.en, c.ru)}</p>`;
+      if(c.red) h += `<div class="red">${c.red}</div>`;
+      h += lensUI(id);
+    }
+  } else h += `<p>${c.text}</p>`;
+  if(!s.blank) h += `<div class="clue-foot"><button type="button" class="doubt-b" data-doubt="${id}">${s.doubt ? 'Снова доверять' : 'Не доверять'}</button></div>`;
+  return h + '</article>';
+}
+function lensUI(id){
+  const c = CLUES[id], s = st.clues[id];
+  if(st.diff === 'easy'){ const L = LENSES[c.lens]; return `<div class="tip">Что доказывает: <b>${L.label}</b> (${L.form}). ${L.tip}</div>`; }
+  let h = '<div class="clue-foot"><span class="lens-q">Что доказывает эта запись?</span>';
+  for(const [k, L] of Object.entries(LENSES)) h += `<button type="button" class="pill" data-lens="${id}:${k}" aria-pressed="${s.lens === k}">${L.label}</button>`;
+  h += '</div>';
+  if(s.lens && st.diff === 'normal') h += `<div class="tip">${LENSES[s.lens].tip}</div>`;
+  return h;
+}
+
+function verUI(){
+  let h = '<div class="case-h">Версия</div><div class="case-q">Нельзя просто найти правильный ответ. Нужно выбрать, что произошло, и приложить свидетельства.</div>';
+  if(st.outcome){
+    h += `<p class="sentence">${sentence()}</p><p>Лес принял эту версию. Дело закрыто.</p>`;
+    return h;
+  }
+  for(const k of activeSlots()){
+    const S0 = SLOTS[k], cur = st.ver[k];
+    h += `<section class="slot"><h4>${S0.q}</h4><div class="opts">`;
+    for(const [o, O] of Object.entries(S0.opts)) h += `<button type="button" class="pill" data-opt="${k}:${o}" aria-pressed="${cur === o}">${O.l}</button>`;
+    h += '</div>';
+    if(cur && !(k === 'C' && cur === 'none')){
+      const s = strength(k), need = S0.need, ok = s >= need;
+      if(st.diff === 'hard') h += `<div class="meter${ok ? ' ok' : ''}"><span>${qual(s, need)}</span></div>`;
+      else h += `<div class="meter${ok ? ' ok' : ''}"><span>Опора ${fmt(s)} из ${need}</span><span class="track"><i style="width:${Math.max(0, Math.min(100, s / need * 100))}%"></i></span></div>`;
+      const pool = st.order.filter(id => !st.clues[id].blank);
+      if(!pool.length) h += '<p class="empty">Прикладывать пока нечего.</p>';
+      else {
+        h += '<ul class="att">';
+        for(const id of pool){
+          const on = st.ver.att[k].includes(id), d = st.clues[id].doubt, c = CLUES[id];
+          let tag = '';
+          if(d) tag = '<span class="tag nil">не доверяю</span>';
+          else if(c.kind === 'en' && !st.clues[id].lens) tag = '<span class="tag nil">не разобрана</span>';
+          else if(st.diff === 'easy'){
+            const v = supOf(id)[k + '.' + cur] || 0;
+            tag = v > 0 ? `<span class="tag pro">опора +${fmt(v)}</span>` : v < 0 ? `<span class="tag con">против ${fmt(v)}</span>` : '<span class="tag nil">не о том</span>';
+          }
+          h += `<li><input type="checkbox" id="att-${k}-${id}" data-att="${k}:${id}"${on ? ' checked' : ''}${d ? ' disabled' : ''}><label for="att-${k}-${id}">${c.t}</label>${tag}</li>`;
+        }
+        h += '</ul>';
+      }
+    } else if(cur === 'none') h += '<p class="hint-line">Этого можно не доказывать. Но и лес этого не услышит.</p>';
+    h += '</section>';
+  }
+  h += `<h3>Собранная версия</h3><p class="sentence">${sentence()}</p>`;
+  h += '<p class="hint-line">Закрепить версию можно только там, где судьба оборвалась.</p>';
+  return h;
+}
+
+function notesUI(){
+  if(!st.notes.length) return '<p class="empty">Записок пока нет.</p>';
+  let h = '';
+  const ag = st.notes.filter(id => !NOTES[id].ru), other = st.notes.filter(id => NOTES[id].ru);
+  if(ag.length){
+    h += '<h3>Записки Аглаи</h3>';
+    for(const id of ag){ const n = NOTES[id], a = NOTE_ANN[id] ? NOTE_ANN[id]() : ''; h += `<div class="nt"><div class="src">${n.src}</div>${en(n.en, n.ru)}${a ? `<div class="ann">${a}</div>` : ''}</div>`; }
+  }
+  for(const id of other){
+    const n = NOTES[id], a = NOTE_ANN[id] ? NOTE_ANN[id]() : '';
+    h += `<h3>${n.title || 'Правила Груни'}</h3><div class="nt"><div class="src">${n.src}</div><ul>${n.items.map(x => `<li>${x}</li>`).join('')}</ul>${a ? `<div class="ann">${a}</div>` : ''}</div>`;
+  }
+  return h;
+}
+function worldUI(){
+  let h = '<h3>Как меняется Заветье</h3>';
+  h += st.changes.length ? st.changes.map(c => `<div class="chg"><small>${dayName(c.day)} · ${PHASES[c.phase]}</small>${c.text}</div>`).join('') : '<p class="empty">Пока всё как было. Или так только кажется.</p>';
+  h += '<h3>Люди и не люди</h3>';
+  h += st.people.length ? `<dl class="ppl">${st.people.map(p => `<dt>${PEOPLE[p].n}</dt><dd>${PEOPLE[p].d}</dd>`).join('')}</dl>` : '<p class="empty">Анна пока никого не знает.</p>';
+  h += '<h3>Дом Аглаи</h3><p>' + (F('greeted') ? 'Анна поздоровалась с домом. Домовой принимает её как гостью: тепло и вежливо, но хозяйское только одалживает.' : F('silentEntry') ? 'Анна промолчала, как велела Аглая. Домовой зовёт её хозяйкой. Кто-то в углу с этим не согласен.' : 'Анна ещё не дошла до дома.') + '</p>';
+  return h;
+}
+function gramUI(){
+  return `<h3>Грамматика Аглаи</h3><p>Страница, вклеенная в конец тетради. В Заветье память переписывает всё, что пересказывают. Домашние задания не пересказывает никто.</p>
+  <div class="gram-wrap"><table class="gram"><thead><tr><th>Форма</th><th>По-русски</th><th>Что это доказывает</th></tr></thead><tbody>
+  <tr><td>wanted to leave</td><td>хотел уехать</td><td>Желание. Мечта без даты.</td></tr>
+  <tr><td>will leave</td><td>уеду</td><td>Решение. Твёрдое, но пока без билета.</td></tr>
+  <tr><td>was going to leave</td><td>собирался уехать</td><td>План, решённый заранее.</td></tr>
+  <tr><td>have bought</td><td>(уже) купил</td><td>Шаг, который уже сделан.</td></tr>
+  <tr><td>promised to leave</td><td>обещал уехать</td><td>Обещание кому-то. Важно, кому и что.</td></tr>
+  <tr><td>would have left</td><td>уехал бы</td><td>Не случилось. Что-то помешало.</td></tr>
+  </tbody></table></div>
+  <p style="font:500 21px/1.25 var(--hand);color:var(--rowan);margin-top:12px">Для расследования это четыре разные вещи. — А. К.</p>`;
+}
+
+/* =====================================================================
+   КАРТА
+   ===================================================================== */
+function openMap(){ if($('bMap').disabled) return; drawMap(); $('mapOv').hidden = false; $('mapClose').focus(); }
+function closeMap(){ $('mapOv').hidden = true; }
+function drawMap(){
+  const canGo = HUBS.has(st.scene);
+  $('mapSub').textContent = canGo ? `${dayName(st.day)} · ${PHASES[st.phase]}` : 'Сначала закончите разговор';
+  let g = '';
+  const r = rng(7);
+  // лес
+  for(let i = 0; i < 150; i++){
+    const x = r() * 70, y = r() * 34;
+    if(y > 30 - x * .25) continue;
+    const s = 1.6 + r() * 1.6;
+    g += `<path d="M${x.toFixed(1)} ${(y - s * 1.6).toFixed(1)}L${(x - s * .7).toFixed(1)} ${y.toFixed(1)}H${(x + s * .7).toFixed(1)}Z" fill="#2f4a3a" opacity="${(.45 + r() * .4).toFixed(2)}"/>`;
+  }
+  for(let i = 0; i < 40; i++){ const x = 100 + r() * 60, y = r() * 20; const s = 1.4 + r() * 1.2; g += `<path d="M${x.toFixed(1)} ${(y - s * 1.6).toFixed(1)}L${(x - s * .7).toFixed(1)} ${y.toFixed(1)}H${(x + s * .7).toFixed(1)}Z" fill="#2f4a3a" opacity=".5"/>`; }
+  // река
+  g += '<path d="M92 100 C100 88 108 84 118 82 S140 74 160 66" fill="none" stroke="#6f97a3" stroke-width="3" opacity=".7"/>';
+  // рожь
+  for(let i = 0; i < 30; i++){ const x = 44 + r() * 18, y = 27 + r() * 10; g += `<path d="M${x.toFixed(1)} ${y.toFixed(1)}v-1.4" stroke="#a8914a" stroke-width=".35"/>`; }
+  // дороги
+  const road = F('overgrown') ? 'stroke="#4d7a4f" stroke-dasharray="0.6 1.4" stroke-width="1.1"' : 'stroke="#5a6158" stroke-dasharray="2 1.2" stroke-width=".7"';
+  g += `<path d="M160 40 C145 42 136 44 128 46 S96 56 86 64" fill="none" ${road}/>`;
+  g += '<path d="M86 70 C76 66 70 64 66 62 S50 66 40 68 M66 62 C70 54 74 50 76 46 M60 60 C56 48 54 40 52 32 C46 28 40 25 34 22" fill="none" stroke="#5a6158" stroke-dasharray="2 1.2" stroke-width=".7"/>';
+  g += '<path d="M86 70 C96 76 104 80 110 82" fill="none" stroke="#5a6158" stroke-dasharray="1 1" stroke-width=".5"/>';
+  if(F('foundRoad')) g += '<path d="M34 22 C28 18 22 14 16 10" fill="none" stroke="#b3322a" stroke-width=".6" stroke-dasharray="1 1"/>';
+  // изменения
+  if(F('busstop')) g += '<g transform="translate(131 40)"><path d="M-3 0H3M-2.4 0V4M2.4 0V4" stroke="#1f2622" stroke-width=".5" fill="none"/><path d="M-3.4 -.3H3.4" stroke="#b3322a" stroke-width=".9"/><text x="4.5" y="1" font-size="2.6" fill="#b3322a" font-style="italic">остановка</text></g>';
+  if(F('rustystop')) g += '<g transform="translate(131 40)"><path d="M-3 0H3M-2.4 0V4M2.4 0V4" stroke="#8a6a4a" stroke-width=".5" fill="none"/><text x="4.5" y="1" font-size="2.6" fill="#8a6a4a" font-style="italic">ржавый навес</text></g>';
+  if(F('overgrown')) g += '<text x="136" y="39" font-size="2.6" fill="#4d7a4f" font-style="italic">заросло</text>';
+  // узлы
+  for(const [k, l] of Object.entries(LOCS)){
+    if(k === 'forestroad' && !F('foundRoad')) continue;
+    const here = k === st.loc && HUBS.has(st.scene);
+    const clickable = canGo && !l.hidden;
+    let sub = '';
+    if(k === 'forestroad') sub = F('loopRoad') ? 'парень ждёт 6:38' : 'только через опушку';
+    else if(st.phase === 3 && (k === 'edge' || k === 'field')) sub = 'ночью не ходи';
+    else if(k === 'field' && st.phase === 1 && !F('noonDone')) sub = 'полдень';
+    g += `<g class="node"${clickable ? ` role="button" tabindex="0" data-go="${k}" aria-label="${l.n}"` : ''}>`;
+    if(clickable) g += `<circle class="hit" cx="${l.x}" cy="${l.y}" r="7" fill="transparent"/>`;
+    g += here ? `<circle cx="${l.x}" cy="${l.y}" r="2.6" fill="none" stroke="#b3322a" stroke-width=".8"/><circle cx="${l.x}" cy="${l.y}" r="1.1" fill="#b3322a"/>` : `<circle cx="${l.x}" cy="${l.y}" r="1.4" fill="${l.hidden ? '#b3322a' : '#1f2622'}"/>`;
+    g += `<text x="${l.x + 3}" y="${l.y + 1.3}">${l.n}</text>`;
+    if(sub) g += `<text class="note-t" x="${l.x + 3}" y="${l.y + 5}">${sub}</text>`;
+    g += '</g>';
+  }
+  g += '<text x="4" y="96" font-size="3.2" fill="#5a6158" font-style="italic">Заветье · нарисовано от руки, без масштаба</text>';
+  $('mapSvg').innerHTML = g;
+}
+
+/* =====================================================================
+   КАРТИНКИ — процедурная живопись на canvas
+   ===================================================================== */
+function rng(seed){ let a = seed >>> 0; return () => { a = (a + 0x6D2B79F5) >>> 0; let t = a; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+const hashStr = s => { let h = 2166136261; for(const ch of s) h = Math.imul(h ^ ch.charCodeAt(0), 16777619); return h >>> 0; };
+const PAL = [
+  { top:'#6f8594', bot:'#c9cec3', far:'#52625c', near:'#233028', ground:'#323d2f', fog:'rgba(225,230,225,.32)', sun:[.2,.36,16,'rgba(255,246,228,.75)'] },
+  { top:'#98aca8', bot:'#ebe1bf', far:'#65735d', near:'#2e3c2d', ground:'#8d8553', fog:'rgba(255,250,232,.16)', sun:[.52,.14,20,'rgba(255,253,238,.95)'] },
+  { top:'#2a3050', bot:'#d9894a', far:'#3c3542', near:'#18171e', ground:'#282420', fog:'rgba(240,170,110,.13)', sun:[.82,.64,17,'rgba(255,186,118,.9)'] },
+  { top:'#04070d', bot:'#16242e', far:'#0f181c', near:'#050909', ground:'#09100e', fog:'rgba(120,150,185,.13)', moon:[.8,.2,9] },
+];
+function spruce(g, x, y, h, col){
+  const w = h * .42, tiers = 5; g.fillStyle = col; g.beginPath(); g.moveTo(x, y - h);
+  for(let i = 1; i <= tiers; i++){ const ty = y - h + h * i / tiers, tw = w * i / tiers; g.lineTo(x + tw, ty); if(i < tiers) g.lineTo(x + tw * .45, ty); }
+  for(let i = tiers; i >= 1; i--){ const ty = y - h + h * i / tiers, tw = w * i / tiers; if(i < tiers) g.lineTo(x - tw * .45, ty); g.lineTo(x - tw, ty); }
+  g.closePath(); g.fill(); g.fillRect(x - h * .02, y - 2, h * .04, 4);
+}
+function treeline(g, w, y, hmin, hmax, col, r, step){ for(let x = -20; x < w + 20; x += step * (.6 + r() * .8)) spruce(g, x, y + r() * 6, hmin + r() * (hmax - hmin), col); g.fillStyle = col; g.fillRect(0, y, w, 400); }
+function fogBand(g, w, y, hgt, col){ const gr = g.createLinearGradient(0, y - hgt, 0, y + hgt); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(.5, col); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, y - hgt, w, hgt * 2); }
+function sky(g, w, h, p, r){
+  const gr = g.createLinearGradient(0, 0, 0, h * .75); gr.addColorStop(0, p.top); gr.addColorStop(1, p.bot); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+  if(p.sun){ const [sx, sy, sr, sc] = p.sun, x = sx * w, y = sy * h; const rg = g.createRadialGradient(x, y, 0, x, y, sr * 5); rg.addColorStop(0, sc); rg.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = rg; g.fillRect(0, 0, w, h); g.fillStyle = sc; g.beginPath(); g.arc(x, y, sr, 0, 7); g.fill(); }
+  if(p.moon){ for(let i = 0; i < 70; i++){ g.fillStyle = `rgba(230,235,245,${.2 + r() * .6})`; g.fillRect(r() * w, r() * h * .55, 1.2, 1.2); }
+    const [mx, my, mr] = p.moon, x = mx * w, y = my * h; const rg = g.createRadialGradient(x, y, 0, x, y, mr * 6); rg.addColorStop(0, 'rgba(210,225,240,.35)'); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(0, 0, w, h);
+    g.fillStyle = '#dfe6ee'; g.beginPath(); g.arc(x, y, mr, 0, 7); g.fill(); g.fillStyle = p.top; g.beginPath(); g.arc(x + mr * .45, y - mr * .2, mr * .9, 0, 7); g.fill(); }
+}
+function hut(g, x, y, s, col, lit, boarded){
+  g.fillStyle = col; g.fillRect(x - s, y - s * 1.1, s * 2, s * 1.1);
+  g.beginPath(); g.moveTo(x - s * 1.25, y - s * 1.05); g.lineTo(x, y - s * 1.95); g.lineTo(x + s * 1.25, y - s * 1.05); g.closePath(); g.fill();
+  g.fillRect(x + s * .45, y - s * 2.1, s * .22, s * .6);
+  const wx = x - s * .35, wy = y - s * .8, ww = s * .5, wh = s * .45;
+  if(lit){ const rg = g.createRadialGradient(wx + ww / 2, wy + wh / 2, 0, wx + ww / 2, wy + wh / 2, s * 1.6); rg.addColorStop(0, 'rgba(255,170,90,.35)'); rg.addColorStop(1, 'rgba(255,170,90,0)'); g.fillStyle = rg; g.fillRect(x - s * 2, y - s * 2.5, s * 4, s * 3); g.fillStyle = '#f0a55a'; g.fillRect(wx, wy, ww, wh); }
+  if(boarded){ g.strokeStyle = 'rgba(160,150,130,.55)'; g.lineWidth = Math.max(1, s * .06); g.beginPath(); g.moveTo(wx, wy); g.lineTo(wx + ww, wy + wh); g.moveTo(wx + ww, wy); g.lineTo(wx, wy + wh); g.stroke(); }
+}
+function person(g, x, y, s, col, o = {}){
+  g.fillStyle = col; g.beginPath(); g.arc(x, y - s * 1.72, s * .17, 0, 7); g.fill();
+  if(o.sit){ g.fillRect(x - s * .2, y - s * 1.52, s * .4, s * .7); g.fillRect(x - s * .2, y - s * .86, s * .55, s * .16); g.fillRect(x + s * .25, y - s * .86, s * .12, s * .6); }
+  else { g.beginPath(); g.moveTo(x - s * .22, y - s * 1.52); g.lineTo(x + s * .22, y - s * 1.52); g.lineTo(x + (o.robe ? s * .45 : s * .2), y - (o.robe ? 0 : s * .7)); g.lineTo(x - (o.robe ? s * .45 : s * .2), y - (o.robe ? 0 : s * .7)); g.closePath(); g.fill();
+    if(!o.robe){ g.fillRect(x - s * .18, y - s * .75, s * .13, s * .75); g.fillRect(x + s * .05, y - s * .75, s * .13, s * .75); } }
+  if(o.case){ g.fillStyle = o.caseCol || col; g.fillRect(x + s * .35, y - s * .45, s * .5, s * .38); }
+}
+function interior(g, w, h, wall, floor){ g.fillStyle = wall; g.fillRect(0, 0, w, h); for(let y = 8; y < h * .78; y += 14){ g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(0, y, w, 2); } g.fillStyle = floor; g.fillRect(0, h * .78, w, h); }
+function glow(g, x, y, rad, col){ const rg = g.createRadialGradient(x, y, 0, x, y, rad); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(x - rad, y - rad, rad * 2, rad * 2); }
+
+function paintArt(cv, key, phase, full){
+  if(!cv) return;
+  const w = Math.max(10, cv.clientWidth), h = Math.max(10, cv.clientHeight), dpr = Math.min(2, window.devicePixelRatio || 1);
+  if(cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)){ cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+  const r = rng(hashStr(key + (full ? 'f' : '')) ^ 99);
+  const p = PAL[key === 'bus' || key === 'flat' ? 2 : phase];
+  const outdoor = !['flat','house_in','grunya_in','school_in','kiki'].includes(key);
+  const hy = h * .7;
+  if(outdoor){
+    sky(g, w, h, key === 'night_forest' || key === 'title' ? PAL[3] : key === 'vision' || key === 'noon' ? PAL[1] : p, r);
+    const q = key === 'night_forest' || key === 'title' ? PAL[3] : p;
+    treeline(g, w, h * .6, h * .12, h * .26, q.far, r, 16);
+    fogBand(g, w, h * .6, h * .08, q.fog);
+  }
+  const P = key === 'night_forest' || key === 'title' ? PAL[3] : p;
+  switch(key){
+    case 'flat': {
+      interior(g, w, h, '#1e1b22', '#141217');
+      const wx = w * .56, wy = h * .12, ww = w * .3, wh = h * .52; const gr = g.createLinearGradient(0, wy, 0, wy + wh); gr.addColorStop(0, '#2c3353'); gr.addColorStop(1, '#c97b48'); g.fillStyle = gr; g.fillRect(wx, wy, ww, wh);
+      for(let i = 0; i < 9; i++){ const bx = wx + r() * ww, bh = wh * (.2 + r() * .5), bw = ww * (.06 + r() * .08); g.fillStyle = '#1a1820'; g.fillRect(bx, wy + wh - bh, bw, bh); for(let j = 0; j < 6; j++) if(r() > .6){ g.fillStyle = 'rgba(255,200,120,.8)'; g.fillRect(bx + 2 + r() * (bw - 4), wy + wh - bh + 3 + r() * (bh - 6), 2, 2); } }
+      g.strokeStyle = '#0d0c10'; g.lineWidth = 4; g.strokeRect(wx, wy, ww, wh); g.beginPath(); g.moveTo(wx + ww / 2, wy); g.lineTo(wx + ww / 2, wy + wh); g.stroke();
+      g.fillStyle = '#2a2530'; g.fillRect(0, h * .72, w, h * .06);
+      g.fillStyle = '#8b7a5e'; g.fillRect(w * .2, h * .56, w * .16, h * .16); g.fillStyle = '#6f614b'; g.fillRect(w * .2, h * .56, w * .16, h * .03);
+      g.strokeStyle = '#b3322a'; g.lineWidth = 2; g.beginPath(); g.moveTo(w * .28, h * .56); g.lineTo(w * .28, h * .72); g.moveTo(w * .2, h * .64); g.lineTo(w * .36, h * .64); g.stroke();
+      glow(g, wx + ww / 2, wy + wh, w * .35, 'rgba(210,130,70,.12)');
+      break; }
+    case 'bus': case 'road': {
+      g.fillStyle = P.ground; g.fillRect(0, hy, w, h);
+      g.fillStyle = '#2b2a2a'; g.beginPath(); g.moveTo(w * .47, h * .62); g.lineTo(w * .53, h * .62); g.lineTo(w * .82, h); g.lineTo(w * .18, h); g.closePath(); g.fill();
+      treeline(g, w * .3, h * .82, h * .3, h * .5, P.near, r, 22);
+      g.save(); g.translate(w * .78, 0); treeline(g, w * .22, h * .84, h * .3, h * .5, P.near, r, 22); g.restore();
+      const sx = w * .64, sy = h * .86; g.fillStyle = '#5b5a55'; g.fillRect(sx, sy, w * .1, h * .04);
+      if(key === 'road' && F('busstop')){ g.fillStyle = '#3f4a4e'; g.fillRect(sx + 4, sy - h * .22, 3, h * .22); g.fillRect(sx + w * .1 - 7, sy - h * .22, 3, h * .22); g.fillStyle = '#b3322a'; g.fillRect(sx - 2, sy - h * .24, w * .1 + 4, 5); }
+      else if(key === 'road' && F('rustystop')){ g.fillStyle = '#6b4a33'; g.fillRect(sx + 4, sy - h * .2, 3, h * .2); g.fillRect(sx - 2, sy - h * .22, w * .1 + 4, 4); }
+      else if(key === 'road' && F('overgrown')){ g.fillStyle = '#2f4a30'; for(let i = 0; i < 18; i++){ g.beginPath(); g.arc(sx + r() * w * .12, sy + r() * 8, 4 + r() * 6, 0, 7); g.fill(); } }
+      else { g.fillStyle = '#3a2a22'; for(let i = 0; i < 4; i++) g.fillRect(sx + 6 + i * w * .024, sy - 5, 2, 5); g.fillStyle = '#f2efe6'; g.beginPath(); g.arc(sx + w * .05, sy + 3, 2.2, 0, 7); g.fill(); }
+      if(key === 'bus'){ const bx = w * .44, by = h * .66, bw = w * .12, bh = h * .2; g.fillStyle = '#c9c1a8'; g.fillRect(bx, by, bw, bh); g.fillStyle = '#2d3238'; g.fillRect(bx + bw * .1, by + bh * .12, bw * .8, bh * .35); g.fillStyle = '#e04a3a'; g.fillRect(bx + 3, by + bh * .72, 5, 4); g.fillRect(bx + bw - 8, by + bh * .72, 5, 4); glow(g, bx + 5, by + bh * .74, 20, 'rgba(255,70,50,.35)'); glow(g, bx + bw - 5, by + bh * .74, 20, 'rgba(255,70,50,.35)'); }
+      g.fillStyle = '#5c5a52'; g.fillRect(w * .2, h * .66, 2, h * .14); g.fillStyle = '#d8d2bf'; g.fillRect(w * .16, h * .64, w * .08, h * .045);
+      break; }
+    case 'house': case 'house_old': case 'grunya': case 'grisha': case 'school': {
+      g.fillStyle = P.ground; g.fillRect(0, hy, w, h);
+      const lit = phase >= 2 || key === 'house';
+      if(key === 'house' || key === 'house_old'){ treeline(g, w, h * .72, h * .25, h * .45, P.near, r, 18); g.fillStyle = P.ground; g.fillRect(0, h * .76, w, h); hut(g, w * .42, h * .84, h * .15, '#1a1c19', key === 'house', key === 'house_old'); }
+      if(key === 'grunya'){ hut(g, w * .52, h * .84, h * .15, '#1b1a17', phase >= 2); g.fillStyle = '#1b1a17'; g.fillRect(w * .3, h * .74, w * .05, h * .1); g.fillRect(w * .32, h * .56, 3, h * .18); g.fillRect(w * .28, h * .56, w * .09, 3); for(let i = 0; i < 7; i++){ g.fillStyle = '#3b4a33'; g.fillRect(w * .6 + i * 10, h * .6, 4, 10 + r() * 8); } }
+      if(key === 'grisha'){ hut(g, w * .36, h * .84, h * .16, '#1b1a17', phase >= 2); hut(g, w * .78, h * .84, h * .09, '#141412', false); g.fillStyle = '#141412'; g.beginPath(); g.arc(w * .55, h * .82, h * .035, 0, 7); g.arc(w * .63, h * .82, h * .035, 0, 7); g.fill(); g.fillRect(w * .55, h * .76, w * .08, h * .035);
+        if(st && !st.outcome || st && (st.outcome === 'truth' || st.outcome === 'loop')){ g.fillStyle = '#6b4f36'; g.fillRect(w * .43, h * .8, w * .03, h * .04); }
+        g.strokeStyle = '#2a2a24'; g.lineWidth = 2; g.beginPath(); for(let x = 0; x < w; x += 12){ g.moveTo(x, h * .86); g.lineTo(x + (r() - .5) * 3, h * .78); } g.stroke(); }
+      if(key === 'school'){ g.fillStyle = '#1c2124'; g.fillRect(w * .3, h * .5, w * .4, h * .34); g.beginPath(); g.moveTo(w * .28, h * .5); g.lineTo(w * .5, h * .38); g.lineTo(w * .72, h * .5); g.fill(); for(let i = 0; i < 6; i++) for(let j = 0; j < 2; j++){ g.fillStyle = (i === 0 && j === 1) ? '#050706' : '#394247'; g.fillRect(w * .33 + i * w * .058, h * .54 + j * h * .14, w * .03, h * .08); } }
+      treeline(g, w * .18, h * .95, h * .3, h * .55, P.near, r, 20);
+      break; }
+    case 'field': case 'noon': {
+      g.fillStyle = P.ground; g.fillRect(0, h * .62, w, h);
+      g.strokeStyle = 'rgba(40,35,20,.35)'; g.lineWidth = 1; g.beginPath(); for(let i = 0; i < 700; i++){ const x = r() * w, y = h * .62 + r() * h * .4; g.moveTo(x, y); g.lineTo(x + (r() - .5) * 2, y - 4 - r() * 6); } g.stroke();
+      if(key === 'noon'){ glow(g, w * .55, h * .5, h * .5, 'rgba(255,252,235,.55)'); person(g, w * .55, h * .86, h * .5, 'rgba(250,248,238,.85)', { robe:true }); g.strokeStyle = 'rgba(250,248,238,.7)'; g.lineWidth = 2; g.beginPath(); g.arc(w * .55 + h * .2, h * .44, h * .09, Math.PI * 1.1, Math.PI * 1.9); g.stroke(); }
+      break; }
+    case 'vision': {
+      g.fillStyle = '#b9ae8f'; g.fillRect(0, h * .66, w, h);
+      hut(g, w * .62, h * .86, h * .12, '#5a5244', false);
+      person(g, w * .55, h * .88, h * .3, '#4a4338', {});
+      person(g, w * .22, h * .9, h * .26, '#2a2622', { robe:true });
+      g.strokeStyle = '#4a4338'; g.lineWidth = 3; g.beginPath(); g.moveTo(w * .58, h * .76); g.lineTo(w * .66, h * .76); g.stroke();
+      g.fillStyle = 'rgba(235,228,205,.55)'; g.fillRect(0, 0, w, h);
+      fogBand(g, w, h * .7, h * .3, 'rgba(245,240,225,.6)');
+      break; }
+    case 'river': case 'water': {
+      g.fillStyle = P.ground; g.fillRect(0, h * .6, w, h * .08);
+      const wy = h * .66; const gr = g.createLinearGradient(0, wy, 0, h); gr.addColorStop(0, P.bot); gr.addColorStop(1, P.top); g.fillStyle = gr; g.fillRect(0, wy, w, h - wy);
+      g.save(); g.globalAlpha = .45; g.translate(0, wy * 2); g.scale(1, -1); const r2 = rng(5); treeline(g, w, h * .6, h * .12, h * .26, P.far, r2, 16); g.restore();
+      g.fillStyle = P.near; g.fillRect(0, h * .62, w, h * .05);
+      g.fillStyle = '#3a3128'; g.fillRect(w * .08, h * .74, w * .22, h * .03); for(let i = 0; i < 3; i++) g.fillRect(w * .1 + i * w * .08, h * .74, 3, h * .2);
+      g.strokeStyle = 'rgba(255,255,255,.12)'; g.lineWidth = 1; g.beginPath(); for(let i = 0; i < 14; i++){ const y = wy + 8 + r() * (h - wy - 10), x = r() * w; g.moveTo(x, y); g.lineTo(x + 20 + r() * 40, y); } g.stroke();
+      if(key === 'water'){ const x = w * .6, y = h * .82; glow(g, x, y, h * .3, 'rgba(255,220,160,.45)'); g.fillStyle = 'rgba(255,230,180,.8)'; g.fillRect(x - w * .07, y - h * .07, w * .14, h * .1); g.fillStyle = '#6a5a44'; g.fillRect(x - w * .06, y - h * .06, w * .12, h * .025); }
+      break; }
+    case 'edge': case 'leshy': case 'forestroad': case 'forestroad_empty': case 'night_forest': case 'title': {
+      g.fillStyle = P.ground; g.fillRect(0, h * .78, w, h);
+      if(key === 'forestroad' || key === 'forestroad_empty'){ g.fillStyle = '#151618'; g.beginPath(); g.moveTo(w * .48, h * .6); g.lineTo(w * .52, h * .6); g.lineTo(w * .7, h); g.lineTo(w * .3, h); g.fill(); }
+      treeline(g, w * .38, h * .92, h * .45, h * .8, P.near, r, 24);
+      g.save(); g.translate(w * .64, 0); treeline(g, w * .4, h * .92, h * .45, h * .8, P.near, r, 24); g.restore();
+      if(key === 'edge'){ g.fillStyle = '#b3322a'; g.fillRect(w * .36, h * .7, 6, 2); }
+      if(key === 'leshy'){ g.fillStyle = '#23201a'; g.fillRect(w * .47, h * .86, w * .06, h * .06); person(g, w * .5, h * .86, h * .3, '#0b0d0b', { robe:true }); g.fillStyle = 'rgba(200,210,190,.5)'; g.fillRect(w * .5 - 2, h * .86 - h * .3 * 1.75, 1.5, 1.5); g.fillRect(w * .5 + 2, h * .86 - h * .3 * 1.75, 1.5, 1.5); }
+      if(key === 'forestroad' || key === 'forestroad_empty'){ const sx = w * .64, sy = h * .88; g.fillStyle = '#3d4549'; g.fillRect(sx, sy - h * .26, 3, h * .26); g.fillRect(sx + w * .12, sy - h * .26, 3, h * .26); g.fillStyle = '#58646a'; g.fillRect(sx - 4, sy - h * .28, w * .12 + 11, 6); g.fillStyle = '#2a2d2e'; g.fillRect(sx + 4, sy - h * .08, w * .11, 4);
+        if(key === 'forestroad'){ person(g, sx + w * .05, sy - h * .04, h * .24, '#0a0c0c', { sit:true }); g.fillStyle = '#6b4f36'; g.fillRect(sx + w * .09, sy - h * .07, w * .03, h * .07); } }
+      if(key === 'night_forest'){ const x = w * .5, y = h * .8; g.fillStyle = '#0c0f10'; for(let i = 0; i < 5; i++) g.fillRect(x - w * .08 + i * 3, y - i * h * .04, w * .16 - i * 6, h * .04); hut(g, x, y - h * .2, h * .1, '#0c0f10', true); }
+      fogBand(g, w, h * .86, h * .1, P.fog);
+      break; }
+    case 'house_in': {
+      interior(g, w, h, '#241c16', '#17120e');
+      glow(g, w * .3, h * .65, w * .4, 'rgba(227,154,82,.22)');
+      g.fillStyle = '#d9cfbd'; g.fillRect(w * .16, h * .22, w * .26, h * .56); g.fillStyle = '#c6baa4'; g.fillRect(w * .14, h * .2, w * .3, h * .05);
+      g.fillStyle = '#1a120c'; g.beginPath(); g.moveTo(w * .22, h * .78); g.lineTo(w * .22, h * .6); g.quadraticCurveTo(w * .29, h * .5, w * .36, h * .6); g.lineTo(w * .36, h * .78); g.fill();
+      glow(g, w * .29, h * .7, h * .22, 'rgba(255,140,50,.7)');
+      g.fillStyle = '#3b2c20'; g.fillRect(w * .58, h * .6, w * .3, h * .04); g.fillRect(w * .6, h * .64, 4, h * .14); g.fillRect(w * .85, h * .64, 4, h * .14);
+      g.fillStyle = '#e8e0d0'; g.fillRect(w * .7, h * .56, w * .025, h * .04); if(st && F('greeted')) g.fillRect(w * .74, h * .56, w * .025, h * .04);
+      g.fillStyle = '#e39a52'; g.fillRect(w * .66, h * .2, w * .07, h * .12); glow(g, w * .695, h * .26, w * .12, 'rgba(227,154,82,.18)');
+      break; }
+    case 'grunya_in': {
+      interior(g, w, h, '#2a2117', '#1a140e');
+      glow(g, w * .5, h * .35, w * .5, 'rgba(240,170,90,.25)');
+      g.strokeStyle = '#1a140e'; g.lineWidth = 2; g.beginPath(); g.moveTo(0, h * .14); g.lineTo(w, h * .14); g.stroke();
+      for(let i = 0; i < 16; i++){ const x = w * .06 + i * w * .058; g.fillStyle = ['#4d5a3a','#6b6440','#5a4a3a'][i % 3]; g.beginPath(); g.moveTo(x - 6, h * .14); g.lineTo(x + 6, h * .14); g.lineTo(x + 2, h * .3 + r() * h * .08); g.lineTo(x - 2, h * .3 + r() * h * .08); g.fill(); }
+      g.fillStyle = '#3b2c20'; g.fillRect(w * .3, h * .62, w * .4, h * .05);
+      g.fillStyle = '#1c1511'; g.fillRect(w * .78, h * .5, w * .14, h * .28); g.fillStyle = '#2a2018'; g.fillRect(w * .79, h * .68, w * .12, h * .08);
+      g.fillStyle = '#f4d9a8'; g.beginPath(); g.arc(w * .5, h * .5, 6, 0, 7); g.fill(); glow(g, w * .5, h * .5, h * .3, 'rgba(255,200,120,.35)');
+      break; }
+    case 'school_in': {
+      interior(g, w, h, '#1d2226', '#141719');
+      g.fillStyle = '#1f3a2e'; g.fillRect(w * .2, h * .16, w * .5, h * .34); g.strokeStyle = '#3a2c20'; g.lineWidth = 5; g.strokeRect(w * .2, h * .16, w * .5, h * .34);
+      g.fillStyle = 'rgba(230,230,220,.7)'; g.font = `${Math.round(h * .06)}px Caveat, cursive`; g.fillText('What will I be?', w * .26, h * .3); g.fillText('I have lost. I have found.', w * .26, h * .42);
+      for(let i = 0; i < 4; i++){ g.fillStyle = '#2d2a26'; g.fillRect(w * .12 + i * w * .2, h * .66, w * .14, h * .04); g.fillRect(w * .14 + i * w * .2, h * .7, 3, h * .1); }
+      g.fillStyle = 'rgba(200,210,215,.1)'; g.fillRect(w * .8, h * .1, w * .12, h * .5);
+      break; }
+    case 'kiki': {
+      interior(g, w, h, '#15171a', '#0e0f11');
+      glow(g, w * .62, h * .55, h * .5, 'rgba(210,200,150,.12)');
+      g.fillStyle = '#23262a'; g.fillRect(w * .5, h * .18, w * .24, h * .6);
+      g.strokeStyle = 'rgba(220,210,170,.55)'; g.lineWidth = 1.5; g.beginPath(); g.moveTo(w * .46, h * .3); g.lineTo(w * .46, h * .7); g.stroke();
+      g.fillStyle = 'rgba(220,210,170,.5)'; g.beginPath(); g.ellipse(w * .46, h * .55, 5, 16, 0, 0, 7); g.fill();
+      g.strokeStyle = 'rgba(220,210,170,.25)'; g.beginPath(); g.moveTo(w * .46, h * .3); g.quadraticCurveTo(w * .4, h * .2, w * .3, h * .24); g.stroke();
+      g.fillStyle = 'rgba(230,220,180,.8)'; g.fillRect(w * .755, h * .42, 2, 2); g.fillRect(w * .765, h * .42, 2, 2);
+      break; }
+  }
+  if(outdoor){ const vg = g.createRadialGradient(w / 2, h / 2, h * .2, w / 2, h / 2, w * .7); vg.addColorStop(0, 'rgba(0,0,0,0)'); vg.addColorStop(1, 'rgba(0,0,0,.35)'); g.fillStyle = vg; g.fillRect(0, 0, w, h); }
+}
+
+/* =====================================================================
+   ФИНАЛ
+   ===================================================================== */
+function showEnd(kind){
+  const o = st.outcome, a = st.flags.answer;
+  const title = kind === 'leave' ? (o ? 'Автобус обратно' : 'Лес подождёт') : ({ truth:'Остановка на старой дороге', half:'Ржавый навес', convenient:'Заросшая дорога', erase:'Чистые страницы', loop:'Шесть тридцать восемь' }[o] || 'Заветье');
+  const P = [];
+  if(kind === 'leave'){
+    P.push('Автобус трогается. В заднем стекле Заветье становится маленьким: дома, дым, лес. Телефон находит сеть на сороковом километре, и на экран сыплются сообщения за неделю.');
+    P.push('Через месяц Анна не может вспомнить, как звали учительницу, которая прислала ей посылку. Ключ лежит в ящике стола.' + (F('thread') === 'wrist' ? ' Нить на запястье до сих пор красная.' : ''));
+    if(!o) P.push('А где-то в лесу парень с чемоданом смотрит на часы. На часах 6:38.');
+  } else {
+    P.push('Автобус уходит без неё. Водитель, кажется, не удивлён. «Ну, до воскресенья», — говорит он. «Какого?» — спрашивает Анна. «А какого надо?»');
+    P.push('В доме Аглаи тепло. ' + (F('greeted') ? 'На столе две чашки.' : 'На столе одна чашка, и её кто-то уже вымыл.'));
+    P.push('А в стене горницы, где вчера была просто стена, теперь есть дверь. Анна точно помнит, что вчера её не было.');
+  }
+  const kept = st.order.filter(id => !CLUES[id].fake && !st.clues[id].doubt && !st.clues[id].blank).length;
+  const L = [];
+  L.push(['Дом Аглаи принял Анну', F('greeted') ? 'как гостью' : 'как хозяйку']);
+  L.push(['Версия, которую принял лес', o ? sentence() : 'Никакой. Дело Гриши осталось открытым']);
+  L.push(['Свидетельств сохранено', String(kept)]);
+  L.push(['Удобных окончаний закреплено', ['convenient','erase','loop'].includes(o) ? '1' : '0']);
+  if(a) L.push(['Что Анна сказала Грише', { leave:'«Уезжай». Решила за него', stay:'«Оставайся». Решила за него', choice:'Вернула ему правду и отказалась решать за него', silence:'Промолчала' }[a]]);
+  L.push(['Груня', [F('toldMother') ? 'знает, чья Анна дочь' : 'не знает, чья Анна дочь', F('grunyaNoticed') ? 'видела, как Анна открывала комод' : (F('snoopDecided') ? 'считает, что Анна не шарит по углам' : '')].filter(Boolean).join('; ')]);
+  if(F('reflection')) L.push(['Отражение в Кромке', 'опаздывает на полсекунды']);
+  const body = `<h1 class="t-title" style="font-size:clamp(38px,7vw,68px)">${title}</h1>
+    <svg class="thread" viewBox="0 0 520 26" aria-hidden="true"><path d="M2 14 C60 2 90 24 150 13 S250 3 300 14 S400 25 440 12 C470 4 490 20 518 10"/></svg>
+    ${P.map(x => `<p class="t-lead" style="margin:0 0 12px">${x}</p>`).join('')}
+    <h3 style="margin:24px 0 0;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--text-dim)">Что запомнил лес</h3>
+    <ul class="end-list">${L.map(([k, v]) => `<li><small>${k}</small>${v}</li>`).join('')}</ul>
+    <div class="teaser"><b>Дело второе: дверь, которой вчера не было</b>В доме Аглаи появилась комната. В ней живёт кто-то, кого Анна не помнит, а он помнит её. Полная игра продолжится четырьмя легендами Заветья, Отражённой Анной и Избой Порогов.</div>
+    <div class="t-actions" style="margin-top:22px"><button class="btn" type="button" id="endRestart">Сыграть заново</button>${kind === 'stay' ? '<button class="btn ghost" type="button" id="endStay">Остаться и осмотреться</button>' : ''}</div>
+    <p class="t-foot">При следующем прохождении попробуйте иначе войти в дом. Там, где Анна поздоровалась, ей одалживают. Там, где промолчала, ей подбрасывают.</p>`;
+  $('endBody').innerHTML = body;
+  $('endScr').hidden = false; $('endScr').scrollTop = 0;
+  paintArt($('endArt'), 'title', 3, true);
+  setF('ended', kind);
+  save();
+  $('endRestart').onclick = () => { wipeSave(); $('endScr').hidden = true; showTitle(); };
+  const sb = $('endStay'); if(sb) sb.onclick = () => { $('endScr').hidden = true; st.flags.ended = false; st.scene = 'loc'; st.view = null; render(); };
+}
+
+/* =====================================================================
+   ТИТУЛ, МЕНЮ, СОБЫТИЯ
+   ===================================================================== */
+let pickDiff = 'normal';
+function showTitle(){
+  const sv = loadSave();
+  $('bCont').hidden = !sv || !!(sv.flags && sv.flags.ended);
+  $('titleScr').hidden = false;
+  paintArt($('titleArt'), 'title', 3, true);
+}
+function startNew(){ st = fresh(pickDiff); $('titleScr').hidden = true; st.scene = 'p_flat'; st.view = null; render(); }
+function continueGame(){ const sv = loadSave(); if(!sv) return startNew(); st = sv; $('titleScr').hidden = true; render(); }
+function setDiff(d){
+  st.diff = d;
+  if(d === 'easy') for(const id of st.order) if(CLUES[id].kind === 'en' && !st.clues[id].lens) st.clues[id].lens = CLUES[id].lens;
+  st.view = null; render(); toast('Сложность: ' + ({ easy:'лёгкая', normal:'обычная', hard:'высокая' }[d]));
+}
+function renderMenu(){
+  $('menuDiff').innerHTML = 'Сложность: ' + ['easy','normal','hard'].map(d => `<button type="button" class="pill" style="color:var(--text);border-color:var(--line-n);display:inline-block;width:auto;margin:4px 4px 0 0;padding:3px 10px" data-sd="${d}" aria-pressed="${st && st.diff === d}">${{ easy:'лёгкая', normal:'обычная', hard:'высокая' }[d]}</button>`).join('');
+}
+
+document.addEventListener('click', e => {
+  const t = e.target;
+  const trb = t.closest('.trb'); if(trb){ const s = document.createElement('span'); s.className = 'tr'; s.textContent = trb.dataset.tr; trb.replaceWith(s); return; }
+  const ch = t.closest('.ch'); if(ch && ch.dataset.i != null){ choose(+ch.dataset.i); return; }
+  const gb = t.closest('[data-go]'); if(gb){ travel(gb.dataset.go); return; }
+  const tab = t.closest('[data-tab]'); if(tab){ bookTab = tab.dataset.tab; renderBook(); return; }
+  const ln = t.closest('[data-lens]'); if(ln){ const [id, k] = ln.dataset.lens.split(':'); st.clues[id].lens = st.clues[id].lens === k ? null : k; save(); renderBook(); return; }
+  const db = t.closest('[data-doubt]'); if(db){ const s = st.clues[db.dataset.doubt]; s.doubt = !s.doubt; save(); renderBook(); return; }
+  const op = t.closest('[data-opt]'); if(op){ const [k, o] = op.dataset.opt.split(':'); st.ver[k] = st.ver[k] === o ? null : o; save(); renderBook(); return; }
+  const sd = t.closest('[data-sd]'); if(sd){ setDiff(sd.dataset.sd); renderMenu(); return; }
+  const dp = t.closest('#diffPick button'); if(dp){ pickDiff = dp.dataset.d; document.querySelectorAll('#diffPick button').forEach(b => b.setAttribute('aria-pressed', b === dp)); return; }
+  const mm = t.closest('[data-m]'); if(mm){ $('menu').hidden = true;
+    if(mm.dataset.m === 'title'){ save(); showTitle(); }
+    if(mm.dataset.m === 'restart'){ wipeSave(); showTitle(); }
+    return; }
+  if(!t.closest('#menu') && !t.closest('#bMenu')) $('menu').hidden = true;
+});
+document.addEventListener('change', e => {
+  const a = e.target.closest('[data-att]'); if(!a) return;
+  const [k, id] = a.dataset.att.split(':'); const L = st.ver.att[k];
+  if(a.checked){ if(!L.includes(id)) L.push(id); } else st.ver.att[k] = L.filter(x => x !== id);
+  save(); renderBook();
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape'){ closeMap(); closeBook(); $('menu').hidden = true; return; }
+  const n = e.target.closest('.node[data-go]'); if(n && (e.key === 'Enter' || e.key === ' ')){ e.preventDefault(); travel(n.dataset.go); return; }
+  if(!st || !$('titleScr').hidden || !$('endScr').hidden || !$('mapOv').hidden) return;
+  if(/^[1-9]$/.test(e.key) && !e.target.closest('input,textarea,[contenteditable]')){ const i = +e.key - 1; if(curChoices[i]) choose(i); }
+});
+$('bMap').onclick = openMap; $('mapClose').onclick = closeMap;
+$('mapOv').addEventListener('click', e => { if(e.target === $('mapOv')) closeMap(); });
+$('bBook').onclick = () => openBook(); $('bookClose').onclick = closeBook;
+$('bMenu').onclick = () => { renderMenu(); $('menu').hidden = !$('menu').hidden; };
+$('bNew').onclick = startNew; $('bCont').onclick = continueGame;
+let rsT = null;
+window.addEventListener('resize', () => { clearTimeout(rsT); rsT = setTimeout(() => {
+  if(st && st.view) paintArt($('art'), st.view.art, st.phase);
+  if(!$('titleScr').hidden) paintArt($('titleArt'), 'title', 3, true);
+  if(!$('endScr').hidden) paintArt($('endArt'), 'title', 3, true);
+}, 120); });
+
+function boot(data){
+  if(data && data.st){ st = data.st; $('titleScr').hidden = true; if(st.flags.ended){ render(); showEnd(st.flags.ended); } else render(); return; }
+  showTitle();
+}
+window.claude?.hot?.snapshot?.(() => ({ st }));
+if(window.claude?.hot?.ready) window.claude.hot.ready(boot); else boot(window.claude?.hot?.data ?? {});
+</script>
+</body>
+</html>
