@@ -1903,7 +1903,7 @@ function hotsFor(){
       h(3990, 'Осмотреть', 'Баня', later('banya'));
       break;
     case 'aglaya':
-      h(70, 'Выйти', 'На улицу', () => enter('village', 600));
+      h(70, 'Выйти', 'На улицу', () => enter('village', spot('village', 'Дом Аглаи', 600)));
       h(160, 'Осмотреть', 'Прялка', () => 'h_corner');
       h(330, st.phase === 3 ? 'Позвать' : 'Осмотреть', st.phase === 3 ? 'Того, кто за печью' : 'Печь', () => (st.phase === 3 ? 'dom' : 'h_stove'));
       h(560, 'Осмотреть', 'Стол', () => 'h_table');
@@ -1911,17 +1911,17 @@ function hotsFor(){
       h(900, st.phase >= 2 ? 'Лечь' : 'Присесть', 'Лавка', () => 'h_bed');
       break;
     case 'grunya':
-      h(70, 'Выйти', 'На улицу', () => enter('village', 1560));
+      h(70, 'Выйти', 'На улицу', () => enter('village', spot('village', 'Изба Груни', 1560)));
       h(240, 'Осмотреть', 'Комод', () => 'gr_chest');
       h(640, 'Осмотреть', 'Травы', () => 'gr_herbs');
       break;
     case 'laptev':
-      h(70, 'Выйти', 'Во двор', () => enter('village', 3500));
+      h(70, 'Выйти', 'Во двор', () => enter('village', spot('village', 'Дом Лаптевых', 3500)));
       h(290, 'Осмотреть', 'Стекло у вешалки', () => 'lap_timetable');
       h(840, 'Осмотреть', 'Голландка в сенях', () => 'lap_stove');
       break;
     case 'school':
-      h(70, 'Вылезти', 'В окно', () => enter('village', 2322));
+      h(70, 'Вылезти', 'В окно', () => enter('village', spot('village', 'Окно школы', 2322)));
       h(450, 'Прочитать', 'Доска', () => 'school_again');
       h(700, 'Осмотреть', 'Стенгазета', () => 'school_paper');
       h(890, 'Осмотреть', 'Учительский стол', () => 'school_desk');
@@ -1931,7 +1931,7 @@ function hotsFor(){
       if(F('noonDone')) h(1100, 'Осмотреть', 'Выжженный круг', () => 'field_circle');
       break;
     case 'river':
-      h(170, 'Подняться', 'В деревню', () => enter('village', 1150));
+      h(170, 'Подняться', 'В деревню', () => enter('village', spot('village', 'Тропа к реке', 1150)));
       h(690, 'Прочитать', 'Надпись', () => 'river_sign');
       h(830, 'Встать', 'На мостки', () => 'river_bridge');
       break;
@@ -2232,6 +2232,7 @@ function drawArtFrame(v, camX, anna, P, ph){
    ===================================================================== */
 const ASSETS = {
   'bg_street_1': 'art/bg_street_1.jpg',
+  'bg_street_2': 'art/bg_street_2.jpg',
   // 'bg_street_a': 'art/bg_street_a.jpg',
   // 'p_grunya_warm': 'art/p_grunya_warm.png',
 };
@@ -2247,7 +2248,7 @@ function loadAssets(){
 const STRIP_ART = {
   // улица из четырёх картин; segs — какие участки логической улицы покрывает каждая картина
   village:   { parts:['bg_street_1','bg_street_2','bg_street_3','bg_street_4'], segs:[0, 1100, 2150, 3050, 4400], charScale:.86,
-               hotPx:{ 'Дом Аглаи':[0, 1030] } },
+               hotPx:{ 'Дом Аглаи':[0, 1030], 'Изба Груни':[1, 215], 'Лавка у колодца':[1, 590], 'Тропа к реке':[1, 880], 'Колодец-журавль':[1, 1290] } },
   road:      { parts:['bg_road'] },
   field:     { parts:['bg_field'] },
   river:     { parts:['bg_river'] },
@@ -2279,6 +2280,11 @@ function layout(strip){
 function R(strip, x){ const Ly = layout(strip); if(!Ly) return x; for(const s of Ly.segs) if(x <= s.lb || s === Ly.segs[Ly.segs.length - 1]) return s.r0 + (x - s.la) / (s.lb - s.la) * s.rw; return x; }
 function Lg(strip, rx){ const Ly = layout(strip); if(!Ly) return rx; for(const s of Ly.segs) if(rx <= s.r0 + s.rw || s === Ly.segs[Ly.segs.length - 1]) return s.la + (rx - s.r0) / s.rw * (s.lb - s.la); return rx; }
 function RW(strip){ const Ly = layout(strip); return Ly ? Ly.total : STRIPS[strip].w; }
+/* логическая точка у нарисованного места (куда ставить Анну, выходя из дома) */
+function spot(strip, label, fx){
+  const a = STRIP_ART[strip], hp = a && a.hotPx && a.hotPx[label], Ly = hp && layout(strip); if(!Ly) return fx;
+  const s = Ly.segs[hp[0]]; return s && s.img ? Lg(strip, s.r0 + hp[1] / s.img.width * s.rw) : fx;
+}
 /* точные места на картине: подпись точки → [номер картины, x в пикселях картины] */
 function applyHotPx(strip, list){
   const a = STRIP_ART[strip], Ly = a && a.hotPx && layout(strip); if(!Ly) return;
@@ -2370,6 +2376,10 @@ function drawArtStrip(g, P, camX, strip){
   Ly.segs.forEach((sg, i) => { const im = P.imgs[i], x = sg.r0, w = sg.rw; if(x + w < camX - 10 || x > camX + VIEW.viewW + 10) return;
     if(im) g.drawImage(im, (x - camX) * s, oy, w * s + 1, VH * s);
     else { const gr = g.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, '#2a2530'); gr.addColorStop(.75, '#3a3530'); gr.addColorStop(1, '#1a1814'); g.fillStyle = gr; g.fillRect((x - camX) * s, oy, w * s + 1, VH * s); } });
+  // стыки картин прячутся в полосе тумана
+  for(let i = 1; i < Ly.segs.length; i++){ const bx = (Ly.segs[i].r0 - camX) * s, hw = 120 * s; if(bx < -hw || bx > VIEW.cw + hw) continue;
+    const gr = g.createLinearGradient(bx - hw, 0, bx + hw, 0); gr.addColorStop(0, 'rgba(70,64,72,0)'); gr.addColorStop(.5, 'rgba(78,70,76,.55)'); gr.addColorStop(1, 'rgba(70,64,72,0)');
+    g.fillStyle = gr; g.fillRect(bx - hw, oy, hw * 2, VH * s); }
 }
 /* =====================================================================
    ИГРА — цикл, управление, диалоги, тетрадь, звук
