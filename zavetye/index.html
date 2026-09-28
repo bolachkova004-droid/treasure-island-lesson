@@ -1941,6 +1941,7 @@ function hotsFor(){
       break;
   }
   for(const n of npcsFor(st)) if(n.scene) L.push({ x:n.x, verb:'Поговорить', label:n.label, act:() => n.scene, npc:true });
+  applyHotPx(st.strip, L);
   return L;
 }
 function suitcaseVisible(){ return F('arrived') && st.day >= 1 && !(st.day === 4 && st.phase <= 1 && !st.outcome) && !['convenient','erase','half'].includes(st.outcome); }
@@ -2200,20 +2201,22 @@ function drawFrame(v, camX, anna){
 
 /* кадр с живописным фоном: фон-картина, силуэты или спрайты, туман, цветокоррекция */
 function drawArtFrame(v, camX, anna, P, ph){
-  const { s, oy, cw, ch } = VIEW, g = g0, strip = STRIPS[v.strip], sx = SX(v.strip), a = STRIP_ART[v.strip];
+  const { s, oy, cw, ch } = VIEW, g = g0, strip = STRIPS[v.strip], a = STRIP_ART[v.strip], k = a.charScale || 1, rx = x => R(v.strip, x);
   g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0b0b0e'; g.fillRect(0, 0, cw, ch);
-  drawArtStrip(g, P, camX);
+  drawArtStrip(g, P, camX, v.strip);
   if(oy + VH * s < ch){ g.fillStyle = '#101014'; g.fillRect(0, oy + VH * s - 1, cw, ch); }
   g.setTransform(s, 0, 0, s, -camX * s, oy);
   SIL = a.bright ? 'rgba(40,34,30,.9)' : strip.indoor ? 'rgba(22,16,12,.92)' : 'rgba(14,15,20,.9)';
   try{
-    for(const n of npcsFor(v)){ const m = { ...n, x:n.x * sx }; if(n.id === 'varya' && !IMG.s_varya){ figure(g, m.x, LOOKS.varya, { face:1 }); continue; } drawNpc(g, m); }
-    if(anna) annaDraw(g, anna.x * sx, anna.dir, anna.move, anna.ph);
+    const at = x => { g.setTransform(s * k, 0, 0, s * k, (x - camX) * s - x * s * k, oy + GY * s * (1 - k)); };
+    for(const n of npcsFor(v)){ const m = { ...n, x:rx(n.x) }; at(m.x); if(n.id === 'varya' && !IMG.s_varya){ figure(g, m.x, LOOKS.varya, { face:1 }); continue; } drawNpc(g, m); }
+    if(anna){ at(rx(anna.x)); annaDraw(g, rx(anna.x), anna.dir, anna.move, anna.ph); }
+    g.setTransform(s, 0, 0, s, -camX * s, oy);
   } finally { SIL = null; }
-  if(anna && ph === 3) glow(anna.x * sx, GY - 70, strip.indoor ? 130 : 170, .8);
+  if(anna && ph === 3) glow(rx(anna.x), GY - 70, strip.indoor ? 130 : 170, .8);
   drawParticles(g, v);
   g.setTransform(1, 0, 0, 1, 0, 0);
-  if(!a.bright) drawFog(g, ph, camX, strip.indoor ? .12 : 1);
+  if(!a.bright) drawFog(g, ph, camX, strip.indoor ? .12 : ph === 0 ? .55 : .9);
   gradeArt(g, ph, P.nightArt, a.bright);
   if(GLOWS.length){ g.globalCompositeOperation = 'lighter'; for(const L of GLOWS){ const x = (L.x - camX) * s, y = oy + L.y * s, r = L.r * s; if(r <= 0) continue; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${L.col},${.3 * L.a})`); gr.addColorStop(1, `rgba(${L.col},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); } g.globalCompositeOperation = 'source-over'; }
 }
@@ -2228,6 +2231,7 @@ function drawArtFrame(v, camX, anna, P, ph){
      s_<кто>[_1.._4]      — фигура в полный рост, вид сбоку, лицом вправо
    ===================================================================== */
 const ASSETS = {
+  'bg_street_1': 'art/bg_street_1.jpg',
   // 'bg_street_a': 'art/bg_street_a.jpg',
   // 'p_grunya_warm': 'art/p_grunya_warm.png',
 };
@@ -2241,7 +2245,9 @@ function loadAssets(){
 }
 /* какие фоны у какой полосы: части склеиваются слева направо */
 const STRIP_ART = {
-  village:   { parts:['bg_street_1','bg_street_2','bg_street_3','bg_street_4'] },
+  // улица из четырёх картин; segs — какие участки логической улицы покрывает каждая картина
+  village:   { parts:['bg_street_1','bg_street_2','bg_street_3','bg_street_4'], segs:[0, 1100, 2150, 3050, 4400], charScale:.86,
+               hotPx:{ 'Дом Аглаи':[0, 1030] } },
   road:      { parts:['bg_road'] },
   field:     { parts:['bg_field'] },
   river:     { parts:['bg_river'] },
@@ -2255,13 +2261,29 @@ const STRIP_ART = {
 function artParts(strip, ph){
   const a = STRIP_ART[strip]; if(!a) return null;
   const night = ph === 3 && !a.noNight;
-  const list = a.parts.map(p => (night && IMG[p + '_night']) || IMG[p]);
-  return list.every(Boolean) ? { imgs:list, nightArt: night && a.parts.every(p => IMG[p + '_night']) } : null;
+  const list = a.parts.map(p => (night && IMG[p + '_night']) || IMG[p] || null);
+  if(a.segs ? !list.some(Boolean) : !list.every(Boolean)) return null;
+  return { imgs:list, nightArt: night && a.parts.every(p => IMG[p + '_night']) };
 }
-function artWidth(strip){ const P = artParts(strip, 0); if(!P) return 0; return P.imgs.reduce((w, im) => w + im.width / im.height * VH, 0); }
-/* масштаб: логика игры живёт в координатах кода, картинка может быть шире или уже */
-function SX(strip){ const w = artWidth(strip); return w ? w / STRIPS[strip].w : 1; }
-const RW = strip => STRIPS[strip].w * SX(strip);
+/* раскладка: логические участки полосы → отрезки на картинах */
+function layout(strip){
+  const a = STRIP_ART[strip], P = artParts(strip, 0), w = STRIPS[strip].w;
+  if(!P) return null;
+  const segs = a.segs || [0, w], out = []; let r = 0;
+  for(let i = 0; i < P.imgs.length; i++){
+    const im = P.imgs[i], la = segs[i], lb = segs[i + 1] ?? w, rw = im ? im.width / im.height * VH : (lb - la);
+    out.push({ la, lb, r0:r, rw, img:im }); r += rw;
+  }
+  return { segs:out, total:r };
+}
+function R(strip, x){ const Ly = layout(strip); if(!Ly) return x; for(const s of Ly.segs) if(x <= s.lb || s === Ly.segs[Ly.segs.length - 1]) return s.r0 + (x - s.la) / (s.lb - s.la) * s.rw; return x; }
+function Lg(strip, rx){ const Ly = layout(strip); if(!Ly) return rx; for(const s of Ly.segs) if(rx <= s.r0 + s.rw || s === Ly.segs[Ly.segs.length - 1]) return s.la + (rx - s.r0) / s.rw * (s.lb - s.la); return rx; }
+function RW(strip){ const Ly = layout(strip); return Ly ? Ly.total : STRIPS[strip].w; }
+/* точные места на картине: подпись точки → [номер картины, x в пикселях картины] */
+function applyHotPx(strip, list){
+  const a = STRIP_ART[strip], Ly = a && a.hotPx && layout(strip); if(!Ly) return;
+  for(const h of list){ const hp = a.hotPx[h.label]; if(!hp) continue; const s = Ly.segs[hp[0]]; if(!s || !s.img) continue; h.x = Lg(strip, s.r0 + hp[1] / s.img.width * s.rw); }
+}
 
 /* ---------- кто говорит в сцене ---------- */
 function speakerOf(id){
@@ -2337,15 +2359,17 @@ function drawFog(g, ph, camX, strength = 1){
 function gradeArt(g, ph, nightArt, bright){
   const { cw, ch } = VIEW;
   if(bright) return;
-  if(ph === 0){ g.fillStyle = 'rgba(205,220,232,.14)'; g.fillRect(0, 0, cw, ch); }
-  if(ph === 2){ g.globalCompositeOperation = 'soft-light'; const gr = g.createLinearGradient(0, 0, 0, ch); gr.addColorStop(0, 'rgba(120,80,150,.55)'); gr.addColorStop(1, 'rgba(255,140,60,.55)'); g.fillStyle = gr; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'source-over'; }
+  if(ph === 0){ g.globalCompositeOperation = 'color'; g.fillStyle = 'rgba(170,190,205,.45)'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'screen'; g.fillStyle = 'rgba(120,135,150,.28)'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'source-over'; }
+  if(ph === 1){ g.globalCompositeOperation = 'screen'; g.fillStyle = 'rgba(150,140,110,.3)'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'source-over'; }
   if(ph === 3 && !nightArt){ g.globalCompositeOperation = 'multiply'; g.fillStyle = 'rgb(62,78,128)'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'source-over'; }
   const v = g.createRadialGradient(cw / 2, ch * .45, Math.min(cw, ch) * .3, cw / 2, ch * .45, Math.max(cw, ch) * .75);
   v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(8,8,14,${ph === 3 ? .6 : .4})`); g.fillStyle = v; g.fillRect(0, 0, cw, ch);
 }
-function drawArtStrip(g, P, camX){
-  const { s, oy } = VIEW; let x = 0;
-  for(const im of P.imgs){ const w = im.width / im.height * VH; if(x + w > camX - 10 && x < camX + VIEW.viewW + 10) g.drawImage(im, (x - camX) * s, oy, w * s + 1, VH * s); x += w; }
+function drawArtStrip(g, P, camX, strip){
+  const { s, oy } = VIEW, Ly = layout(strip);
+  Ly.segs.forEach((sg, i) => { const im = P.imgs[i], x = sg.r0, w = sg.rw; if(x + w < camX - 10 || x > camX + VIEW.viewW + 10) return;
+    if(im) g.drawImage(im, (x - camX) * s, oy, w * s + 1, VH * s);
+    else { const gr = g.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, '#2a2530'); gr.addColorStop(.75, '#3a3530'); gr.addColorStop(1, '#1a1814'); g.fillStyle = gr; g.fillRect((x - camX) * s, oy, w * s + 1, VH * s); } });
 }
 /* =====================================================================
    ИГРА — цикл, управление, диалоги, тетрадь, звук
@@ -2367,7 +2391,7 @@ function teleport(dest, then){
     setTimeout(() => { ui.fading = false; if(changed) showArea(); save(); if(then) then(); }, 300);
   }, 460);
 }
-function snapCam(){ const W = RW(st.strip), ax = st.x * SX(st.strip), vw = VIEW.viewW; camX = W <= vw ? (W - vw) / 2 : Math.max(0, Math.min(W - vw, ax - vw / 2)); }
+function snapCam(){ const W = RW(st.strip), ax = R(st.strip, st.x), vw = VIEW.viewW; camX = W <= vw ? (W - vw) / 2 : Math.max(0, Math.min(W - vw, ax - vw / 2)); }
 let areaT = null;
 function showArea(){
   const s = STRIPS[st.strip]; $('areaName').textContent = s.name; $('areaSub').textContent = s.sub || `${dayName(st.day)} · ${PHASES[st.phase]}`;
@@ -2481,13 +2505,13 @@ function update(dt){
     saveT += dt; if(saveT > 4){ saveT = 0; save(); }
   }
   annaHist.push({ x:st.x, dir:st.dir, move:moving, ph:walkPh }); if(annaHist.length > 32) annaHist.shift();
-  const vw = VIEW.viewW, W = RW(st.strip), ax = st.x * SX(st.strip), tx = W <= vw ? (W - vw) / 2 : Math.max(0, Math.min(W - vw, ax - vw / 2 + st.dir * vw * .08));
+  const vw = VIEW.viewW, W = RW(st.strip), ax = R(st.strip, st.x), tx = W <= vw ? (W - vw) / 2 : Math.max(0, Math.min(W - vw, ax - vw / 2 + st.dir * vw * .08));
   camX += (tx - camX) * Math.min(1, dt * 3.2);
   tickParticles(dt, st, camX, vw);
   curHot = blocked() ? null : nearestHot();
   const pr = $('prompt');
   if(curHot){ pr.hidden = false; $('promptTx').textContent = `${curHot.verb} · ${curHot.label}`;
-    const sx = (curHot.x * SX(st.strip) - camX) * VIEW.s / VIEW.dpr, sy = (VIEW.oy + (GY - (curHot.npc ? 150 : 120)) * VIEW.s) / VIEW.dpr;
+    const sx = (R(st.strip, curHot.x) - camX) * VIEW.s / VIEW.dpr, sy = (VIEW.oy + (GY - (curHot.npc ? 150 : 120)) * VIEW.s) / VIEW.dpr;
     pr.style.left = Math.max(90, Math.min(innerWidth - 90, sx)) + 'px'; pr.style.top = Math.max(80, sy) + 'px'; }
   else pr.hidden = true;
 }
@@ -2513,7 +2537,7 @@ cv.addEventListener('pointerdown', e => {
   audioInit();
   if(ui.dlg){ advance(); return; }
   if(blocked() || !st) return;
-  const wx = (camX + e.clientX * VIEW.dpr / VIEW.s) / SX(st.strip), wy = (e.clientY * VIEW.dpr - VIEW.oy) / VIEW.s;
+  const wx = Lg(st.strip, camX + e.clientX * VIEW.dpr / VIEW.s), wy = (e.clientY * VIEW.dpr - VIEW.oy) / VIEW.s;
   let hit = null, bd = 1e9; for(const h of hotsFor()){ const d = Math.abs(h.x - wx); if(d < 80 && d < bd && wy > GY - 330){ hit = h; bd = d; } }
   if(hit){ if(Math.abs(hit.x - st.x) < 60) interact(hit); else { target = hit.x - Math.sign(hit.x - st.x) * 30; targetHot = hit; } }
   else { target = Math.max(10, Math.min(STRIPS[st.strip].w - 10, wx)); targetHot = null; }
