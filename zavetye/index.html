@@ -1879,6 +1879,7 @@ function npcsFor(v){
   if(v.strip === 'forestroad' && (!v.outcome || v.outcome === 'loop')) n('young', 960, { scene:'fr', label:'Парень с чемоданом' });
   if(v.strip === 'field' && v.phase === 1 && !v.flags.noonDone) n('noon', 1100, {});
   if(v.strip === 'field' && sc.startsWith('leshy')) n('leshy', 150, {});
+  applyNpcPx(v.strip, N);
   return N;
 }
 
@@ -2234,14 +2235,17 @@ const ASSETS = {
   'bg_street_1': 'art/bg_street_1.jpg',
   'bg_street_2': 'art/bg_street_2.jpg',
   'bg_street_3': 'art/bg_street_3.jpg',
+  'bg_street_4': 'art/bg_street_4.jpg',
   // 'bg_street_a': 'art/bg_street_a.jpg',
   // 'p_grunya_warm': 'art/p_grunya_warm.png',
 };
 const IMG = {};
+/* места, куда игра переносит Анну, следуют за нарисованными домами */
+function syncPlaces(){ PLACES.house = ['village', spot('village', 'Дом Аглаи', 600)]; PLACES.grisha = ['village', spot('village', 'Дом Лаптевых', 3430) - 100]; }
 function loadAssets(){
   for(const [k, src] of Object.entries(ASSETS)){
     const im = new Image(); im.decoding = 'async';
-    im.onload = () => { IMG[k] = im; for(const t in tiles) if(t.startsWith('art')) delete tiles[t]; };
+    im.onload = () => { IMG[k] = im; fadedCache.clear(); syncPlaces(); };
     im.src = src;
   }
 }
@@ -2250,7 +2254,9 @@ const STRIP_ART = {
   // улица из четырёх картин; segs — какие участки логической улицы покрывает каждая картина
   village:   { parts:['bg_street_1','bg_street_2','bg_street_3','bg_street_4'], segs:[0, 1100, 2150, 3050, 4400], charScale:.86,
                hotPx:{ 'Дом Аглаи':[0, 1030], 'Изба Груни':[1, 215], 'Лавка у колодца':[1, 590], 'Тропа к реке':[1, 880], 'Колодец-журавль':[1, 1290],
-                      'Окно школы':[2, 850], 'Дверь школы':[2, 1000], 'Соседский дом':[2, 1370] } },
+                      'Окно школы':[2, 850], 'Дверь школы':[2, 1000], 'Соседский дом':[2, 1370],
+                      'Чемодан':[3, 745], 'Дом Лаптевых':[3, 820], 'Баня':[3, 1360] },
+               npcPx:{ grisha:[3, 330], nina:[3, 990], varya:[3, 1150] } },
   road:      { parts:['bg_road'] },
   field:     { parts:['bg_field'] },
   river:     { parts:['bg_river'] },
@@ -2268,24 +2274,43 @@ function artParts(strip, ph){
   if(a.segs ? !list.some(Boolean) : !list.every(Boolean)) return null;
   return { imgs:list, nightArt: night && a.parts.every(p => IMG[p + '_night']) };
 }
-/* раскладка: логические участки полосы → отрезки на картинах */
+/* раскладка: логические участки полосы → отрезки на картинах.
+   Соседние картины заходят друг на друга на OV единиц и плавно перетекают. */
+const OV = 110;
 function layout(strip){
   const a = STRIP_ART[strip], P = artParts(strip, 0), w = STRIPS[strip].w;
   if(!P) return null;
-  const segs = a.segs || [0, w], out = []; let r = 0;
-  for(let i = 0; i < P.imgs.length; i++){
+  const segs = a.segs || [0, w], out = [], n = P.imgs.length; let r = 0;
+  for(let i = 0; i < n; i++){
     const im = P.imgs[i], la = segs[i], lb = segs[i + 1] ?? w, rw = im ? im.width / im.height * VH : (lb - la);
-    out.push({ la, lb, r0:r, rw, img:im }); r += rw;
+    const r0 = i ? r - OV : r;
+    out.push({ la, lb, r0, rw, img:im, ra: r0 + (i ? OV / 2 : 0), rb: r0 + rw - (i < n - 1 ? OV / 2 : 0) });
+    r = r0 + rw;
   }
   return { segs:out, total:r };
 }
-function R(strip, x){ const Ly = layout(strip); if(!Ly) return x; for(const s of Ly.segs) if(x <= s.lb || s === Ly.segs[Ly.segs.length - 1]) return s.r0 + (x - s.la) / (s.lb - s.la) * s.rw; return x; }
-function Lg(strip, rx){ const Ly = layout(strip); if(!Ly) return rx; for(const s of Ly.segs) if(rx <= s.r0 + s.rw || s === Ly.segs[Ly.segs.length - 1]) return s.la + (rx - s.r0) / s.rw * (s.lb - s.la); return rx; }
+function R(strip, x){ const Ly = layout(strip); if(!Ly) return x; const S = Ly.segs; for(const s of S) if(x <= s.lb || s === S[S.length - 1]) return s.ra + (x - s.la) / (s.lb - s.la) * (s.rb - s.ra); return x; }
+function Lg(strip, rx){ const Ly = layout(strip); if(!Ly) return rx; const S = Ly.segs; for(const s of S) if(rx <= s.rb || s === S[S.length - 1]) return s.la + (rx - s.ra) / (s.rb - s.ra) * (s.lb - s.la); return rx; }
 function RW(strip){ const Ly = layout(strip); return Ly ? Ly.total : STRIPS[strip].w; }
+/* картина с растворённым левым краем — для перетекания */
+const fadedCache = new Map();
+function fadedLeft(im, frac){
+  const key = im.src + frac; if(fadedCache.has(key)) return fadedCache.get(key);
+  const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const g = c.getContext('2d');
+  g.drawImage(im, 0, 0); g.globalCompositeOperation = 'destination-in';
+  const gr = g.createLinearGradient(0, 0, im.width, 0); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(Math.min(.5, frac), 'rgba(0,0,0,1)'); gr.addColorStop(1, 'rgba(0,0,0,1)');
+  g.fillStyle = gr; g.fillRect(0, 0, im.width, im.height);
+  fadedCache.set(key, c); return c;
+}
 /* логическая точка у нарисованного места (куда ставить Анну, выходя из дома) */
 function spot(strip, label, fx){
   const a = STRIP_ART[strip], hp = a && a.hotPx && a.hotPx[label], Ly = hp && layout(strip); if(!Ly) return fx;
   const s = Ly.segs[hp[0]]; return s && s.img ? Lg(strip, s.r0 + hp[1] / s.img.width * s.rw) : fx;
+}
+/* люди на картине: id → [номер картины, x в пикселях] */
+function applyNpcPx(strip, list){
+  const a = STRIP_ART[strip], Ly = a && a.npcPx && layout(strip); if(!Ly) return;
+  for(const n of list){ const hp = a.npcPx[n.id]; if(!hp) continue; const s = Ly.segs[hp[0]]; if(!s || !s.img) continue; n.x = Lg(strip, s.r0 + hp[1] / s.img.width * s.rw) + (n.pose === 'suitcase' ? 90 : 0); }
 }
 /* точные места на картине: подпись точки → [номер картины, x в пикселях картины] */
 function applyHotPx(strip, list){
@@ -2376,12 +2401,8 @@ function gradeArt(g, ph, nightArt, bright){
 function drawArtStrip(g, P, camX, strip){
   const { s, oy } = VIEW, Ly = layout(strip);
   Ly.segs.forEach((sg, i) => { const im = P.imgs[i], x = sg.r0, w = sg.rw; if(x + w < camX - 10 || x > camX + VIEW.viewW + 10) return;
-    if(im) g.drawImage(im, (x - camX) * s, oy, w * s + 1, VH * s);
+    if(im) g.drawImage(i ? fadedLeft(im, OV / w) : im, (x - camX) * s, oy, w * s + 1, VH * s);
     else { const gr = g.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, '#2a2530'); gr.addColorStop(.75, '#3a3530'); gr.addColorStop(1, '#1a1814'); g.fillStyle = gr; g.fillRect((x - camX) * s, oy, w * s + 1, VH * s); } });
-  // стыки картин прячутся в полосе тумана
-  for(let i = 1; i < Ly.segs.length; i++){ const bx = (Ly.segs[i].r0 - camX) * s, hw = 120 * s; if(bx < -hw || bx > VIEW.cw + hw) continue;
-    const gr = g.createLinearGradient(bx - hw, 0, bx + hw, 0); gr.addColorStop(0, 'rgba(70,64,72,0)'); gr.addColorStop(.5, 'rgba(78,70,76,.55)'); gr.addColorStop(1, 'rgba(70,64,72,0)');
-    g.fillStyle = gr; g.fillRect(bx - hw, oy, hw * 2, VH * s); }
 }
 /* =====================================================================
    ИГРА — цикл, управление, диалоги, тетрадь, звук
