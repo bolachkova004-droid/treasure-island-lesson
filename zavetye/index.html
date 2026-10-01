@@ -2184,7 +2184,9 @@ function drawFrame(v, camX, anna){
     g.strokeStyle = C.ink; g.lineWidth = 2; g.beginPath(); g.moveTo(camX - 50, GY + 16); g.lineTo(camX + VIEW.viewW + 50, GY + 16); g.stroke();
   }
   world();
+  drawFx(g);
   if(anna) annaDraw(g, anna.x, anna.dir, anna.move, anna.ph);
+  drawFx(g, true);
   if(anna && ph === 3) glow(anna.x, GY - 70, strip.indoor ? 130 : 170, .8);
   drawParticles(g, v);
   g.setTransform(1, 0, 0, 1, 0, 0);
@@ -2212,10 +2214,12 @@ function drawArtFrame(v, camX, anna, P, ph){
   g.setTransform(s, 0, 0, s, -camX * s, oy);
   SIL = a.bright ? 'rgba(40,34,30,.9)' : strip.indoor ? 'rgba(22,16,12,.92)' : 'rgba(14,15,20,.9)';
   try{
+    drawFx(g);
     const at = x => { g.setTransform(s * k, 0, 0, s * k, (x - camX) * s - x * s * k, oy + GY * s * (1 - k)); };
     for(const n of npcsFor(v)){ const m = { ...n, x:rx(n.x) }; at(m.x); if(n.id === 'varya' && !IMG.s_varya){ figure(g, m.x, LOOKS.varya, { face:1 }); continue; } drawNpc(g, m); }
     if(anna){ at(rx(anna.x)); annaDraw(g, rx(anna.x), anna.dir, anna.move, anna.ph); }
     g.setTransform(s, 0, 0, s, -camX * s, oy);
+    drawFx(g, true);
   } finally { SIL = null; }
   if(anna && ph === 3) glow(rx(anna.x), GY - 70, strip.indoor ? 130 : 170, .8);
   drawParticles(g, v);
@@ -2241,6 +2245,7 @@ const ASSETS = {
   'bg_street_4': 'art/bg_street_4.jpg',
   's_anna': 'art/s_anna.png',
   's_anna_body': 'art/s_anna_body.png',
+  's_anna_head': 'art/s_anna_head.png',
   's_anna_arm': 'art/s_anna_arm.png',
   's_anna_bag': 'art/s_anna_bag.png',
   's_anna_scarf': 'art/s_anna_scarf.png',
@@ -2380,46 +2385,106 @@ function drawSprite(g, im, x, h, face, bob = 0){
   g.save(); g.translate(x, GY - bob); g.scale(face, 1); g.drawImage(im, -w / 2, -h, w, h); g.restore();
 }
 
-/* Анна на шарнирах: корпус, рука, шарф, сумка и две ноги (бедро + голень).
+/* Анна на шарнирах: голова, корпус, рука, шарф, сумка и две ноги (бедро + голень).
    Координаты — в пикселях картинки s_anna (161×600). Бедро и плечо спрятаны под пальто. */
-const ANNA_RIG = { W:161, H:600, hip:[70, 372], knee:[70, 478], shoulder:[84, 112], strap:[36, 184], foot:221,
-  pos:{ arm:[66,96], bag:[1,179], scarf:[109,133], thigh:[37,385], thigh2:[37,385], shin:[36,472], shin2:[36,472] } };
+const ANNA_RIG = { W:161, H:600, hip:[70, 372], knee:[70, 478], shoulder:[84, 112], strap:[36, 184], neck:[98, 82], mouth:[127, 70], foot:221,
+  pos:{ head:[28,0], arm:[66,96], bag:[1,179], scarf:[109,133], thigh:[37,385], thigh2:[37,385], shin:[36,472], shin2:[36,472] } };
 const RIG_PARTS = ['body', ...Object.keys(ANNA_RIG.pos)];
+const ANNA_ANIM = { k:0, face:1, run:0 };          // плавность: разгон/остановка, разворот
 function annaRigReady(){ return RIG_PARTS.every(p => IMG['s_anna_' + p]); }
 function drawAnnaRig(g, x, h, face, ph, moving, run){
   const R = ANNA_RIG, k = h / R.H, P = R.pos, im = n => IMG['s_anna_' + n];
-  const t = performance.now() / 1000;
-  const A = moving ? (run ? .5 : .4) : 0, sn = Math.sin(ph), cs = Math.cos(ph);
-  // нога: угол бедра и сгиб колена (колено сгибается, пока нога идёт вперёд по воздуху)
+  const t = performance.now() / 1000, m = ANNA_ANIM.k, rn = ANNA_ANIM.run;
+  face = ANNA_ANIM.face;
+  const A = (.4 + .12 * rn) * m, sn = Math.sin(ph);
   const legPose = s => { const th = -A * Math.sin(ph + s), sw = Math.cos(ph + s);
-    return { th, bend: moving ? Math.max(0, sw) ** 1.5 * (run ? .95 : .75) + .04 : 0 }; };
+    return { th, bend: (Math.max(0, sw) ** 1.5 * (.75 + .25 * rn) + .04) * m }; };
   const near = legPose(0), far = legPose(Math.PI);
   const stance = near.bend < far.bend ? near : far;
-  const drop = R.foot * (1 - Math.cos(stance.th)) + (moving ? 1.5 : 0);
-  const breathe = moving ? 0 : Math.sin(t * 1.6) * 1.2;
-  const w = R.W * k;
+  const drop = R.foot * (1 - Math.cos(stance.th)) + 1.5 * m;
+  const idle = 1 - m;
+  const breathe = Math.sin(t * 1.7) * 1.4 * idle;
+  const w = R.W * k * Math.max(.35, Math.abs(face));
   g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, w * .4 + Math.abs(sn) * A * 30 * k, 5, 0, 0, Math.PI * 2); g.fill();
   g.save(); g.translate(x, GY); g.scale(face * k, k); g.translate(-R.W / 2, -R.H + drop);
   const put = (n, dx = 0, dy = 0) => g.drawImage(im(n), P[n][0] + dx, P[n][1] + dy);
   const rot = (px, py, a, fn) => { g.save(); g.translate(px, py); g.rotate(a); g.translate(-px, -py); fn(); g.restore(); };
   const leg = (L, sfx) => rot(R.hip[0], R.hip[1], L.th, () => { put('thigh' + sfx); rot(R.knee[0], R.knee[1], L.bend, () => put('shin' + sfx)); });
   leg(far, '2'); leg(near, '');
-  // корпус: лёгкий наклон вперёд при ходьбе, полы пальто отстают и колышутся
-  rot(R.hip[0], R.hip[1], moving ? .035 + Math.sin(ph * 2) * .01 : 0, () => {
-    g.translate(0, breathe * .3);
-    const body = im('body'), y0 = 300, y1 = 445, sway = moving ? -(2.5 + 2 * Math.sin(ph * 2 + .6)) * (run ? 1.6 : 1) : Math.sin(t * .9) * .4;
+  // стоя — переминается с ноги на ногу; в ходьбе — наклон вперёд и пружинка
+  const lean = m * (.035 + .02 * rn + Math.sin(ph * 2) * .012) + idle * Math.sin(t * .55) * .008;
+  rot(R.hip[0], R.hip[1], lean, () => {
+    g.translate(0, breathe * .35 - m * Math.abs(Math.cos(ph)) * 2.5);
+    // голова: кивает в такт шагу, стоя — оглядывается и опускает взгляд
+    const look = idle * (Math.sin(t * .37) * .05 + Math.sin(t * 1.13 + 1) * .02 + Math.max(0, Math.sin(t * .21 - 2)) * .07);
+    rot(R.neck[0], R.neck[1], m * (Math.sin(ph * 2 + .5) * .03 - .02) + look, () => put('head'));
+    const body = im('body'), y0 = 300, y1 = 445, sway = -(2.5 + 2 * Math.sin(ph * 2 + .6)) * (1 + .7 * rn) * m + Math.sin(t * .9) * .5 * idle;
+    g.save(); g.translate(0, R.hip[1]); g.scale(1, 1 + breathe * .002); g.translate(0, -R.hip[1]);
     g.drawImage(body, 0, 0, R.W, y0 + 2, 0, 0, R.W, y0 + 2);
-    for(let y = y0; y < y1; y += 5){ const q = ((y - y0) / (y1 - y0)) ** 1.6; g.drawImage(body, 0, y, R.W, Math.min(8, y1 + 20 - y), sway * q, y, R.W, Math.min(8, y1 + 20 - y)); }
+    g.restore();
+    for(let y = y0; y < y1; y += 5){ const q = ((y - y0) / (y1 - y0)) ** 1.6, hh = Math.min(8, y1 + 20 - y); g.drawImage(body, 0, y, R.W, hh, sway * q, y, R.W, hh); }
     // сумка качается на ремне с запаздыванием
-    rot(R.strap[0], R.strap[1], moving ? Math.sin(ph * 2 - 1.2) * .07 + .04 : Math.sin(t * .8) * .01, () => put('bag'));
-    // шарф: концы отстают назад и волной колышутся
-    const sc = im('scarf'), sh = sc.height, trail = moving ? (run ? 9 : 5) : 0;
-    for(let y = 0; y < sh; y += 4){ const q = y / sh, dx = -trail * q ** 1.3 + Math.sin(t * (moving ? 7 : 1.7) - q * 4) * (moving ? 2.2 : .8) * q;
-      const hh = Math.min(7, sh - y); g.drawImage(sc, 0, y, sc.width, hh, P.scarf[0] + dx, P.scarf[1] + y, sc.width, hh); }
-    // рука в противоход ближней ноге
-    rot(R.shoulder[0], R.shoulder[1], moving ? -near.th * .8 + .03 : Math.sin(t * 1.1) * .01, () => put('arm'));
+    rot(R.strap[0], R.strap[1], m * (Math.sin(ph * 2 - 1.2) * (.07 + .04 * rn) + .04) + idle * Math.sin(t * .8) * .012, () => put('bag'));
+    // шарф: концы отстают назад и волной колышутся (и на ветру, когда стоит)
+    const sc = im('scarf'), sh = sc.height, trail = (5 + 6 * rn) * m;
+    for(let y = 0; y < sh; y += 4){ const q = y / sh, hh = Math.min(7, sh - y), dx = -trail * q ** 1.3 + Math.sin(t * (1.7 + 5.5 * m) - q * 4) * (.9 + 1.6 * m) * q;
+      g.drawImage(sc, 0, y, sc.width, hh, P.scarf[0] + dx, P.scarf[1] + y, sc.width, hh); }
+    // рука в противоход ближней ноге; стоя — чуть покачивается
+    rot(R.shoulder[0], R.shoulder[1], -near.th * (.8 + .3 * rn) + .03 * m + idle * Math.sin(t * .9 + 2) * .015, () => put('arm'));
   });
   g.restore();
+}
+
+/* ---------- живые мелочи: брызги из-под ног, круги на лужах, пар изо рта ---------- */
+const FX = [];
+/* лужи на картине улицы: [номер картины, от, до] в пикселях */
+const WET = { village: [[0, 1280, 1460], [1, 690, 960], [2, 117, 390], [2, 664, 840], [3, 0, 254]] };
+function surfaceAt(strip, x){
+  const S = STRIPS[strip];
+  if(strip === 'flat') return 'carpet';
+  if(S.indoor) return 'wood';
+  if(strip === 'road' || strip === 'forestroad') return 'asphalt';
+  if(strip === 'field') return 'grass';
+  if(strip === 'river') return x > 760 && x < 1010 ? 'planks' : 'mud';
+  if(WET[strip]){ const Ly = layout(strip); if(Ly){ const rx = R(strip, x);
+    for(const [i, a, b] of WET[strip]){ const s = Ly.segs[i]; if(!s || !s.img) continue; const k = s.rw / s.img.width; if(rx > s.r0 + a * k && rx < s.r0 + b * k) return 'puddle'; } } }
+  return 'mud';
+}
+function charK(strip){ const a = STRIP_ART[strip]; return a && artParts(strip, 0) ? a.charScale || 1 : 1; }
+function footFx(strip, x, surf, run){
+  const rx = R(strip, x), rnd = (a, b) => a + Math.random() * (b - a), n = run ? 1.6 : 1;
+  if(surf === 'mud' || surf === 'puddle'){
+    const wet = surf === 'puddle';
+    for(let i = 0; i < (wet ? 7 : 4) * n; i++) FX.push({ k:'drop', x:rx + rnd(-4, 4), y:GY - 1, vx:rnd(-55, 55), vy:rnd(-95, -40) * (wet ? 1.1 : .8), t:0, life:rnd(.35, .6), r:rnd(.6, 1.3), c:wet ? '120,112,100' : '52,38,28' });
+    if(wet){ FX.push({ k:'ring', x:rx, y:GY + 2, t:0, life:1.1 }); FX.push({ k:'ring', x:rx + rnd(-6, 6), y:GY + 3, t:-.15, life:1.1 }); }
+    else FX.push({ k:'splat', x:rx, y:GY + 2, t:0, life:1.6 });
+  } else if(surf === 'grass'){
+    for(let i = 0; i < 4 * n; i++) FX.push({ k:'chaff', x:rx + rnd(-8, 8), y:GY - rnd(2, 10), vx:rnd(-12, 12), vy:rnd(-30, -10), t:0, life:rnd(.8, 1.4), r:rnd(.8, 1.4) });
+  } else if(surf !== 'carpet'){
+    FX.push({ k:'puff', x:rx, y:GY - 2, t:0, life:.6, r:surf === 'wood' ? 7 : 9 });
+  }
+}
+function breathFx(strip, x, face){
+  const R0 = ANNA_RIG, cs = charK(strip), u = 124 / R0.H * cs, rx = R(strip, x);
+  for(let i = 0; i < 3; i++) FX.push({ k:'breath', x:rx + face * (R0.mouth[0] - R0.W / 2) * u, y:GY - (R0.H - R0.mouth[1]) * u, vx:face * (14 + Math.random() * 10), vy:-6 - Math.random() * 6, t:-i * .05, life:1.7, r:1.5 });
+}
+function fxStep(dt){
+  for(const f of FX){ f.t += dt; if(f.t < 0) continue;
+    if(f.vx !== undefined){ f.x += f.vx * dt; f.y += f.vy * dt; }
+    if(f.k === 'drop'){ f.vy += 420 * dt; if(f.y > GY + 2){ f.y = GY + 2; f.vy = 0; f.vx *= .3; } }
+    if(f.k === 'chaff'){ f.vy += 6 * dt; f.vx += Math.sin(f.t * 5) * 8 * dt; }
+    if(f.k === 'breath'){ f.vx *= 1 - dt * .9; f.vy -= 2 * dt; f.r += dt * 7; } }
+  for(let i = FX.length - 1; i >= 0; i--) if(FX[i].t > FX[i].life) FX.splice(i, 1);
+}
+function drawFx(g, air = false){
+  for(const f of FX){ if(f.t < 0 || (f.k === 'breath') !== air) continue; const q = f.t / f.life, a = 1 - q;
+    if(f.k === 'drop'){ g.fillStyle = `rgba(${f.c},${a * .9})`; g.beginPath(); g.arc(f.x, f.y, f.r, 0, Math.PI * 2); g.fill(); }
+    else if(f.k === 'splat'){ g.fillStyle = `rgba(30,22,16,${a * .35})`; g.beginPath(); g.ellipse(f.x, f.y, 7 + q * 3, 1.6, 0, 0, Math.PI * 2); g.fill(); }
+    else if(f.k === 'ring'){ const r = 3 + q * 20; g.strokeStyle = `rgba(250,214,160,${a * .28})`; g.lineWidth = .8; g.beginPath(); g.ellipse(f.x, f.y, r, r * .2, 0, 0, Math.PI * 2); g.stroke(); }
+    else if(f.k === 'chaff'){ g.fillStyle = `rgba(222,196,120,${a * .8})`; g.fillRect(f.x, f.y, f.r * 2, f.r * .7); }
+    else if(f.k === 'puff'){ const r = f.r * (.5 + q); const gr = g.createRadialGradient(f.x, f.y, 0, f.x, f.y, r); gr.addColorStop(0, `rgba(150,140,128,${a * .25})`); gr.addColorStop(1, 'rgba(150,140,128,0)'); g.fillStyle = gr; g.fillRect(f.x - r, f.y - r, r * 2, r * 2); }
+    else if(f.k === 'breath'){ const gr = g.createRadialGradient(f.x, f.y, 0, f.x, f.y, f.r); const al = Math.min(1, f.t * 6) * a * .5; gr.addColorStop(0, `rgba(236,240,244,${al})`); gr.addColorStop(1, 'rgba(236,240,244,0)'); g.fillStyle = gr; g.fillRect(f.x - f.r, f.y - f.r, f.r * 2, f.r * 2); }
+  }
 }
 
 /* ---------- туман и цветокоррекция ---------- */
@@ -2463,7 +2528,7 @@ function drawArtStrip(g, P, camX, strip){
    ИГРА — цикл, управление, диалоги, тетрадь, звук
    ===================================================================== */
 const ui = { dlg:false, nb:false, title:false, end:false, fading:false, cut:false };
-let camX = 0, walkPh = 0, moving = false, target = null, targetHot = null, curHot = null, curChoices = [], DLG = null, saveT = 0, lastStep = 0;
+let breathT = 1.5, camX = 0, walkPh = 0, moving = false, target = null, targetHot = null, curHot = null, curChoices = [], DLG = null, saveT = 0, lastStep = 0;
 const keys = {};
 const blocked = () => ui.dlg || ui.nb || ui.title || ui.end || ui.fading || ui.cut;
 const wrapP = s => (s.startsWith('<') ? s : `<p>${s}</p>`).replace(/^<p>— /, '<p class="dl">— ');
@@ -2474,7 +2539,7 @@ function teleport(dest, then){
   setTimeout(() => {
     const [strip, x] = dest, changed = st.strip !== strip;
     st.strip = strip; st.x = x; st.dir = x > STRIPS[strip].w / 2 ? -1 : 1; target = null; targetHot = null;
-    snapCam(); PARTS.length = 0; annaHist.length = 0;
+    snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = st.dir;
     $('fade').classList.remove('on');
     setTimeout(() => { ui.fading = false; if(changed) showArea(); save(); if(then) then(); }, 300);
   }, 460);
@@ -2580,7 +2645,8 @@ function update(dt){
     else if(target != null){ const dx = target - st.x; if(Math.abs(dx) < 8){ target = null; const h = targetHot; targetHot = null; if(h) interact(h); } else d = Math.sign(dx); }
     if(d){
       const sp = (keys.run ? 330 : 190) * dt; st.x += d * sp; st.dir = d; moving = true; walkPh += dt * (keys.run ? 19 : 13.5);
-      if(Math.floor(walkPh / Math.PI) !== lastStep){ lastStep = Math.floor(walkPh / Math.PI); sfx('step'); }
+      const plant = Math.floor((walkPh - Math.PI / 2) / Math.PI);   // момент, когда пятка встаёт на землю
+      if(plant !== lastStep){ lastStep = plant; const surf = surfaceAt(st.strip, st.x + st.dir * 14); stepSound(surf, keys.run); footFx(st.strip, st.x + st.dir * 14, surf, keys.run); }
       hideHint();
     }
     const minX = S0.minX || 30, maxX = S0.maxX || S0.w - 30;
@@ -2592,6 +2658,15 @@ function update(dt){
     if(st.strip === 'field' && st.phase === 1 && !F('noonDone') && Math.abs(st.x - 1100) < 300 && !F('noonAsk' + st.day)){ setF('noonAsk' + st.day); target = null; openScene('field_noon'); }
     saveT += dt; if(saveT > 4){ saveT = 0; save(); }
   }
+  // плавный разгон/остановка и разворот; пар изо рта на холоде
+  const AN = ANNA_ANIM, tk = moving ? 1 : 0;
+  AN.k += (tk - AN.k) * Math.min(1, dt * (moving ? 9 : 7));
+  AN.run += ((moving && keys.run ? 1 : 0) - AN.run) * Math.min(1, dt * 5);
+  const fd = st.dir - AN.face; AN.face += Math.sign(fd) * Math.min(Math.abs(fd), dt * 11);
+  const cold = !STRIPS[st.strip].indoor && st.strip !== 'flat' && phaseOf(st) !== 1;
+  breathT -= dt * (1 + AN.k * .8 + AN.run * 1.2);
+  if(breathT <= 0){ breathT = 2.4 + Math.random() * .8; if(cold && !STRIPS[st.strip].frozen) breathFx(st.strip, st.x, AN.face >= 0 ? 1 : -1); }
+  fxStep(dt);
   annaHist.push({ x:st.x, dir:st.dir, move:moving, ph:walkPh }); if(annaHist.length > 32) annaHist.shift();
   const vw = VIEW.viewW, W = RW(st.strip), ax = R(st.strip, st.x), tx = W <= vw ? (W - vw) / 2 : Math.max(0, Math.min(W - vw, ax - vw / 2 + st.dir * vw * .08));
   camX += (tx - camX) * Math.min(1, dt * 3.2);
@@ -2797,15 +2872,58 @@ function audioInit(){
   AU.noise = buf;
   const mk = (freq, type = 'lowpass') => { const s = c.createBufferSource(); s.buffer = buf; s.loop = true; const f = c.createBiquadFilter(); f.type = type; f.frequency.value = freq; const gn = c.createGain(); gn.gain.value = 0; s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(); return { f, g:gn }; };
   AU.wind = mk(420); AU.fire = mk(900, 'bandpass'); AU.fire.f.Q.value = .8;
+  AU.water = mk(650, 'bandpass'); AU.water.f.Q.value = .6;
+  const cityN = mk(160); AU.city = cityN.g;
+  const dr = c.createOscillator(); dr.type = "sine"; dr.frequency.value = 55; AU.drone = c.createGain(); AU.drone.gain.value = 0; dr.connect(AU.drone); AU.drone.connect(AU.master); dr.start();
   const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 42; const of = c.createBiquadFilter(); of.type = 'lowpass'; of.frequency.value = 180; AU.eng = c.createGain(); AU.eng.gain.value = 0; o.connect(of); of.connect(AU.eng); AU.eng.connect(AU.master); o.start();
   updateSoundIcon();
 }
 function env(freq, dur, vol, type = 'sine', when = 0){ const c = AU.ctx; if(!c) return; const t = c.currentTime + when, o = c.createOscillator(), gn = c.createGain(); o.type = type; o.frequency.value = freq; gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + .02); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(gn); gn.connect(AU.master); o.start(t); o.stop(t + dur + .05); }
 function burst(dur, vol, freq){ const c = AU.ctx; if(!c) return; const s = c.createBufferSource(); s.buffer = AU.noise; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq; const gn = c.createGain(); const t = c.currentTime; gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(t, Math.random()); s.stop(t + dur); }
+/* шум через фильтр со сдвигом частоты: основа для шагов и брызг */
+function nz(o){ const c = AU.ctx; if(!c) return; const t = c.currentTime + (o.when || 0), s = c.createBufferSource(); s.buffer = AU.noise;
+  const f = c.createBiquadFilter(); f.type = o.type || 'bandpass'; f.Q.value = o.q || 1; f.frequency.setValueAtTime(o.f0, t); if(o.f1) f.frequency.exponentialRampToValueAtTime(o.f1, t + o.dur);
+  const gn = c.createGain(); gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(o.vol, t + (o.att || .006)); gn.gain.exponentialRampToValueAtTime(.0001, t + o.dur);
+  s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(t, Math.random() * 1.5); s.stop(t + o.dur + .05); }
+function tone(o){ const c = AU.ctx; if(!c) return; const t = c.currentTime + (o.when || 0), os = c.createOscillator(), gn = c.createGain(); os.type = o.type || 'sine';
+  os.frequency.setValueAtTime(o.f0, t); if(o.f1) os.frequency.exponentialRampToValueAtTime(o.f1, t + o.dur);
+  gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(o.vol, t + (o.att || .005)); gn.gain.exponentialRampToValueAtTime(.0001, t + o.dur);
+  let out = os; if(o.lp){ const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; f.Q.value = o.q || 1; os.connect(f); out = f; }
+  out.connect(gn); gn.connect(AU.master); os.start(t); os.stop(t + o.dur + .05); }
+/* шаги: у каждой поверхности свой звук */
+function stepSound(surf, run){
+  if(!AU.ctx || AU.muted) return;
+  const v = run ? 1.3 : 1, j = .85 + Math.random() * .3;
+  if(surf === 'mud'){                                   // хлюп: вязкое «чвак» + присос
+    nz({ f0:1300 * j, f1:300, q:3.5, dur:.16, vol:.17 * v, type:'bandpass' });
+    tone({ f0:230 * j, f1:85, dur:.09, vol:.06 * v, type:'triangle' });
+    if(Math.random() < .5) nz({ f0:2400 * j, f1:700, q:6, dur:.07, vol:.05, when:.08 });
+  } else if(surf === 'puddle'){                         // плеск и капли
+    nz({ f0:3200 * j, f1:900, q:1.2, dur:.24, vol:.15 * v });
+    nz({ f0:600, f1:250, q:2, dur:.14, vol:.08 * v, type:'lowpass' });
+    for(let i = 0; i < 3; i++) tone({ f0:1300 + Math.random() * 1300, f1:2600 + Math.random() * 900, dur:.035, vol:.025, when:.05 + Math.random() * .2 });
+  } else if(surf === 'asphalt'){                        // каблук по старому асфальту
+    nz({ f0:2600 * j, q:.8, dur:.045, vol:.12 * v, type:'highpass' });
+    tone({ f0:120 * j, f1:70, dur:.07, vol:.09 * v });
+    if(Math.random() < .35) nz({ f0:5000, q:2, dur:.05, vol:.03, when:.03 });   // хрустнул камешек
+  } else if(surf === 'grass'){                          // шорох ржи
+    nz({ f0:4200 * j, f1:2600, q:.7, dur:.2, vol:.07 * v, att:.03 });
+    nz({ f0:3000 * j, q:.7, dur:.15, vol:.035 * v, att:.02, when:.07 });
+  } else if(surf === 'planks'){                         // гулкие мостки
+    tone({ f0:190 * j, f1:150, dur:.16, vol:.12 * v });
+    nz({ f0:900, q:1, dur:.08, vol:.07 * v, type:'lowpass' });
+  } else if(surf === 'wood'){                           // половицы, иногда скрипнут
+    nz({ f0:520 * j, q:.8, dur:.1, vol:.15 * v, type:'lowpass' });
+    tone({ f0:140 * j, f1:95, dur:.08, vol:.07 * v });
+    if(Math.random() < .14) tone({ f0:250 + Math.random() * 60, f1:310 + Math.random() * 80, dur:.4, vol:.022, type:'sawtooth', lp:900, q:8, att:.08, when:.04 });
+  } else {                                              // ковёр в городской квартире
+    nz({ f0:380 * j, q:.7, dur:.07, vol:.08 * v, type:'lowpass' });
+  }
+}
 function sfx(k){
   if(!AU.ctx || AU.muted) return;
   if(k === 'clue'){ env(880, 1.2, .06); env(1318, 1.4, .04, 'sine', .12); }
-  if(k === 'step') burst(.09, STRIPS[st.strip].indoor ? .12 : .07, STRIPS[st.strip].indoor ? 700 : 1400);
+  if(k === 'step') stepSound(surfaceAt(st.strip, st.x), keys.run);
   if(k === 'door') burst(.35, .12, 300);
   if(k === 'page') burst(.12, .04, 3000);
 }
@@ -2823,6 +2941,27 @@ function audioTick(dt){
   AU.fire.g.gain.setTargetAtTime(fire * (Math.random() < .3 ? 2.2 : .6), t, .03);
   const eng = !AU.muted && v && v.bus && v.strip === 'road' ? .06 : 0; AU.eng.gain.setTargetAtTime(eng, t, .4);
   if(!AU.muted && out && ph >= 2 && Math.random() < dt * 1.6){ for(let i = 0; i < 3; i++) env(4300 + Math.random() * 300, .05, .012, 'sine', i * .07); }
+  if(AU.muted || !v) return;
+  const S = v.strip, rnd = Math.random;
+  // вода у реки
+  AU.water.g.gain.setTargetAtTime(S === 'river' ? .07 + Math.sin(T * .7) * .015 : 0, t, .6);
+  // мёртвая тишина на лесной остановке: низкий гул и часы
+  AU.drone.gain.setTargetAtTime(S === 'forestroad' ? .035 : 0, t, 1.2);
+  if((S === 'forestroad' || S === 'laptev') && (AU.tick = (AU.tick || 0) + dt) > 1){ AU.tick = 0; nz({ f0:3500, q:4, dur:.03, vol:S === 'forestroad' ? .03 : .022 }); }
+  if(S === 'flat'){ AU.city.gain.setTargetAtTime(.025, t, 1); } else AU.city.gain.setTargetAtTime(0, t, 1);
+  if(!out || S === 'forestroad') return;
+  // утром птицы
+  if(ph === 0 && rnd() < dt * .7){ const f = 2600 + rnd() * 1400; for(let i = 0; i < 2 + (rnd() * 3 | 0); i++) tone({ f0:f, f1:f * (1.2 + rnd() * .4), dur:.07, vol:.018, when:i * .11 }); }
+  // в полдень кузнечики в поле
+  if(S === 'field' && ph === 1 && rnd() < dt * 2.2){ const f = 5200 + rnd() * 900; for(let i = 0; i < 6; i++) tone({ f0:f, dur:.025, vol:.008, when:i * .045 }); }
+  // вечером и ночью лягушки у воды
+  if(S === 'river' && ph >= 2 && rnd() < dt * .9){ const f = 95 + rnd() * 40; for(let i = 0; i < 3 + (rnd() * 3 | 0); i++) tone({ f0:f * 1.4, f1:f, dur:.06, vol:.05, type:'square', lp:420, when:i * .09 }); }
+  // ночью сова
+  if(ph === 3 && rnd() < dt * .05){ tone({ f0:390, f1:360, dur:.35, vol:.035, att:.06 }); tone({ f0:380, f1:340, dur:.6, vol:.035, att:.08, when:.55 }); }
+  // вечером вороны
+  if(ph === 2 && S === 'village' && rnd() < dt * .06){ for(let i = 0; i < 2 + (rnd() * 2 | 0); i++) tone({ f0:560 + rnd() * 60, f1:420, dur:.2, vol:.02, type:'sawtooth', lp:1500, q:4, when:i * .32 }); }
+  // капли с крыш на мокрой улице
+  if(S === 'village' && rnd() < dt * .5) tone({ f0:1500 + rnd() * 1200, f1:2600 + rnd() * 800, dur:.03, vol:.012 });
 }
 function updateSoundIcon(){ $('sndIco').innerHTML = AU.muted ? '<path d="M3 7h3l4-3v10l-4-3H3z"/><path d="M13 7l4 4M17 7l-4 4"/>' : '<path d="M3 7h3l4-3v10l-4-3H3z"/><path d="M13 6.5a3.5 3.5 0 0 1 0 5M15 4.5a6.5 6.5 0 0 1 0 9"/>'; }
 $('bSound').onclick = () => { AU.muted = !AU.muted; try{ localStorage.setItem('zavetye.mute', AU.muted ? '1' : '0'); }catch(e){} if(AU.muted){ if(AU.ctx) AU.master.gain.value = 0; } else { audioInit(); if(AU.ctx) AU.master.gain.value = .9; } updateSoundIcon(); };
