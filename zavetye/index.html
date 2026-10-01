@@ -2206,6 +2206,9 @@ function drawArtFrame(v, camX, anna, P, ph){
   g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0b0b0e'; g.fillRect(0, 0, cw, ch);
   drawArtStrip(g, P, camX, v.strip);
   if(oy + VH * s < ch){ g.fillStyle = '#101014'; g.fillRect(0, oy + VH * s - 1, cw, ch); }
+  const fogK = strip.indoor ? .12 : ph === 0 ? .55 : .9;
+  // дальний туман — за героями, ближний — полупрозрачно поверх, чтобы фигуры не тонули
+  if(!a.bright){ g.setTransform(1, 0, 0, 1, 0, 0); drawFog(g, ph, camX, fogK, 'back'); }
   g.setTransform(s, 0, 0, s, -camX * s, oy);
   SIL = a.bright ? 'rgba(40,34,30,.9)' : strip.indoor ? 'rgba(22,16,12,.92)' : 'rgba(14,15,20,.9)';
   try{
@@ -2217,7 +2220,7 @@ function drawArtFrame(v, camX, anna, P, ph){
   if(anna && ph === 3) glow(rx(anna.x), GY - 70, strip.indoor ? 130 : 170, .8);
   drawParticles(g, v);
   g.setTransform(1, 0, 0, 1, 0, 0);
-  if(!a.bright) drawFog(g, ph, camX, strip.indoor ? .12 : ph === 0 ? .55 : .9);
+  if(!a.bright) drawFog(g, ph, camX, fogK * .45, 'front');
   gradeArt(g, ph, P.nightArt, a.bright);
   if(GLOWS.length){ g.globalCompositeOperation = 'lighter'; for(const L of GLOWS){ const x = (L.x - camX) * s, y = oy + L.y * s, r = L.r * s; if(r <= 0) continue; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${L.col},${.3 * L.a})`); gr.addColorStop(1, `rgba(${L.col},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); } g.globalCompositeOperation = 'source-over'; }
 }
@@ -2238,8 +2241,13 @@ const ASSETS = {
   'bg_street_4': 'art/bg_street_4.jpg',
   's_anna': 'art/s_anna.png',
   's_anna_body': 'art/s_anna_body.png',
-  's_anna_leg': 'art/s_anna_leg.png',
-  's_anna_leg2': 'art/s_anna_leg2.png',
+  's_anna_arm': 'art/s_anna_arm.png',
+  's_anna_bag': 'art/s_anna_bag.png',
+  's_anna_scarf': 'art/s_anna_scarf.png',
+  's_anna_thigh': 'art/s_anna_thigh.png',
+  's_anna_thigh2': 'art/s_anna_thigh2.png',
+  's_anna_shin': 'art/s_anna_shin.png',
+  's_anna_shin2': 'art/s_anna_shin2.png',
   // 'bg_street_a': 'art/bg_street_a.jpg',
   // 'p_grunya_warm': 'art/p_grunya_warm.png',
 };
@@ -2372,24 +2380,45 @@ function drawSprite(g, im, x, h, face, bob = 0){
   g.save(); g.translate(x, GY - bob); g.scale(face, 1); g.drawImage(im, -w / 2, -h, w, h); g.restore();
 }
 
-/* Анна на шарнирах: корпус + две ноги, шагающие из-под пальто.
-   Координаты — в пикселях картинки s_anna (161×600), бедро спрятано под пальто. */
-const ANNA_RIG = { W:161, H:600, legX:36, legY:385, hipX:70, hipY:372, foot:221 };
-function annaRigReady(){ return IMG.s_anna_body && IMG.s_anna_leg && IMG.s_anna_leg2; }
+/* Анна на шарнирах: корпус, рука, шарф, сумка и две ноги (бедро + голень).
+   Координаты — в пикселях картинки s_anna (161×600). Бедро и плечо спрятаны под пальто. */
+const ANNA_RIG = { W:161, H:600, hip:[70, 372], knee:[70, 478], shoulder:[84, 112], strap:[36, 184], foot:221,
+  pos:{ arm:[66,96], bag:[1,179], scarf:[109,133], thigh:[37,385], thigh2:[37,385], shin:[36,472], shin2:[36,472] } };
+const RIG_PARTS = ['body', ...Object.keys(ANNA_RIG.pos)];
+function annaRigReady(){ return RIG_PARTS.every(p => IMG['s_anna_' + p]); }
 function drawAnnaRig(g, x, h, face, ph, moving, run){
-  const R = ANNA_RIG, k = h / R.H;
-  const A = moving ? (run ? .52 : .42) : 0, sn = Math.sin(ph), cs = Math.cos(ph);
-  const ta = -A * sn, tb = A * sn;                       // ta — ближняя нога, вперёд = отрицательный угол
-  const drop = R.foot * (1 - Math.cos(A * sn));          // опорная нога должна стоять на земле
-  const liftA = moving ? Math.max(0, cs) * 9 : 0, liftB = moving ? Math.max(0, -cs) * 9 : 0;
+  const R = ANNA_RIG, k = h / R.H, P = R.pos, im = n => IMG['s_anna_' + n];
+  const t = performance.now() / 1000;
+  const A = moving ? (run ? .5 : .4) : 0, sn = Math.sin(ph), cs = Math.cos(ph);
+  // нога: угол бедра и сгиб колена (колено сгибается, пока нога идёт вперёд по воздуху)
+  const legPose = s => { const th = -A * Math.sin(ph + s), sw = Math.cos(ph + s);
+    return { th, bend: moving ? Math.max(0, sw) ** 1.5 * (run ? .95 : .75) + .04 : 0 }; };
+  const near = legPose(0), far = legPose(Math.PI);
+  const stance = near.bend < far.bend ? near : far;
+  const drop = R.foot * (1 - Math.cos(stance.th)) + (moving ? 1.5 : 0);
+  const breathe = moving ? 0 : Math.sin(t * 1.6) * 1.2;
   const w = R.W * k;
   g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, w * .4 + Math.abs(sn) * A * 30 * k, 5, 0, 0, Math.PI * 2); g.fill();
   g.save(); g.translate(x, GY); g.scale(face * k, k); g.translate(-R.W / 2, -R.H + drop);
-  const leg = (im, t, lift) => { g.save(); g.translate(R.hipX, R.hipY - lift); g.rotate(t); g.drawImage(im, R.legX - R.hipX, R.legY - R.hipY); g.restore(); };
-  leg(IMG.s_anna_leg2, tb, liftB);
-  leg(IMG.s_anna_leg, ta, liftA);
-  if(moving){ g.translate(R.hipX, R.hipY); g.rotate(.03 + Math.sin(ph * 2) * .008); g.translate(-R.hipX, -R.hipY); }
-  g.drawImage(IMG.s_anna_body, 0, 0);
+  const put = (n, dx = 0, dy = 0) => g.drawImage(im(n), P[n][0] + dx, P[n][1] + dy);
+  const rot = (px, py, a, fn) => { g.save(); g.translate(px, py); g.rotate(a); g.translate(-px, -py); fn(); g.restore(); };
+  const leg = (L, sfx) => rot(R.hip[0], R.hip[1], L.th, () => { put('thigh' + sfx); rot(R.knee[0], R.knee[1], L.bend, () => put('shin' + sfx)); });
+  leg(far, '2'); leg(near, '');
+  // корпус: лёгкий наклон вперёд при ходьбе, полы пальто отстают и колышутся
+  rot(R.hip[0], R.hip[1], moving ? .035 + Math.sin(ph * 2) * .01 : 0, () => {
+    g.translate(0, breathe * .3);
+    const body = im('body'), y0 = 300, y1 = 445, sway = moving ? -(2.5 + 2 * Math.sin(ph * 2 + .6)) * (run ? 1.6 : 1) : Math.sin(t * .9) * .4;
+    g.drawImage(body, 0, 0, R.W, y0 + 2, 0, 0, R.W, y0 + 2);
+    for(let y = y0; y < y1; y += 5){ const q = ((y - y0) / (y1 - y0)) ** 1.6; g.drawImage(body, 0, y, R.W, Math.min(8, y1 + 20 - y), sway * q, y, R.W, Math.min(8, y1 + 20 - y)); }
+    // сумка качается на ремне с запаздыванием
+    rot(R.strap[0], R.strap[1], moving ? Math.sin(ph * 2 - 1.2) * .07 + .04 : Math.sin(t * .8) * .01, () => put('bag'));
+    // шарф: концы отстают назад и волной колышутся
+    const sc = im('scarf'), sh = sc.height, trail = moving ? (run ? 9 : 5) : 0;
+    for(let y = 0; y < sh; y += 4){ const q = y / sh, dx = -trail * q ** 1.3 + Math.sin(t * (moving ? 7 : 1.7) - q * 4) * (moving ? 2.2 : .8) * q;
+      const hh = Math.min(7, sh - y); g.drawImage(sc, 0, y, sc.width, hh, P.scarf[0] + dx, P.scarf[1] + y, sc.width, hh); }
+    // рука в противоход ближней ноге
+    rot(R.shoulder[0], R.shoulder[1], moving ? -near.th * .8 + .03 : Math.sin(t * 1.1) * .01, () => put('arm'));
+  });
   g.restore();
 }
 
@@ -2403,10 +2432,11 @@ function fogTex(ph){
     for(const dx of [-1024, 0, 1024]){ const gr = g.createRadialGradient(x + dx, y, 0, x + dx, y, rr); gr.addColorStop(0, `rgba(${FOGCFG[ph].c},.2)`); gr.addColorStop(1, `rgba(${FOGCFG[ph].c},0)`); g.fillStyle = gr; g.fillRect(x + dx - rr, y - rr, rr * 2, rr * 2); } }
   return fogCache[ph] = c;
 }
-function drawFog(g, ph, camX, strength = 1){
+function drawFog(g, ph, camX, strength = 1, part = 'all'){
   const { s, oy, cw } = VIEW, tex = fogTex(ph), a = FOGCFG[ph].a * strength;
   const layers = [ { y:GY - 220, h:300, sp:5, par:.45, a:.55 }, { y:GY - 110, h:240, sp:12, par:.9, a:.85 }, { y:GY - 20, h:190, sp:20, par:1.25, a:1 } ];
-  for(const L of layers){
+  for(const [i, L] of layers.entries()){
+    if(part === 'back' && i === 2 || part === 'front' && i < 2) continue;
     const tw = 1024 * 1.4 * s, th = L.h * s, y = oy + L.y * s;
     let off = -(((camX * L.par + T * L.sp) * s) % tw); if(off > 0) off -= tw;
     g.globalAlpha = Math.min(1, a * L.a);
