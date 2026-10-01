@@ -2423,7 +2423,7 @@ function drawAnnaRig(g, x, h, face, ph, moving, run){
   let i = 0; while(i < V.length - 2 && th > V[i + 1].th) i++;
   const A = V[i], B = V[i + 1], lp = (th - A.th) / (B.th - A.th), w = smooth(.4, .6, lp);
   // между ракурсами фигура сужается — как будто поворачивается в глубину
-  const squash = 1 - .2 * Math.sin(lp * Math.PI);
+  const squash = 1 - (V.length > 3 ? .04 : .15) * Math.sin(lp * Math.PI);
   const drawV = (v, alpha, near) => { if(alpha <= 0) return; g.save(); g.globalAlpha = alpha;
     const sq = squash * (near ? 1 : 1);
     if(v.side) drawAnnaSide(g, x, h, v.side * sq, ph);
@@ -2450,11 +2450,11 @@ function drawAnnaSide(g, x, h, face, ph){
   const leg = (L, sfx) => rot(R.hip[0], R.hip[1], L.th, () => { put('thigh' + sfx); rot(R.knee[0], R.knee[1], L.bend, () => put('shin' + sfx)); });
   leg(far, '2'); leg(near, '');
   // стоя — переминается с ноги на ногу; в ходьбе — наклон вперёд и пружинка
-  const lean = m * (.035 + .02 * rn + Math.sin(ph * 2) * .012) + idle * Math.sin(t * .55) * .008;
+  const lean = m * (.035 + .02 * rn + Math.sin(ph * 2) * .012) + idle * Math.sin(t * .55) * .003;
   rot(R.hip[0], R.hip[1], lean, () => {
     g.translate(0, breathe * .35 - m * Math.abs(Math.cos(ph)) * 2.5);
     // голова: кивает в такт шагу, стоя — оглядывается и опускает взгляд
-    const look = idle * (Math.sin(t * .37) * .05 + Math.sin(t * 1.13 + 1) * .02 + Math.max(0, Math.sin(t * .21 - 2)) * .07);
+    const look = idle * Math.sin(t * .3) * .012;
     rot(R.neck[0], R.neck[1], m * (Math.sin(ph * 2 + .5) * .03 - .02) + look, () => put('head'));
     const body = im('body'), y0 = 300, y1 = 445, sway = -(2.5 + 2 * Math.sin(ph * 2 + .6)) * (1 + .7 * rn) * m + Math.sin(t * .9) * .5 * idle;
     g.save(); g.translate(0, R.hip[1]); g.scale(1, 1 + breathe * .002); g.translate(0, -R.hip[1]);
@@ -2578,7 +2578,7 @@ function teleport(dest, then){
   setTimeout(() => {
     const [strip, x] = dest, changed = st.strip !== strip;
     st.strip = strip; st.x = x; st.dir = x > STRIPS[strip].w / 2 ? -1 : 1; target = null; targetHot = null;
-    snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = ANNA_ANIM.dirPrev = st.dir; ANNA_ANIM.th = st.dir > 0 ? 0 : Math.PI; ANNA_ANIM.thv = 0; ANNA_ANIM.look = ANNA_ANIM.idle = 0;
+    snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = ANNA_ANIM.dirPrev = st.dir; ANNA_ANIM.th = ANNA_ANIM.thTo = st.dir > 0 ? 0 : Math.PI; ANNA_ANIM.look = ANNA_ANIM.idle = 0;
     $('fade').classList.remove('on');
     setTimeout(() => { ui.fading = false; if(changed) showArea(); save(); if(then) then(); }, 300);
   }, 460);
@@ -2701,16 +2701,13 @@ function update(dt){
   const AN = ANNA_ANIM, tk = moving ? 1 : 0;
   AN.k += (tk - AN.k) * Math.min(1, dt * (moving ? 9 : 7));
   AN.run += ((moving && keys.run ? 1 : 0) - AN.run) * Math.min(1, dt * 5);
-  if(st.dir !== AN.dirPrev){ AN.via = st.dir < 0 ? 'front' : 'back'; AN.dirPrev = st.dir; }
-  // поворот по углу с плавным разгоном и торможением (~0.5 с на полный разворот)
-  { const target = st.dir > 0 ? 0 : Math.PI; AN.th = AN.th ?? (st.dir > 0 ? 0 : Math.PI);
-    const d = target - AN.th; AN.thv = (AN.thv || 0) + (d * 60 - (AN.thv || 0) * 14) * dt;   // пружина без перелёта
-    AN.th += AN.thv * dt; if(Math.abs(d) < .002 && Math.abs(AN.thv) < .01){ AN.th = target; AN.thv = 0; }
+  if(st.dir !== AN.dirPrev){ AN.via = 'front'; AN.dirPrev = st.dir; }
+  // поворот: фиксированная длительность (~0.32 с на разворот), мягкий старт и финиш
+  { const target = st.dir > 0 ? 0 : Math.PI; if(AN.th == null) AN.th = target;
+    if(AN.thTo !== target){ AN.thFrom = AN.th; AN.thTo = target; AN.thT = 0; AN.thDur = .08 + .24 * Math.abs(target - AN.th) / Math.PI; }
+    if(AN.th !== target){ AN.thT += dt; const q = Math.min(1, AN.thT / AN.thDur), e = q * q * (3 - 2 * q); AN.th = q >= 1 ? target : AN.thFrom + (target - AN.thFrom) * e; }
     AN.face = Math.cos(AN.th); }
-  // постояв, Анна оборачивается к нам и оглядывает улицу
-  AN.idle = moving || target != null ? 0 : AN.idle + dt;
-  const lk = !STRIPS[st.strip].indoor && AN.idle > 7 && (AN.idle - 7) % 12 < 2.6 ? 1 : 0;
-  AN.look += (lk - AN.look) * Math.min(1, dt * 5);
+  AN.look = 0;
   const cold = !STRIPS[st.strip].indoor && st.strip !== 'flat' && phaseOf(st) !== 1;
   breathT -= dt * (1 + AN.k * .8 + AN.run * 1.2);
   if(breathT <= 0){ breathT = 2.4 + Math.random() * .8; if(cold && !STRIPS[st.strip].frozen) breathFx(st.strip, st.x, AN.face >= 0 ? 1 : -1); }
