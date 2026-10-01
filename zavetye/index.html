@@ -2245,6 +2245,8 @@ const ASSETS = {
   'bg_street_4': 'art/bg_street_4.jpg',
   's_anna': 'art/s_anna.png',
   's_anna_body': 'art/s_anna_body.png',
+  's_anna_front': 'art/s_anna_front.png',
+  's_anna_back': 'art/s_anna_back.png',
   's_anna_head': 'art/s_anna_head.png',
   's_anna_arm': 'art/s_anna_arm.png',
   's_anna_bag': 'art/s_anna_bag.png',
@@ -2390,12 +2392,26 @@ function drawSprite(g, im, x, h, face, bob = 0){
 const ANNA_RIG = { W:161, H:600, hip:[70, 372], knee:[70, 478], shoulder:[84, 112], strap:[36, 184], neck:[98, 82], mouth:[127, 70], foot:221,
   pos:{ head:[28,0], arm:[66,96], bag:[1,179], scarf:[109,133], thigh:[37,385], thigh2:[37,385], shin:[36,472], shin2:[36,472] } };
 const RIG_PARTS = ['body', ...Object.keys(ANNA_RIG.pos)];
-const ANNA_ANIM = { k:0, face:1, run:0 };          // плавность: разгон/остановка, разворот
-function annaRigReady(){ return RIG_PARTS.every(p => IMG['s_anna_' + p]); }
+const ANNA_ANIM = { k:0, face:1, run:0, via:'front', look:0, idle:0, dirPrev:1 };   // разгон/остановка, разворот через фас/спину, взгляд в сторону зрителя
+function annaRigReady(){ return RIG_PARTS.every(p => IMG['s_anna_' + p]) && IMG.s_anna_front; }
+const smooth = (a, b, x) => { const q = Math.max(0, Math.min(1, (x - a) / (b - a))); return q * q * (3 - 2 * q); };
+/* Анна целиком: в профиль — на шарнирах; в развороте и когда смотрит на нас — вид спереди/со спины */
 function drawAnnaRig(g, x, h, face, ph, moving, run){
+  const AN = ANNA_ANIM, f = AN.face, u = Math.abs(f) * (1 - AN.look);
+  const mid = 1 - smooth(.36, .5, u);                       // 1 — фас/спина, 0 — профиль
+  const sideSx = (f < 0 ? -1 : 1) * (.5 + .5 * smooth(.2, 1, u));
+  const k = h / ANNA_RIG.H;
+  g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, ANNA_RIG.W * k * .4, 5, 0, 0, Math.PI * 2); g.fill();
+  if(mid < .5) drawAnnaSide(g, x, h, sideSx, ph);
+  if(mid > 0){
+    const im = IMG[AN.look > .3 ? 's_anna_front' : 's_anna_' + AN.via] || IMG.s_anna_front, t = performance.now() / 1000;
+    const sx = .72 + .28 * mid, br = Math.sin(t * 1.7) * .003;
+    g.save(); g.globalAlpha = Math.min(1, mid * 2); g.translate(x, GY); g.scale(sx * k, k * (1 + br)); g.drawImage(im, -im.width / 2, -im.height); g.restore();
+  }
+}
+function drawAnnaSide(g, x, h, face, ph){
   const R = ANNA_RIG, k = h / R.H, P = R.pos, im = n => IMG['s_anna_' + n];
   const t = performance.now() / 1000, m = ANNA_ANIM.k, rn = ANNA_ANIM.run;
-  face = ANNA_ANIM.face;
   const A = (.4 + .12 * rn) * m, sn = Math.sin(ph);
   const legPose = s => { const th = -A * Math.sin(ph + s), sw = Math.cos(ph + s);
     return { th, bend: (Math.max(0, sw) ** 1.5 * (.75 + .25 * rn) + .04) * m }; };
@@ -2404,8 +2420,6 @@ function drawAnnaRig(g, x, h, face, ph, moving, run){
   const drop = R.foot * (1 - Math.cos(stance.th)) + 1.5 * m;
   const idle = 1 - m;
   const breathe = Math.sin(t * 1.7) * 1.4 * idle;
-  const w = R.W * k * Math.max(.35, Math.abs(face));
-  g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, w * .4 + Math.abs(sn) * A * 30 * k, 5, 0, 0, Math.PI * 2); g.fill();
   g.save(); g.translate(x, GY); g.scale(face * k, k); g.translate(-R.W / 2, -R.H + drop);
   const put = (n, dx = 0, dy = 0) => g.drawImage(im(n), P[n][0] + dx, P[n][1] + dy);
   const rot = (px, py, a, fn) => { g.save(); g.translate(px, py); g.rotate(a); g.translate(-px, -py); fn(); g.restore(); };
@@ -2466,7 +2480,8 @@ function footFx(strip, x, surf, run){
 }
 function breathFx(strip, x, face){
   const R0 = ANNA_RIG, cs = charK(strip), u = 124 / R0.H * cs, rx = R(strip, x);
-  for(let i = 0; i < 3; i++) FX.push({ k:'breath', x:rx + face * (R0.mouth[0] - R0.W / 2) * u, y:GY - (R0.H - R0.mouth[1]) * u, vx:face * (14 + Math.random() * 10), vy:-6 - Math.random() * 6, t:-i * .05, life:1.7, r:1.5 });
+  const front = ANNA_ANIM.look > .5;
+  for(let i = 0; i < 3; i++) FX.push({ k:'breath', x:rx + (front ? 0 : face * (R0.mouth[0] - R0.W / 2) * u), y:GY - (R0.H - R0.mouth[1]) * u, vx:front ? (Math.random() - .5) * 8 : face * (14 + Math.random() * 10), vy:-6 - Math.random() * 6, t:-i * .05, life:1.7, r:1.5 });
 }
 function fxStep(dt){
   for(const f of FX){ f.t += dt; if(f.t < 0) continue;
@@ -2539,7 +2554,7 @@ function teleport(dest, then){
   setTimeout(() => {
     const [strip, x] = dest, changed = st.strip !== strip;
     st.strip = strip; st.x = x; st.dir = x > STRIPS[strip].w / 2 ? -1 : 1; target = null; targetHot = null;
-    snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = st.dir;
+    snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = ANNA_ANIM.dirPrev = st.dir; ANNA_ANIM.look = ANNA_ANIM.idle = 0;
     $('fade').classList.remove('on');
     setTimeout(() => { ui.fading = false; if(changed) showArea(); save(); if(then) then(); }, 300);
   }, 460);
@@ -2662,7 +2677,12 @@ function update(dt){
   const AN = ANNA_ANIM, tk = moving ? 1 : 0;
   AN.k += (tk - AN.k) * Math.min(1, dt * (moving ? 9 : 7));
   AN.run += ((moving && keys.run ? 1 : 0) - AN.run) * Math.min(1, dt * 5);
-  const fd = st.dir - AN.face; AN.face += Math.sign(fd) * Math.min(Math.abs(fd), dt * 11);
+  if(st.dir !== AN.dirPrev){ AN.via = st.dir < 0 ? 'front' : 'back'; AN.dirPrev = st.dir; }
+  const fd = st.dir - AN.face; AN.face += Math.sign(fd) * Math.min(Math.abs(fd), dt * 6.5);
+  // постояв, Анна оборачивается к нам и оглядывает улицу
+  AN.idle = moving || target != null ? 0 : AN.idle + dt;
+  const lk = !STRIPS[st.strip].indoor && AN.idle > 7 && (AN.idle - 7) % 12 < 2.6 ? 1 : 0;
+  AN.look += (lk - AN.look) * Math.min(1, dt * 5);
   const cold = !STRIPS[st.strip].indoor && st.strip !== 'flat' && phaseOf(st) !== 1;
   breathT -= dt * (1 + AN.k * .8 + AN.run * 1.2);
   if(breathT <= 0){ breathT = 2.4 + Math.random() * .8; if(cold && !STRIPS[st.strip].frozen) breathFx(st.strip, st.x, AN.face >= 0 ? 1 : -1); }
