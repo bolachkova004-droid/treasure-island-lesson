@@ -2957,8 +2957,8 @@ function makeStepBuf(c, kind, seed){
   return buf;
 }
 /* настоящие записи шагов (CC0, см. sfx/CREDITS.txt); синтез — запасной вариант */
-const STEP_REC = { mud:12, wet:2, concrete:5, grass:5, wood:5, carpet:5 };
-const STEP_OF = { mud:['mud', .3, 1], puddle:['wet', .32, 1], asphalt:['concrete', .2, 1], grass:['grass', .22, 1], wood:['wood', .2, 1], planks:['wood', .24, .82], carpet:['carpet', .16, 1] };
+const STEP_REC = { wet:3, concrete:5, grass:5, wood:5, carpet:5 };
+const STEP_OF = { mud:['wet', .32, 1], puddle:['wet', .38, .92], asphalt:['concrete', .2, 1], grass:['grass', .22, 1], wood:['wood', .2, 1], planks:['wood', .24, .82], carpet:['carpet', .16, 1] };
 function loadStepRecordings(c){
   AU.rec = {};
   for(const [k, n] of Object.entries(STEP_REC)) for(let i = 0; i < n; i++)
