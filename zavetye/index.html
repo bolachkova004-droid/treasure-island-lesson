@@ -1762,7 +1762,7 @@ function head(g, U, hy, L, skin, o = {}){
   if(L.cap){ shape(g, C.brown, () => { g.moveTo(-10 * U, hy - 5 * U); g.quadraticCurveTo(-8 * U, hy - 16 * U, 3 * U, hy - 14 * U); g.quadraticCurveTo(10 * U, hy - 12 * U, 10 * U, hy - 7 * U); g.lineTo(17 * U, hy - 6 * U); g.lineTo(16 * U, hy - 3.5 * U); g.lineTo(-10 * U, hy - 4 * U); g.closePath(); }, 1.6); }
   if(L.beard){ shape(g, col(L.hair), () => { g.moveTo(9 * U, hy + 2 * U); g.lineTo(12 * U, hy + 16 * U); g.lineTo(6 * U, hy + 28 * U); g.lineTo(0, hy + 20 * U); g.lineTo(-6 * U, hy + 30 * U); g.lineTo(-7 * U, hy + 8 * U); g.closePath(); }, 1.6); g.strokeStyle = C.ink; g.lineWidth = 1; g.beginPath(); for(let i = 0; i < 4; i++){ g.moveTo(-3 * U + i * 3 * U, hy + 8 * U); g.lineTo(-4 * U + i * 3 * U, hy + 22 * U); } g.stroke(); }
 }
-function annaDraw(g, x, dir, move, ph){ const sp = typeof spriteFor === 'function' && spriteFor('anna', ph, move); if(sp) return drawSprite(g, sp, x, 124, dir, move ? Math.abs(Math.sin(ph)) * 2 : 0); figure(g, x, LOOKS.anna, { face:dir, move, ph }); }
+function annaDraw(g, x, dir, move, ph){ if(typeof annaRigReady === 'function' && annaRigReady() && !IMG.s_anna_1) return drawAnnaRig(g, x, 124, dir, ph, move, typeof keys !== 'undefined' && keys.run); const sp = typeof spriteFor === 'function' && spriteFor('anna', ph, move); if(sp) return drawSprite(g, sp, x, 124, dir, move ? Math.abs(Math.sin(ph)) * 2 : 0); figure(g, x, LOOKS.anna, { face:dir, move, ph }); }
 function drawNpc(g, n){
   const sp = typeof spriteFor === 'function' && spriteFor(n.id, 0, false);
   if(sp){ const H = { grisha:126, grunya:102, nina:112, varya:84, young:122, leshy:176, noon:238, domovoi:44 }[n.id] || 120; if(n.id === 'noon') glow(n.x, GY - 140, 300, 1, '255,248,220'); drawSprite(g, sp, n.x, H, n.id === 'grisha' && n.pose === 'suitcase' ? 1 : -1); return; }
@@ -2237,6 +2237,9 @@ const ASSETS = {
   'bg_street_3': 'art/bg_street_3.jpg',
   'bg_street_4': 'art/bg_street_4.jpg',
   's_anna': 'art/s_anna.png',
+  's_anna_body': 'art/s_anna_body.png',
+  's_anna_leg': 'art/s_anna_leg.png',
+  's_anna_leg2': 'art/s_anna_leg2.png',
   // 'bg_street_a': 'art/bg_street_a.jpg',
   // 'p_grunya_warm': 'art/p_grunya_warm.png',
 };
@@ -2367,6 +2370,27 @@ function drawSprite(g, im, x, h, face, bob = 0){
   const w = im.width / im.height * h;
   g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, w * .32, 5, 0, 0, Math.PI * 2); g.fill();
   g.save(); g.translate(x, GY - bob); g.scale(face, 1); g.drawImage(im, -w / 2, -h, w, h); g.restore();
+}
+
+/* Анна на шарнирах: корпус + две ноги, шагающие из-под пальто.
+   Координаты — в пикселях картинки s_anna (161×600), бедро спрятано под пальто. */
+const ANNA_RIG = { W:161, H:600, legX:36, legY:385, hipX:70, hipY:372, foot:221 };
+function annaRigReady(){ return IMG.s_anna_body && IMG.s_anna_leg && IMG.s_anna_leg2; }
+function drawAnnaRig(g, x, h, face, ph, moving, run){
+  const R = ANNA_RIG, k = h / R.H;
+  const A = moving ? (run ? .52 : .42) : 0, sn = Math.sin(ph), cs = Math.cos(ph);
+  const ta = -A * sn, tb = A * sn;                       // ta — ближняя нога, вперёд = отрицательный угол
+  const drop = R.foot * (1 - Math.cos(A * sn));          // опорная нога должна стоять на земле
+  const liftA = moving ? Math.max(0, cs) * 9 : 0, liftB = moving ? Math.max(0, -cs) * 9 : 0;
+  const w = R.W * k;
+  g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, w * .4 + Math.abs(sn) * A * 30 * k, 5, 0, 0, Math.PI * 2); g.fill();
+  g.save(); g.translate(x, GY); g.scale(face * k, k); g.translate(-R.W / 2, -R.H + drop);
+  const leg = (im, t, lift) => { g.save(); g.translate(R.hipX, R.hipY - lift); g.rotate(t); g.drawImage(im, R.legX - R.hipX, R.legY - R.hipY); g.restore(); };
+  leg(IMG.s_anna_leg2, tb, liftB);
+  leg(IMG.s_anna_leg, ta, liftA);
+  if(moving){ g.translate(R.hipX, R.hipY); g.rotate(.03 + Math.sin(ph * 2) * .008); g.translate(-R.hipX, -R.hipY); }
+  g.drawImage(IMG.s_anna_body, 0, 0);
+  g.restore();
 }
 
 /* ---------- туман и цветокоррекция ---------- */
@@ -2525,7 +2549,7 @@ function update(dt){
     if(d){ target = null; targetHot = null; }
     else if(target != null){ const dx = target - st.x; if(Math.abs(dx) < 8){ target = null; const h = targetHot; targetHot = null; if(h) interact(h); } else d = Math.sign(dx); }
     if(d){
-      const sp = (keys.run ? 330 : 190) * dt; st.x += d * sp; st.dir = d; moving = true; walkPh += dt * (keys.run ? 13 : 9);
+      const sp = (keys.run ? 330 : 190) * dt; st.x += d * sp; st.dir = d; moving = true; walkPh += dt * (keys.run ? 19 : 13.5);
       if(Math.floor(walkPh / Math.PI) !== lastStep){ lastStep = Math.floor(walkPh / Math.PI); sfx('step'); }
       hideHint();
     }
