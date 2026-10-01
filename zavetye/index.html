@@ -2394,20 +2394,39 @@ const ANNA_RIG = { W:161, H:600, hip:[70, 372], knee:[70, 478], shoulder:[84, 11
 const RIG_PARTS = ['body', ...Object.keys(ANNA_RIG.pos)];
 const ANNA_ANIM = { k:0, face:1, run:0, via:'front', look:0, idle:0, dirPrev:1 };   // разгон/остановка, разворот через фас/спину, взгляд в сторону зрителя
 function annaRigReady(){ return RIG_PARTS.every(p => IMG['s_anna_' + p]) && IMG.s_anna_front; }
+/* ракурсы в три четверти подхватываются, если файлы есть */
 const smooth = (a, b, x) => { const q = Math.max(0, Math.min(1, (x - a) / (b - a))); return q * q * (3 - 2 * q); };
-/* Анна целиком: в профиль — на шарнирах; в развороте и когда смотрит на нас — вид спереди/со спины */
+/* Анна целиком: в профиль — на шарнирах; в повороте — через ракурсы.
+   Угол th: 0 — смотрит вправо, π/2 — на нас (или спиной), π — влево.
+   Ракурсы: профиль, три четверти (если есть картинка), фас/спина. Соседние ракурсы перетекают друг в друга. */
+function annaViews(via){
+  const q = IMG[via === 'front' ? 's_anna_q_front' : 's_anna_q_back'], mid = IMG['s_anna_' + via] || IMG.s_anna_front;
+  const V = [{ th:0, side:1 }];
+  if(q) V.push({ th:Math.PI / 4, im:q, flip:1 });
+  V.push({ th:Math.PI / 2, im:mid, flip:1 });
+  if(q) V.push({ th:Math.PI * 3 / 4, im:q, flip:-1 });
+  V.push({ th:Math.PI, side:-1 });
+  return V;
+}
 function drawAnnaRig(g, x, h, face, ph, moving, run){
-  const AN = ANNA_ANIM, f = AN.face, u = Math.abs(f) * (1 - AN.look);
-  const mid = 1 - smooth(.36, .5, u);                       // 1 — фас/спина, 0 — профиль
-  const sideSx = (f < 0 ? -1 : 1) * (.5 + .5 * smooth(.2, 1, u));
-  const k = h / ANNA_RIG.H;
+  const AN = ANNA_ANIM, k = h / ANNA_RIG.H;
+  // угол поворота: из положения «лицом вправо/влево» плюс взгляд на зрителя
+  let th = Math.acos(Math.max(-1, Math.min(1, AN.face)));
+  const lookTh = AN.look * Math.PI / 2; th = th <= Math.PI / 2 ? Math.max(th, lookTh) : Math.min(th, Math.PI - lookTh);
+  const via = AN.look > .05 ? 'front' : AN.via, V = annaViews(via);
   g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, ANNA_RIG.W * k * .4, 5, 0, 0, Math.PI * 2); g.fill();
-  if(mid < .5) drawAnnaSide(g, x, h, sideSx, ph);
-  if(mid > 0){
-    const im = IMG[AN.look > .3 ? 's_anna_front' : 's_anna_' + AN.via] || IMG.s_anna_front, t = performance.now() / 1000;
-    const sx = .72 + .28 * mid, br = Math.sin(t * 1.7) * .003;
-    g.save(); g.globalAlpha = Math.min(1, mid * 2); g.translate(x, GY); g.scale(sx * k, k * (1 + br)); g.drawImage(im, -im.width / 2, -im.height); g.restore();
-  }
+  let i = 0; while(i < V.length - 2 && th > V[i + 1].th) i++;
+  const A = V[i], B = V[i + 1], lp = (th - A.th) / (B.th - A.th), w = smooth(.4, .6, lp);
+  // между ракурсами фигура сужается — как будто поворачивается в глубину
+  const squash = 1 - .2 * Math.sin(lp * Math.PI);
+  const drawV = (v, alpha, near) => { if(alpha <= 0) return; g.save(); g.globalAlpha = alpha;
+    const sq = squash * (near ? 1 : 1);
+    if(v.side) drawAnnaSide(g, x, h, v.side * sq, ph);
+    else { const br = Math.sin(performance.now() / 1000 * 1.7) * .003; g.translate(x, GY); g.scale(v.flip * sq * k, k * (1 + br)); g.drawImage(v.im, -v.im.width / 2, -v.im.height); }
+    g.restore(); };
+  // перетекание без «призрака»: сначала уходящий ракурс, потом приходящий
+  if(w < .5){ drawV(A, 1); drawV(B, w * 2); }
+  else { drawV(A, (1 - w) * 2); drawV(B, 1); }
 }
 function drawAnnaSide(g, x, h, face, ph){
   const R = ANNA_RIG, k = h / R.H, P = R.pos, im = n => IMG['s_anna_' + n];
@@ -2554,7 +2573,7 @@ function teleport(dest, then){
   setTimeout(() => {
     const [strip, x] = dest, changed = st.strip !== strip;
     st.strip = strip; st.x = x; st.dir = x > STRIPS[strip].w / 2 ? -1 : 1; target = null; targetHot = null;
-    snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = ANNA_ANIM.dirPrev = st.dir; ANNA_ANIM.look = ANNA_ANIM.idle = 0;
+    snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = ANNA_ANIM.dirPrev = st.dir; ANNA_ANIM.th = st.dir > 0 ? 0 : Math.PI; ANNA_ANIM.thv = 0; ANNA_ANIM.look = ANNA_ANIM.idle = 0;
     $('fade').classList.remove('on');
     setTimeout(() => { ui.fading = false; if(changed) showArea(); save(); if(then) then(); }, 300);
   }, 460);
@@ -2659,7 +2678,7 @@ function update(dt){
     if(d){ target = null; targetHot = null; }
     else if(target != null){ const dx = target - st.x; if(Math.abs(dx) < 8){ target = null; const h = targetHot; targetHot = null; if(h) interact(h); } else d = Math.sign(dx); }
     if(d){
-      const sp = (keys.run ? 330 : 190) * dt; st.x += d * sp; st.dir = d; moving = true; walkPh += dt * (keys.run ? 19 : 13.5);
+      const sp = (keys.run ? 330 : 190) * dt * (.3 + .7 * Math.abs(ANNA_ANIM.face)); st.x += d * sp; st.dir = d; moving = true; walkPh += dt * (keys.run ? 19 : 13.5);
       const plant = Math.floor((walkPh - Math.PI / 2) / Math.PI);   // момент, когда пятка встаёт на землю
       if(plant !== lastStep){ lastStep = plant; const surf = surfaceAt(st.strip, st.x + st.dir * 14); stepSound(surf, keys.run); footFx(st.strip, st.x + st.dir * 14, surf, keys.run); }
       hideHint();
@@ -2678,7 +2697,11 @@ function update(dt){
   AN.k += (tk - AN.k) * Math.min(1, dt * (moving ? 9 : 7));
   AN.run += ((moving && keys.run ? 1 : 0) - AN.run) * Math.min(1, dt * 5);
   if(st.dir !== AN.dirPrev){ AN.via = st.dir < 0 ? 'front' : 'back'; AN.dirPrev = st.dir; }
-  const fd = st.dir - AN.face; AN.face += Math.sign(fd) * Math.min(Math.abs(fd), dt * 6.5);
+  // поворот по углу с плавным разгоном и торможением (~0.5 с на полный разворот)
+  { const target = st.dir > 0 ? 0 : Math.PI; AN.th = AN.th ?? (st.dir > 0 ? 0 : Math.PI);
+    const d = target - AN.th; AN.thv = (AN.thv || 0) + (d * 60 - (AN.thv || 0) * 14) * dt;   // пружина без перелёта
+    AN.th += AN.thv * dt; if(Math.abs(d) < .002 && Math.abs(AN.thv) < .01){ AN.th = target; AN.thv = 0; }
+    AN.face = Math.cos(AN.th); }
   // постояв, Анна оборачивается к нам и оглядывает улицу
   AN.idle = moving || target != null ? 0 : AN.idle + dt;
   const lk = !STRIPS[st.strip].indoor && AN.idle > 7 && (AN.idle - 7) % 12 < 2.6 ? 1 : 0;
