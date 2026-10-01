@@ -1,0 +1,5 @@
+Звуки шагов — настоящие записи с лицензией CC0 (общественное достояние):
+- «Impact Sounds» — Kenney (www.kenney.nl), CC0: шаги по бетону, траве, дереву, ковру.
+- «25 CC0 mud sfx» и «100 CC0 SFX #2» (OpenGameArt), CC0: шаги по грязи и мокрые шаги.
+Получены из сборника github.com/lavenderdotpet/CC0-Public-Domain-Sounds.
+Звуки обрезаны и выровнены по громкости.

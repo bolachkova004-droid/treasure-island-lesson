@@ -2918,6 +2918,7 @@ function audioInit(){
   const mk = (freq, type = 'lowpass') => { const s = c.createBufferSource(); s.buffer = buf; s.loop = true; const f = c.createBiquadFilter(); f.type = type; f.frequency.value = freq; const gn = c.createGain(); gn.gain.value = 0; s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(); return { f, g:gn }; };
   AU.wind = mk(420); AU.fire = mk(900, 'bandpass'); AU.fire.f.Q.value = .8;
   AU.water = mk(650, 'bandpass'); AU.water.f.Q.value = .6;
+  loadStepRecordings(c);
   AU.steps = { mud:[1, 2, 3, 4, 5, 6, 7, 8].map(i => makeStepBuf(c, 'mud', i)), puddle:[11, 12, 13, 14, 15].map(i => makeStepBuf(c, 'puddle', i)) };
   const cityN = mk(160); AU.city = cityN.g;
   const dr = c.createOscillator(); dr.type = "sine"; dr.frequency.value = 55; AU.drone = c.createGain(); AU.drone.gain.value = 0; dr.connect(AU.drone); AU.drone.connect(AU.master); dr.start();
@@ -2955,6 +2956,15 @@ function makeStepBuf(c, kind, seed){
     const g = .9 / (pk || 1); for(let i = 0; i < n; i++){ const fade = i > n - 400 ? (n - i) / 400 : 1; d[i] *= g * fade; } }
   return buf;
 }
+/* настоящие записи шагов (CC0, см. sfx/CREDITS.txt); синтез — запасной вариант */
+const STEP_REC = { mud:12, wet:2, concrete:5, grass:5, wood:5, carpet:5 };
+const STEP_OF = { mud:['mud', .3, 1], puddle:['wet', .32, 1], asphalt:['concrete', .2, 1], grass:['grass', .22, 1], wood:['wood', .2, 1], planks:['wood', .24, .82], carpet:['carpet', .16, 1] };
+function loadStepRecordings(c){
+  AU.rec = {};
+  for(const [k, n] of Object.entries(STEP_REC)) for(let i = 0; i < n; i++)
+    fetch(`sfx/step_${k}_${i}.wav`).then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => new Promise((ok, no) => c.decodeAudioData(b, ok, no)))
+      .then(buf => { (AU.rec[k] = AU.rec[k] || []).push(buf); }).catch(() => {});
+}
 function playBuf(buf, vol, rate = 1){ const c = AU.ctx, src = c.createBufferSource(), gn = c.createGain(); src.buffer = buf; src.playbackRate.value = rate; gn.gain.value = vol; src.connect(gn); gn.connect(AU.master); src.start(); }
 /* шум через фильтр со сдвигом частоты: основа для шагов и брызг */
 function nz(o){ const c = AU.ctx; if(!c) return; const t = c.currentTime + (o.when || 0), s = c.createBufferSource(); s.buffer = AU.noise;
@@ -2970,6 +2980,9 @@ function tone(o){ const c = AU.ctx; if(!c) return; const t = c.currentTime + (o.
 function stepSound(surf, run){
   if(!AU.ctx || AU.muted) return;
   const v = run ? 1.3 : 1, j = .85 + Math.random() * .3;
+  const R = STEP_OF[surf], L = R && AU.rec && AU.rec[R[0]];
+  if(L && L.length){ let b; do { b = L[Math.floor(Math.random() * L.length)]; } while(L.length > 2 && b === AU.lastStep); AU.lastStep = b;
+    return playBuf(b, R[1] * v * (.8 + Math.random() * .3), R[2] * (.94 + Math.random() * .12)); }
   if(surf === 'mud' || surf === 'puddle'){             // грязь и лужи — заранее собранные фрагменты
     const L = AU.steps[surf], b = L[Math.floor(Math.random() * L.length)];
     playBuf(b, (surf === 'puddle' ? .13 : .12) * v * (.75 + Math.random() * .4), .9 + Math.random() * .2);
