@@ -2936,21 +2936,21 @@ function makeStepBuf(c, kind, seed){
   const toe = .055 + rnd() * .03;                         // носок встаёт после пятки
   // мягкий удар: низкочастотный шум с быстрым затуханием
   const thump = (t0, amp, fc, dec) => { const a1 = lpA(fc), st = Math.floor(t0 * sr); let y1 = 0, y2 = 0;
-    for(let i = 0; st + i < n; i++){ const t = i / sr; if(t > dec * 6) break; y1 += a1 * ((rnd() * 2 - 1) - y1); y2 += a1 * (y1 - y2); d[st + i] += y2 * amp * Math.min(1, t / .002) * Math.exp(-t / dec) * 14; } };
+    for(let i = 0; st + i < n; i++){ const t = i / sr; if(t > dec * 6) break; y1 += a1 * ((rnd() * 2 - 1) - y1); y2 += a1 * (y1 - y2); d[st + i] += y2 * amp * Math.min(1, t / .007) * Math.exp(-t / dec) * 14; } };
   // хруст: рой очень коротких щелчков — земля и мелкие камешки под подошвой
   const crunch = (t0, count, amp, spread, fLo, fHi) => {
-    for(let k = 0; k < count; k++){ const q = Math.pow(rnd(), 2), st = Math.floor((t0 + q * spread) * sr), len = Math.max(8, Math.floor((.0004 + rnd() * .0018) * sr));
+    for(let k = 0; k < count; k++){ const q = Math.pow(rnd(), 1.6), st = Math.floor((t0 + q * spread) * sr), len = Math.max(30, Math.floor((.0015 + rnd() * .003) * sr));
       const fc = fLo + rnd() * (fHi - fLo), a = lpA(fc), hp = lpA(fc * .35), g = (.3 + rnd() * .7) * amp * (1 - q * .6); let y = 0, l = 0;
       for(let i = 0; i < len && st + i < n; i++){ const w = Math.sin(Math.PI * i / len); y += a * ((rnd() * 2 - 1) - y); l += hp * (y - l); d[st + i] += (y - l) * w * g * 4; } } };
   const soft = kind === 'puddle' ? .7 : 1;
-  thump(0, .9 * soft, 140, .022);  crunch(.002, 55, .5 * soft, .07, 900, 3200);
-  thump(toe, .55 * soft, 180, .016); crunch(toe + .002, 40, .38 * soft, .06, 1100, 3800);
+  thump(0, .9 * soft, 200, .03);   crunch(.004, 22, .16 * soft, .08, 500, 1500);
+  thump(toe, .35 * soft, 240, .022); crunch(toe + .004, 14, .1 * soft, .06, 600, 1700);
   if(kind === 'puddle'){                                   // негромкий шлепок воды по мелкой луже
     const aL = lpA(450), aH = lpA(3000); let l = 0, h = 0;
     for(let i = 0; i < n; i++){ const t = i / sr, x = rnd() * 2 - 1; l += aL * (x - l); h += aH * (x - h);
-      d[i] += (h - l) * Math.min(1, t / .006) * Math.exp(-t / .05) * .35; } }
+      d[i] += (h - l) * Math.min(1, t / .012) * Math.exp(-t / .06) * .18; } }
   // смягчение (земля глушит верх) и нормировка
-  { const a = lpA(kind === 'puddle' ? 5000 : 4200); let y = 0, pk = 0; for(let i = 0; i < n; i++){ y += a * (d[i] - y); d[i] = y; pk = Math.max(pk, Math.abs(y)); }
+  { const a = lpA(kind === 'puddle' ? 2600 : 1900); let y = 0, pk = 0; for(let i = 0; i < n; i++){ y += a * (d[i] - y); d[i] = y; pk = Math.max(pk, Math.abs(y)); }
     const g = .9 / (pk || 1); for(let i = 0; i < n; i++){ const fade = i > n - 300 ? (n - i) / 300 : 1; d[i] *= g * fade; } }
   return buf;
 }
@@ -2971,7 +2971,7 @@ function stepSound(surf, run){
   const v = run ? 1.3 : 1, j = .85 + Math.random() * .3;
   if(surf === 'mud' || surf === 'puddle'){             // сырая земля и лужи — заранее собранные фрагменты
     const L = AU.steps[surf], b = L[Math.floor(Math.random() * L.length)];
-    playBuf(b, (surf === 'puddle' ? .3 : .3) * v * (.8 + Math.random() * .35), .92 + Math.random() * .16);
+    playBuf(b, .1 * v * (.75 + Math.random() * .4), .9 + Math.random() * .2);
   } else if(surf === 'asphalt'){                        // каблук по старому асфальту
     nz({ f0:2600 * j, q:.8, dur:.045, vol:.12 * v, type:'highpass' });
     tone({ f0:120 * j, f1:70, dur:.07, vol:.09 * v });
