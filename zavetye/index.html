@@ -2918,6 +2918,7 @@ function audioInit(){
   const mk = (freq, type = 'lowpass') => { const s = c.createBufferSource(); s.buffer = buf; s.loop = true; const f = c.createBiquadFilter(); f.type = type; f.frequency.value = freq; const gn = c.createGain(); gn.gain.value = 0; s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(); return { f, g:gn }; };
   AU.wind = mk(420); AU.fire = mk(900, 'bandpass'); AU.fire.f.Q.value = .8;
   AU.water = mk(650, 'bandpass'); AU.water.f.Q.value = .6;
+  AU.steps = { mud:[1, 2, 3, 4, 5, 6].map(i => makeStepBuf(c, 'mud', i)), puddle:[11, 12, 13, 14, 15].map(i => makeStepBuf(c, 'puddle', i)) };
   const cityN = mk(160); AU.city = cityN.g;
   const dr = c.createOscillator(); dr.type = "sine"; dr.frequency.value = 55; AU.drone = c.createGain(); AU.drone.gain.value = 0; dr.connect(AU.drone); AU.drone.connect(AU.master); dr.start();
   const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 42; const of = c.createBiquadFilter(); of.type = 'lowpass'; of.frequency.value = 180; AU.eng = c.createGain(); AU.eng.gain.value = 0; o.connect(of); of.connect(AU.eng); AU.eng.connect(AU.master); o.start();
@@ -2925,6 +2926,42 @@ function audioInit(){
 }
 function env(freq, dur, vol, type = 'sine', when = 0){ const c = AU.ctx; if(!c) return; const t = c.currentTime + when, o = c.createOscillator(), gn = c.createGain(); o.type = type; o.frequency.value = freq; gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + .02); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(gn); gn.connect(AU.master); o.start(t); o.stop(t + dur + .05); }
 function burst(dur, vol, freq){ const c = AU.ctx; if(!c) return; const s = c.createBufferSource(); s.buffer = AU.noise; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq; const gn = c.createGain(); const t = c.currentTime; gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(t, Math.random()); s.stop(t + dur); }
+/* Шаги по мокрой земле и лужам собираются заранее как звуковые фрагменты:
+   глухой удар пятки + вязкое «чавканье» из мелких мокрых щелчков + присос при отрыве. */
+function makeStepBuf(c, kind, seed){
+  const sr = c.sampleRate, dur = kind === 'puddle' ? .36 : .3, n = Math.floor(sr * dur), buf = c.createBuffer(1, n, sr), d = buf.getChannelData(0);
+  let sd = seed * 9301 + 49297; const rnd = () => (sd = (sd * 16807) % 2147483647) / 2147483647;
+  const lpA = fc => 1 - Math.exp(-2 * Math.PI * fc / sr);
+  const noise = new Float32Array(n); for(let i = 0; i < n; i++) noise[i] = rnd() * 2 - 1;
+  // 1) удар пятки: низкий мягкий «тук»
+  { const a1 = lpA(160), a2 = lpA(220); let y1 = 0, y2 = 0; const amp = kind === 'puddle' ? .5 : .9;
+    for(let i = 0; i < n; i++){ const t = i / sr; y1 += a1 * (noise[i] - y1); y2 += a2 * (y1 - y2);
+      const env = Math.min(1, t / .004) * Math.exp(-t / .045); d[i] += y2 * env * amp * 9; } }
+  // 2) чавканье: рой коротких мокрых щелчков, гуще в начале
+  const grains = kind === 'puddle' ? 70 : 110, t0 = .012, span = kind === 'puddle' ? .16 : .2;
+  for(let gI = 0; gI < grains; gI++){
+    const q = Math.pow(rnd(), 1.7), st = Math.floor((t0 + q * span) * sr), len = Math.floor((.0015 + rnd() * .006) * sr);
+    const amp = (.25 + rnd() * .75) * (1 - q * .7) * (kind === 'puddle' ? .35 : .55), fc = 500 + rnd() * (kind === 'puddle' ? 1800 : 1100);
+    const a = lpA(fc); let y = 0, yy = 0;
+    for(let i = 0; i < len && st + i < n; i++){ const w = Math.sin(Math.PI * i / len); y += a * ((rnd() * 2 - 1) - y); yy += a * (y - yy); d[st + i] += yy * w * amp * 3; } }
+  // 3) присос при отрыве ноги (тихий, ниже по тону)
+  if(kind === 'mud'){ const st = Math.floor((.15 + rnd() * .04) * sr), len = Math.floor(.06 * sr), a = lpA(420); let y = 0, yy = 0;
+    for(let i = 0; i < len && st + i < n; i++){ const t = i / len, env = Math.sin(Math.PI * Math.min(1, t * 1.4)) * (1 - t); y += a * ((rnd() * 2 - 1) - y); yy += a * (y - yy); d[st + i] += yy * env * 1.6; } }
+  // 4) лужа: всплеск воды и капли
+  if(kind === 'puddle'){
+    { const aL = lpA(700), aH = lpA(5200); let l = 0, h = 0;
+      for(let i = 0; i < n; i++){ const t = i / sr; l += aL * (noise[i] - l); h += aH * (noise[i] - h); const band = h - l;
+        const env = Math.min(1, t / .01) * Math.exp(-t / .07); d[i] += band * env * .55; } }
+    const drops = 3 + Math.floor(rnd() * 4);
+    for(let k = 0; k < drops; k++){ const st = Math.floor((.05 + rnd() * .3) * sr), len = Math.floor(.025 * sr), f0 = 700 + rnd() * 900, amp = .05 + rnd() * .08; let ph = 0;
+      for(let i = 0; i < len && st + i < n; i++){ const t = i / sr, f = f0 * (1 + 1.2 * Math.min(1, t / .012)); ph += 2 * Math.PI * f / sr; d[st + i] += Math.sin(ph) * Math.exp(-t / .007) * amp; } }
+  }
+  // общее смягчение и нормировка
+  { const a = lpA(kind === 'puddle' ? 6000 : 3200); let y = 0, pk = 0; for(let i = 0; i < n; i++){ y += a * (d[i] - y); d[i] = y; pk = Math.max(pk, Math.abs(y)); }
+    const g = .9 / (pk || 1); for(let i = 0; i < n; i++){ const fade = i > n - 400 ? (n - i) / 400 : 1; d[i] *= g * fade; } }
+  return buf;
+}
+function playBuf(buf, vol, rate = 1){ const c = AU.ctx, src = c.createBufferSource(), gn = c.createGain(); src.buffer = buf; src.playbackRate.value = rate; gn.gain.value = vol; src.connect(gn); gn.connect(AU.master); src.start(); }
 /* шум через фильтр со сдвигом частоты: основа для шагов и брызг */
 function nz(o){ const c = AU.ctx; if(!c) return; const t = c.currentTime + (o.when || 0), s = c.createBufferSource(); s.buffer = AU.noise;
   const f = c.createBiquadFilter(); f.type = o.type || 'bandpass'; f.Q.value = o.q || 1; f.frequency.setValueAtTime(o.f0, t); if(o.f1) f.frequency.exponentialRampToValueAtTime(o.f1, t + o.dur);
@@ -2939,14 +2976,9 @@ function tone(o){ const c = AU.ctx; if(!c) return; const t = c.currentTime + (o.
 function stepSound(surf, run){
   if(!AU.ctx || AU.muted) return;
   const v = run ? 1.3 : 1, j = .85 + Math.random() * .3;
-  if(surf === 'mud'){                                   // хлюп: вязкое «чвак» + присос
-    nz({ f0:1300 * j, f1:300, q:3.5, dur:.16, vol:.17 * v, type:'bandpass' });
-    tone({ f0:230 * j, f1:85, dur:.09, vol:.06 * v, type:'triangle' });
-    if(Math.random() < .5) nz({ f0:2400 * j, f1:700, q:6, dur:.07, vol:.05, when:.08 });
-  } else if(surf === 'puddle'){                         // плеск и капли
-    nz({ f0:3200 * j, f1:900, q:1.2, dur:.24, vol:.15 * v });
-    nz({ f0:600, f1:250, q:2, dur:.14, vol:.08 * v, type:'lowpass' });
-    for(let i = 0; i < 3; i++) tone({ f0:1300 + Math.random() * 1300, f1:2600 + Math.random() * 900, dur:.035, vol:.025, when:.05 + Math.random() * .2 });
+  if(surf === 'mud' || surf === 'puddle'){             // мокрая земля и лужи — заранее собранные фрагменты
+    const L = AU.steps[surf], b = L[Math.floor(Math.random() * L.length)];
+    playBuf(b, (surf === 'puddle' ? .3 : .26) * v * (.85 + Math.random() * .3), .9 + Math.random() * .2);
   } else if(surf === 'asphalt'){                        // каблук по старому асфальту
     nz({ f0:2600 * j, q:.8, dur:.045, vol:.12 * v, type:'highpass' });
     tone({ f0:120 * j, f1:70, dur:.07, vol:.09 * v });
