@@ -2368,11 +2368,14 @@ function portraitFor(who, mood){
   if(IMG[`p_${who}_neutral`]) return IMG[`p_${who}_neutral`];
   const k = Object.keys(IMG).find(n => n.startsWith(`p_${who}_`)); return k ? IMG[k] : null;
 }
+/* сторона портрета — по направлению взгляда: смотрит вправо → стоит слева, и наоборот.
+   Здесь перечислены те, кто смотрит влево и потому стоит справа. */
+const PORTRAIT_RIGHT = new Set([]);
 let shownPortrait = null;
 function showPortrait(id){
   const sp = speakerOf(id), el = $('portrait'), im = sp ? portraitFor(sp[0], sp[1]) : null;
   if(!im){ el.classList.remove('on'); shownPortrait = null; return; }
-  const key = im.src; el.classList.toggle('right', sp[0] === 'anna');
+  const key = im.src; el.classList.toggle('right', PORTRAIT_RIGHT.has(`p_${sp[0]}_${sp[1]}`) || PORTRAIT_RIGHT.has(sp[0]));
   if(shownPortrait !== key){ $('portraitImg').src = im.src; shownPortrait = key; }
   el.classList.add('on');
 }
