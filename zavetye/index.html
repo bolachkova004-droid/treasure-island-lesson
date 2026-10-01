@@ -2245,6 +2245,7 @@ const ASSETS = {
   'bg_street_4': 'art/bg_street_4.jpg',
   'p_anna_neutral': 'art/p_anna_neutral.png',
   'p_anna_afraid': 'art/p_anna_afraid.png',
+  'p_anna_sad': 'art/p_anna_sad.png',
   's_anna': 'art/s_anna.png',
   's_anna_body': 'art/s_anna_body.png',
   's_anna_front': 'art/s_anna_front.png',
@@ -2361,6 +2362,7 @@ function speakerOf(id){
   if(/^dom/.test(id)) return ['domovoi','neutral'];
   if(id === 'school_desk' || id === 'school_in') return ['aglaya','photo'];
   if(['p_house_in','p_silent','p_greet','forest_night'].includes(id)) return ['anna','afraid'];
+  if(['p_call','after_case','stay_open','bus_sunday'].includes(id)) return ['anna','sad'];
   if(/^p_/.test(id)) return ['anna','neutral'];
   return null;
 }
