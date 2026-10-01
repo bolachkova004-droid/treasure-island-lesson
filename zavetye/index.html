@@ -2246,6 +2246,8 @@ const ASSETS = {
   'p_anna_neutral': 'art/p_anna_neutral.png',
   'p_anna_afraid': 'art/p_anna_afraid.png',
   'p_anna_sad': 'art/p_anna_sad.png',
+  'p_grunya_warm': 'art/p_grunya_warm.png',
+  's_grunya': 'art/s_grunya.png',
   's_anna': 'art/s_anna.png',
   's_anna_body': 'art/s_anna_body.png',
   's_anna_front': 'art/s_anna_front.png',
@@ -2373,7 +2375,7 @@ function portraitFor(who, mood){
 }
 /* сторона портрета — по направлению взгляда: смотрит вправо → стоит слева, и наоборот.
    Здесь перечислены те, кто смотрит влево и потому стоит справа. */
-const PORTRAIT_RIGHT = new Set([]);
+const PORTRAIT_RIGHT = new Set(['grunya']);
 let shownPortrait = null;
 function showPortrait(id){
   const sp = speakerOf(id), el = $('portrait'), im = sp ? portraitFor(sp[0], sp[1]) : null;
