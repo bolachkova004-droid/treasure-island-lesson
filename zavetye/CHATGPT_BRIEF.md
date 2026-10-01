@@ -49,13 +49,13 @@ bright soft daylight, warm clean colors, calm and cozy, no fog, painterly digita
 
 **Портреты (имена на `p_`):**
 - вертикальный формат **1024 × 1536**, по пояс;
-- лицо видно, взгляд чуть в сторону;
-- **прозрачный фон** (PNG). Если прозрачный не получается, однотонный светло-серый.
+- лицо видно; **Анна смотрит чуть вправо, все остальные герои — чуть влево** (так в разговоре они смотрят друг на друга);
+- **однотонный тёмно-серый фон** (`plain dark grey background`): с него волосы вырезаются чисто, без белого ореола.
 
 **Фигуры для ходьбы (имена на `s_`):**
 - вертикальный формат **1024 × 1536**, **в полный рост**, ноги целиком в кадре;
 - вид **строго сбоку, лицом вправо**;
-- **прозрачный фон** (PNG). Если прозрачный не получается, однотонный светло-серый.
+- **однотонный тёмно-серый фон** (`plain dark grey background`).
 
 ---
 
@@ -72,13 +72,13 @@ bright soft daylight, warm clean colors, calm and cozy, no fog, painterly digita
 > character sheet of Anna, a 30-year-old Russian woman, calm tired intelligent face, grey-green eyes, dark blonde hair in a low loose bun with loose strands, dark charcoal wool coat to the knees, long knitted red scarf, a thin red woolen thread tied around her left wrist, dark boots, modern city clothes that look out of place in a village; front view, side view and back view, full body, plain light grey background
 
 **3. `p_anna_neutral`** — портрет Анны, спокойная и внимательная.
-> waist-up portrait of Anna (same as the approved character sheet), neutral attentive expression, looking slightly to the side, foggy twilight light, transparent background
+> waist-up portrait of Anna (same as the approved character sheet), neutral attentive expression, looking slightly to the side, foggy twilight light, plain dark grey background
 
 **4. `s_anna`** — Анна в полный рост, идёт вправо.
-> full body of Anna (same as the approved character sheet), strict side view facing right, walking, full figure with feet visible, transparent background
+> full body of Anna (same as the approved character sheet), strict side view facing right, walking, full figure with feet visible, plain dark grey background
 
 **5. `p_grunya_warm`** — портрет Груни. Сначала сделай для неё лист персонажа и покажи его мне, потом портрет.
-> Grunya, a warm kind-looking old village midwife in her seventies, round soft face, deep wrinkles around smiling eyes, grey headscarf with small white dots tied under the chin, dark wool dress, linen apron with red embroidered hem, holding a bundle of dried herbs, something unsettling in her too-steady gaze; waist-up portrait, warm gentle smile, transparent background
+> Grunya, a warm kind-looking old village midwife in her seventies, round soft face, deep wrinkles around smiling eyes, grey headscarf with small white dots tied under the chin, dark wool dress, linen apron with red embroidered hem, holding a bundle of dried herbs, something unsettling in her too-steady gaze; waist-up portrait, warm gentle smile, plain dark grey background
 
 ### Этап 2. Остальная улица и места
 
