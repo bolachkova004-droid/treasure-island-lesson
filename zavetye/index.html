@@ -2247,6 +2247,8 @@ const ASSETS = {
   's_anna_body': 'art/s_anna_body.png',
   's_anna_front': 'art/s_anna_front.png',
   's_anna_back': 'art/s_anna_back.png',
+  's_anna_q_front': 'art/s_anna_q_front.png',
+  's_anna_q_back': 'art/s_anna_q_back.png',
   's_anna_head': 'art/s_anna_head.png',
   's_anna_arm': 'art/s_anna_arm.png',
   's_anna_bag': 'art/s_anna_bag.png',
@@ -2399,12 +2401,15 @@ const smooth = (a, b, x) => { const q = Math.max(0, Math.min(1, (x - a) / (b - a
 /* Анна целиком: в профиль — на шарнирах; в повороте — через ракурсы.
    Угол th: 0 — смотрит вправо, π/2 — на нас (или спиной), π — влево.
    Ракурсы: профиль, три четверти (если есть картинка), фас/спина. Соседние ракурсы перетекают друг в друга. */
+/* центр тела на каждой картинке (по ногам и по массе), чтобы при смене ракурса фигура не прыгала */
+const ANNA_AX = { side:84, front:99, back:97.6, q_front:102, q_back:95 };
 function annaViews(via){
-  const q = IMG[via === 'front' ? 's_anna_q_front' : 's_anna_q_back'], mid = IMG['s_anna_' + via] || IMG.s_anna_front;
+  const qn = via === 'front' ? 'q_front' : 'q_back', q = IMG['s_anna_' + qn];
+  const mn = IMG['s_anna_' + via] ? via : 'front', mid = IMG['s_anna_' + mn];
   const V = [{ th:0, side:1 }];
-  if(q) V.push({ th:Math.PI / 4, im:q, flip:1 });
-  V.push({ th:Math.PI / 2, im:mid, flip:1 });
-  if(q) V.push({ th:Math.PI * 3 / 4, im:q, flip:-1 });
+  if(q) V.push({ th:Math.PI / 4, im:q, flip:1, ax:ANNA_AX[qn] });
+  V.push({ th:Math.PI / 2, im:mid, flip:1, ax:ANNA_AX[mn] });
+  if(q) V.push({ th:Math.PI * 3 / 4, im:q, flip:-1, ax:ANNA_AX[qn] });
   V.push({ th:Math.PI, side:-1 });
   return V;
 }
@@ -2422,7 +2427,7 @@ function drawAnnaRig(g, x, h, face, ph, moving, run){
   const drawV = (v, alpha, near) => { if(alpha <= 0) return; g.save(); g.globalAlpha = alpha;
     const sq = squash * (near ? 1 : 1);
     if(v.side) drawAnnaSide(g, x, h, v.side * sq, ph);
-    else { const br = Math.sin(performance.now() / 1000 * 1.7) * .003; g.translate(x, GY); g.scale(v.flip * sq * k, k * (1 + br)); g.drawImage(v.im, -v.im.width / 2, -v.im.height); }
+    else { const br = Math.sin(performance.now() / 1000 * 1.7) * .003; g.translate(x, GY); g.scale(v.flip * sq * k, k * (1 + br)); g.drawImage(v.im, -v.ax, -v.im.height); }
     g.restore(); };
   // перетекание без «призрака»: сначала уходящий ракурс, потом приходящий
   if(w < .5){ drawV(A, 1); drawV(B, w * 2); }
@@ -2439,7 +2444,7 @@ function drawAnnaSide(g, x, h, face, ph){
   const drop = R.foot * (1 - Math.cos(stance.th)) + 1.5 * m;
   const idle = 1 - m;
   const breathe = Math.sin(t * 1.7) * 1.4 * idle;
-  g.save(); g.translate(x, GY); g.scale(face * k, k); g.translate(-R.W / 2, -R.H + drop);
+  g.save(); g.translate(x, GY); g.scale(face * k, k); g.translate(-ANNA_AX.side, -R.H + drop);
   const put = (n, dx = 0, dy = 0) => g.drawImage(im(n), P[n][0] + dx, P[n][1] + dy);
   const rot = (px, py, a, fn) => { g.save(); g.translate(px, py); g.rotate(a); g.translate(-px, -py); fn(); g.restore(); };
   const leg = (L, sfx) => rot(R.hip[0], R.hip[1], L.th, () => { put('thigh' + sfx); rot(R.knee[0], R.knee[1], L.bend, () => put('shin' + sfx)); });
