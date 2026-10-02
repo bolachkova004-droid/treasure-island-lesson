@@ -2235,7 +2235,11 @@ function drawArtFrame(v, camX, anna, P, ph){
     if(v.strip === 'road'){ const sx = rx(spot('road', 'Бетонная плита', 1150)) - 60;
       if(v.flags.busstop){ at(sx); busStop(g, sx + 6, 'new'); } else if(v.flags.rustystop){ at(sx); busStop(g, sx + 6, 'rust'); } }
     if(anna){ at(rx(anna.x)); annaDraw(g, rx(anna.x), anna.dir, anna.move, anna.ph); }
-    if(v.strip === 'road' && v.bus){ const bx = rx(v.bus.x); at(bx); bus(g, bx);
+    if(v.strip === 'road' && v.bus && IMG.s_bus){ const bx = rx(v.bus.x) + 190, im = IMG.s_bus, h = 185, w = im.width / im.height * h, face = v.bus.mode === 'leave' ? 1 : -1;
+      at(bx); const sv = SIL; SIL = null; g.save(); g.translate(bx, GY + 8); g.scale(face, 1); g.drawImage(im, -w / 2, -h, w, h); g.restore();
+      const hx = bx + face * w / 2, cone = g.createLinearGradient(hx, 0, hx + face * 260, 0); cone.addColorStop(0, 'rgba(255,236,180,.32)'); cone.addColorStop(1, 'rgba(255,236,180,0)');
+      g.fillStyle = cone; g.beginPath(); g.moveTo(hx, GY - 36); g.lineTo(hx + face * 260, GY - 80); g.lineTo(hx + face * 260, GY + 10); g.closePath(); g.fill(); SIL = sv; }
+    else if(v.strip === 'road' && v.bus){ const bx = rx(v.bus.x); at(bx); bus(g, bx);
       // в тумане у автобуса видны только тёплые окна, фары и габариты
       const sv = SIL; SIL = null; const y = GY - 20, h = 124;
       g.globalAlpha = .55; for(let i = 0; i < 5; i++){ g.fillStyle = 'rgba(247,207,106,.55)'; g.fillRect(bx + 14 + i * 48, y - h + 18, 40, 36); }
@@ -2270,6 +2274,9 @@ const ASSETS = {
   'bg_street_4': 'art/bg_street_4.jpg',
   'bg_road_l': 'art/bg_road_l.jpg',
   'bg_road': 'art/bg_road.jpg',
+  'bg_field_l': 'art/bg_field_l.jpg',
+  'bg_field': 'art/bg_field.jpg',
+  's_bus': 'art/s_bus.png',
   'p_anna_neutral': 'art/p_anna_neutral.png',
   'p_anna_afraid': 'art/p_anna_afraid.png',
   'p_anna_sad': 'art/p_anna_sad.png',
@@ -2323,7 +2330,7 @@ const STRIP_ART = {
                       'Чемодан':[3, 745], 'Дом Лаптевых':[3, 820], 'Баня':[3, 1360] },
                npcPx:{ grisha:[3, 330], nina:[3, 990], varya:[3, 1150] } },
   road:      { parts:['bg_road_l','bg_road'], segs:[0, 450, 1800], charScale:.9, hotPx:{ 'Бетонная плита':[1, 680] } },
-  field:     { parts:['bg_field'] },
+  field:     { parts:['bg_field_l','bg_field'], segs:[0, 480, 2000], charScale:.9, hotPx:{ 'Ельник':[1, 225] }, npcPx:{ leshy:[1, 225] } },
   river:     { parts:['bg_river'] },
   forestroad:{ parts:['bg_forest_stop'], noNight:true },
   aglaya:    { parts:['bg_aglaya_house'] },
@@ -2806,6 +2813,8 @@ function loop(now){
   audioTick(dt);
   requestAnimationFrame(loop);
 }
+/* на живописных полосах логика сжата в картину — шаг ускоряем, чтобы ноги не скользили */
+function stripPace(){ const a = STRIP_ART[st.strip], w = STRIPS[st.strip].w; if(!a || !artParts(st.strip, 0)) return 1; const k = w / RW(st.strip) * (a.charScale || 1); return Math.max(1, Math.min(2.4, k)); }
 function update(dt){
   const S0 = STRIPS[st.strip];
   moving = false;
@@ -2817,9 +2826,9 @@ function update(dt){
   if(!blocked()){
     let d = (keys.right ? 1 : 0) - (keys.left ? 1 : 0);
     if(d){ target = null; targetHot = null; }
-    else if(target != null){ const dx = target - st.x; if(Math.abs(dx) < 8){ target = null; const h = targetHot; targetHot = null; if(h) interact(h); } else d = Math.sign(dx); }
+    else if(target != null){ const dx = target - st.x; if(Math.abs(dx) < 8 * stripPace()){ target = null; const h = targetHot; targetHot = null; if(h) interact(h); } else d = Math.sign(dx); }
     if(d){
-      const sp = (keys.run ? 330 : 190) * dt * (.3 + .7 * Math.abs(ANNA_ANIM.face)); st.x += d * sp; st.dir = d; moving = true; walkPh += dt * (keys.run ? 19 : 13.5);
+      const sp = (keys.run ? 330 : 190) * dt * (.3 + .7 * Math.abs(ANNA_ANIM.face)) * stripPace(); st.x += d * sp; st.dir = d; moving = true; walkPh += dt * (keys.run ? 19 : 13.5);
       const plant = Math.floor((walkPh - Math.PI / 2) / Math.PI);   // момент, когда пятка встаёт на землю
       if(plant !== lastStep){ lastStep = plant; const surf = surfaceAt(st.strip, st.x + st.dir * 14); stepSound(surf, keys.run); footFx(st.strip, st.x + st.dir * 14, surf, keys.run); }
       hideHint();
