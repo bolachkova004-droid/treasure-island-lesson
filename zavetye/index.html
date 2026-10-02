@@ -140,7 +140,20 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .portrait{position:fixed;bottom:0;left:max(2vw,8px);z-index:19;height:min(82vh,800px);pointer-events:none;opacity:0;transform:translateX(-24px);transition:opacity .45s ease,transform .45s ease}
 .portrait.right{left:auto;right:max(2vw,8px);transform:translateX(24px)}
 .portrait.on{opacity:1;transform:none}
-.portrait img{display:block;height:100%;width:auto;filter:drop-shadow(0 12px 30px rgba(0,0,0,.6))}
+.portrait{transform-origin:50% 100%;transition:opacity .45s ease,transform .45s ease,filter .4s ease}
+.portrait.on.listen{filter:brightness(.52) saturate(.7);transform:translateY(16px) scale(.955)}
+.portrait .fx,.portrait .bob{height:100%;transform-origin:50% 100%}
+.portrait .bob{position:relative;animation:breathe 5.6s ease-in-out infinite}
+.portrait.right .bob{animation-duration:6.4s;animation-delay:-2.1s}
+.portrait img{display:block;height:100%;width:auto;filter:drop-shadow(0 12px 30px rgba(0,0,0,.6));opacity:0;position:absolute;bottom:0;left:0;transition:opacity .38s ease}
+.portrait.right img{left:auto;right:0}
+.portrait img.cur{position:relative;opacity:1}
+.portrait .fx.flinch{animation:flinch .5s ease-out}
+.portrait .fx.pop{animation:pop .55s ease-out}
+@keyframes breathe{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(1.004,1.009)}}
+@keyframes flinch{0%{transform:none}15%{transform:translate(-8px,3px) rotate(-.6deg)}35%{transform:translate(6px,0) rotate(.4deg)}55%{transform:translate(-3px,1px)}75%{transform:translate(2px,0)}100%{transform:none}}
+@keyframes pop{0%{transform:none}40%{transform:scale(1.02) translateY(-4px)}100%{transform:none}}
+@media (prefers-reduced-motion:reduce){.portrait .bob,.portrait .fx{animation:none!important}}
 
 /* ---------- тетрадь: бумага в кожаной обложке ---------- */
 .nbw{position:fixed;inset:0;z-index:25;display:flex;align-items:center;justify-content:center;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(5,5,8,.7);backdrop-filter:blur(4px)}
@@ -257,6 +270,7 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
   .dlg-text p{font-size:17.5px}
   .ch{font-size:16.5px;padding:9px 12px}
   .portrait{height:56vh;left:0}.portrait.right{right:0}
+  .portrait.on.listen{opacity:0}
   .nb{grid-template-columns:1fr;grid-template-rows:auto 1fr;background-image:linear-gradient(90deg,transparent 40px,rgba(179,54,42,.5) 40px,rgba(179,54,42,.5) 42px,transparent 42px),linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px)}
   .nb::before{width:100%;height:100px;bottom:auto}
   .nb::after{display:none}
@@ -302,7 +316,8 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 <button class="prompt" id="prompt" type="button" hidden><kbd>E</kbd><span id="promptTx"></span></button>
 <div class="hint off" id="hint"></div>
 
-<div class="portrait" id="portrait" aria-hidden="true"><img id="portraitImg" alt=""></div>
+<div class="portrait" id="portL" aria-hidden="true"><div class="fx"><div class="bob"><img class="cur" alt=""><img alt=""></div></div></div>
+<div class="portrait right" id="portR" aria-hidden="true"><div class="fx"><div class="bob"><img class="cur" alt=""><img alt=""></div></div></div>
 <section class="dlg" id="dlg" hidden aria-live="polite">
   <div class="dlg-head"><span class="dlg-who" id="dlgWho"></span><span class="dlg-pg" id="dlgPg"></span></div>
   <div class="dlg-body" id="dlgBody"><div class="dlg-text" id="dlgText"></div></div>
@@ -2383,18 +2398,103 @@ function portraitFor(who, mood){
   if(IMG[`p_${who}_neutral`]) return IMG[`p_${who}_neutral`];
   const k = Object.keys(IMG).find(n => n.startsWith(`p_${who}_`)); return k ? IMG[k] : null;
 }
-/* сторона портрета — по направлению взгляда: смотрит вправо → стоит слева, и наоборот.
-   Здесь перечислены те, кто смотрит влево и потому стоит справа. */
-const PORTRAIT_RIGHT = new Set(['grunya', 'grisha', 'nina']);
-let shownPortrait = null;
-function showPortrait(id){
-  const sp = speakerOf(id), el = $('portrait'), im = sp ? portraitFor(sp[0], sp[1]) : null;
-  if(!im){ el.classList.remove('on'); shownPortrait = null; return; }
-  const key = im.src; el.classList.toggle('right', PORTRAIT_RIGHT.has(`p_${sp[0]}_${sp[1]}`) || PORTRAIT_RIGHT.has(sp[0]));
-  if(shownPortrait !== key){ $('portraitImg').src = im.src; shownPortrait = key; }
-  el.classList.add('on');
+/* Портреты в разговоре: Анна слева, собеседник справа. Говорящий — ярко, слушающий — в тени.
+   Эмоции меняются по ходу реплик: правило [сцена, кусок текста, 'кто:эмоция …'] действует с этой страницы дальше.
+   Первый токен без «~» — тот, кто сейчас говорит; «~кто:эмоция» меняет лицо, не передавая слова. */
+const MOODS = [
+  ['m_wed', 'Хорошая была женщина', 'grunya:cold'],
+  ['m_wed', 'Нитку-то кто повязал', 'grunya:cold ~anna:afraid'],
+  ['m_wed', 'будто ищет на них что-то', '~anna:afraid'],
+  ['m_wed', 'перечисляет правила', 'grunya:warm ~anna:neutral'],
+  ['m_wed2', '— До воскресенья', 'grunya:warm'],
+  ['m_wed2', 'Узнаешь — расскажешь', 'grunya:warm'],
+  ['m_wed2', 'Через час под окнами', 'grisha:cheerful'],
+  ['m_wed2', 'Позже Анна узнает', 'anna:sad'],
+  ['m_wed2', 'Анна открывает тетрадь', 'anna:neutral'],
+  ['gr_aglaya', '— А куда она делась', 'anna'],
+  ['gr_aglaya', '— В лес и ушла', 'grunya:cold'],
+  ['gr_aglaya', 'Анна думает о фотографии', 'anna:sad'],
+  ['gr_mother', 'Ложка в руке', 'grunya:cold'],
+  ['gr_mother', 'Тебя здесь быть не должно', 'grunya:cold ~anna:afraid'],
+  ['gr_mother', 'вспоминает, как улыбаться', 'grunya:warm'],
+  ['gr_after', 'Правду сказала?', 'grunya:warm'],
+  ['gr_after', 'как кипяток', 'grunya:cold'],
+  ['gr_after', 'Кто стоял у калитки', 'anna:neutral'],
+  ['gr_after', 'Груня долго на неё смотрит', 'grunya:cold ~anna:afraid'],
+  ['gr_after', 'В её голосе нет ни злости', 'grunya:cold'],
+  ['gr_after', 'успокоился', 'grunya:warm'],
+  ['gr_after', 'полезнее потерять', 'grunya:cold ~anna:sad'],
+  ['gr_dinner', 'Щи, хлеб', 'grunya:warm'],
+  ['gr_dinner', 'тихонько напевать', 'grunya:humming ~anna:afraid'],
+  ['gr_dinner', '— Что это за песня', 'anna:afraid'],
+  ['gr_dinner', '— Колыбельная.', 'grunya:humming'],
+  ['gr_dinner', 'Пойду в погреб', 'grunya:warm ~anna:neutral'],
+  ['gr_snoop', 'В ящике лежат', 'anna:afraid'],
+  ['gr_snoop', 'Б. В. Белова Вера', 'anna:afraid'],
+  ['gr_snoop', 'Груня входит с банкой', 'grunya:cold'],
+  ['gr_wait', 'похожим на нежность', 'grunya:warm'],
+  ['gs_where', '— А дядька знает', 'anna'],
+  ['gs_where', '— А как же. Я ему', 'grisha:confused'],
+  ['gs_earlier', 'вежливым недоумением', 'grisha:confused'],
+  ['gs_earlier', 'возвращается к мотору', 'grisha:cheerful'],
+  ['gs_earlier', 'водителя автобуса', 'anna:afraid'],
+  ['gs_suitcase', 'Смотрите, не жалко', 'grisha:cheerful'],
+  ['gs_suitcase', 'Чемодан старый', 'anna:neutral'],
+  ['gs_suitcase', 'Вещи сорокалетнего', 'anna:sad'],
+  ['gs_suitcase', 'В боковом кармане', 'anna:neutral'],
+  ['gs_notebook', 'берёт тетрадь двумя пальцами', 'grisha:confused'],
+  ['gs_notebook', 'Мой почерк', 'grisha:confused'],
+  ['nina_lie', 'не смотрит в сторону бани', 'anna:neutral'],
+  ['nina_banya', 'прямо в глаза', 'nina:stern ~anna:afraid'],
+  ['res_village', 'сидит на крыльце', 'grisha:broken'],
+  ['res_village', 'без чемодана', 'grisha:confused'],
+  ['res_village', 'Я вспомнил', 'grisha:broken'],
+  ['res_village', 'Я боялась', 'nina:guilty ~anna:sad'],
+  ['res_village', 'Мне сказали, что так будет лучше', 'nina:guilty ~anna:sad'],
+  ['res_village', 'поднимает на Анну глаза', 'grisha:broken ~anna:sad'],
+  ['res_answer', 'Легко тебе говорить', 'grisha:broken'],
+  ['res_answer', 'Вот и мать так решила', 'grisha:broken'],
+  ['res_answer', 'Двадцать два года за меня решали', 'grisha:confused'],
+  ['res_answer', 'кивает, будто услышал', 'grisha:confused'],
+  ['res_answer', 'нет хорошего конца', 'anna:sad'],
+];
+const PSLOT = { L:{ key:null }, R:{ key:null } };
+const slotEl = s => $(s === 'L' ? 'portL' : 'portR');
+function setSlot(s, who, mood){
+  const el = slotEl(s), P = PSLOT[s], im = who ? portraitFor(who, mood) : null;
+  if(!im){ el.classList.remove('on'); P.key = null; return false; }
+  if(P.key !== im.src){
+    const [a, b] = el.querySelectorAll('img'), cur = a.classList.contains('cur') ? a : b, nxt = cur === a ? b : a;
+    if(P.key && el.classList.contains('on')){
+      nxt.src = im.src; cur.classList.remove('cur'); nxt.classList.add('cur');
+      const fx = el.querySelector('.fx'); fx.classList.remove('flinch', 'pop'); void fx.offsetWidth; fx.classList.add(['afraid', 'broken', 'cold'].includes(mood) ? 'flinch' : 'pop');
+    } else cur.src = im.src;
+    P.key = im.src;
+  }
+  el.classList.add('on'); return true;
 }
-function hidePortrait(){ $('portrait').classList.remove('on'); }
+function portraitPage(){
+  if(!st || !st.view || !DLG) return hidePortrait();
+  const id = st.view.id, base = speakerOf(id);
+  if(!base) return hidePortrait();
+  const L = { who:'anna', mood: base[0] === 'anna' ? base[1] : 'neutral' };
+  let R = base[0] === 'anna' ? null : { who:base[0], mood:base[1] }, sp = base[0] === 'anna' ? 'L' : 'R';
+  const rules = MOODS.filter(r => r[0] === id);
+  for(let k = 0; k <= DLG.i && k < st.view.pages.length; k++){
+    const pg = st.view.pages[k]; let hit = false;
+    for(const [, sub, spec] of rules){ if(!pg.includes(sub)) continue; hit = true;
+      for(const tok of spec.split(' ')){ const quiet = tok[0] === '~', [who, mood] = tok.replace('~', '').split(':');
+        if(who === 'anna'){ if(mood) L.mood = mood; if(!quiet) sp = 'L'; }
+        else if(portraitFor(who, mood || 'neutral')){ R = { who, mood: mood || 'neutral' }; if(!quiet) sp = 'R'; } } }
+    if(!hit && pg.includes('class="dl"') && R) sp = 'R';
+  }
+  const okR = R ? setSlot('R', R.who, R.mood) : setSlot('R', null);
+  setSlot('L', L.who, L.mood);
+  if(!okR) sp = 'L';
+  slotEl('L').classList.toggle('listen', sp !== 'L'); slotEl('R').classList.toggle('listen', sp !== 'R');
+}
+function showPortrait(){ portraitPage(); }
+function hidePortrait(){ for(const s of ['L', 'R']){ slotEl(s).classList.remove('on', 'listen'); PSLOT[s].key = null; } }
 
 /* ---------- фигура из картинки ---------- */
 function spriteFor(who, walkPh, moving){
@@ -2634,6 +2734,7 @@ function renderDlg(){
   $('dlgPg').textContent = v.pages.length > 1 ? `${Math.min(DLG.i + 1, v.pages.length)} / ${v.pages.length}` : '';
   $('dlgText').innerHTML = v.pages.slice(0, DLG.i + 1).join('');
   $('dlgMore').hidden = last;
+  portraitPage();
   $('dlgCh').innerHTML = last ? curChoices.map((c, i) => `<button type="button" class="ch${c.say ? ' say' : ''}" data-i="${i}"${c.dis ? ' disabled' : ''} style="animation-delay:${i * 40}ms"><span class="n"><b>${i + 1}</b></span><span class="tx">${c.t}${c.sub ? `<span class="sub">${c.sub}</span>` : ''}</span>${c.cost ? '<span class="cost">время</span>' : ''}</button>`).join('') : '';
   const b = $('dlgBody'); b.scrollTop = b.scrollHeight;
   if(last && curChoices.length && !matchMedia('(pointer:coarse)').matches){ const f = $('dlgCh').querySelector('.ch:not([disabled])'); if(f) f.focus({ preventScroll:true }); }
