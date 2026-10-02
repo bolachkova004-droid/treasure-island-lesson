@@ -2232,7 +2232,17 @@ function drawArtFrame(v, camX, anna, P, ph){
     drawFx(g);
     const at = x => { g.setTransform(s * k, 0, 0, s * k, (x - camX) * s - x * s * k, oy + GY * s * (1 - k)); };
     for(const n of npcsFor(v)){ const m = { ...n, x:rx(n.x) }; at(m.x); if(n.id === 'varya' && !IMG.s_varya){ figure(g, m.x, LOOKS.varya, { face:1 }); continue; } drawNpc(g, m); }
+    if(v.strip === 'road'){ const sx = rx(spot('road', 'Бетонная плита', 1150)) - 60;
+      if(v.flags.busstop){ at(sx); busStop(g, sx + 6, 'new'); } else if(v.flags.rustystop){ at(sx); busStop(g, sx + 6, 'rust'); } }
     if(anna){ at(rx(anna.x)); annaDraw(g, rx(anna.x), anna.dir, anna.move, anna.ph); }
+    if(v.strip === 'road' && v.bus){ const bx = rx(v.bus.x); at(bx); bus(g, bx);
+      // в тумане у автобуса видны только тёплые окна, фары и габариты
+      const sv = SIL; SIL = null; const y = GY - 20, h = 124;
+      g.globalAlpha = .55; for(let i = 0; i < 5; i++){ g.fillStyle = 'rgba(247,207,106,.55)'; g.fillRect(bx + 14 + i * 48, y - h + 18, 40, 36); }
+      g.globalAlpha = 1; g.fillStyle = '#fff0b8'; g.fillRect(bx + 261, y - 32, 7, 12); g.fillStyle = '#ff5a3c'; g.fillRect(bx + 2, y - 30, 7, 11);
+      const cone = g.createLinearGradient(bx + 268, 0, bx + 520, 0); cone.addColorStop(0, 'rgba(255,240,190,.35)'); cone.addColorStop(1, 'rgba(255,240,190,0)');
+      g.fillStyle = cone; g.beginPath(); g.moveTo(bx + 268, y - 30); g.lineTo(bx + 520, y - 70); g.lineTo(bx + 520, y + 20); g.closePath(); g.fill();
+      SIL = sv; }
     g.setTransform(s, 0, 0, s, -camX * s, oy);
     drawFx(g, true);
   } finally { SIL = null; }
@@ -2258,6 +2268,8 @@ const ASSETS = {
   'bg_street_2': 'art/bg_street_2.jpg',
   'bg_street_3': 'art/bg_street_3.jpg',
   'bg_street_4': 'art/bg_street_4.jpg',
+  'bg_road_l': 'art/bg_road_l.jpg',
+  'bg_road': 'art/bg_road.jpg',
   'p_anna_neutral': 'art/p_anna_neutral.png',
   'p_anna_afraid': 'art/p_anna_afraid.png',
   'p_anna_sad': 'art/p_anna_sad.png',
@@ -2310,7 +2322,7 @@ const STRIP_ART = {
                       'Окно школы':[2, 850], 'Дверь школы':[2, 1000], 'Соседский дом':[2, 1370],
                       'Чемодан':[3, 745], 'Дом Лаптевых':[3, 820], 'Баня':[3, 1360] },
                npcPx:{ grisha:[3, 330], nina:[3, 990], varya:[3, 1150] } },
-  road:      { parts:['bg_road'] },
+  road:      { parts:['bg_road_l','bg_road'], segs:[0, 450, 1800], charScale:.9, hotPx:{ 'Бетонная плита':[1, 680] } },
   field:     { parts:['bg_field'] },
   river:     { parts:['bg_river'] },
   forestroad:{ parts:['bg_forest_stop'], noNight:true },
