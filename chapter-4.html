@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#9fdcff">
+<meta name="format-detection" content="telephone=no">
+<title>The Sea-Chest · Treasure Island IV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#233a57; --ink-soft:#5d6f88; --ink-dim:#98a6b8;
+  --paper-2:#f4f9ff; --line:#dbe7f3; --rule:#e6eef7; --shadow:#d3e1ef;
+  --tide:#38b6ff; --signal:#ff5a5f; --moss:#4cc25a; --accent:#e07a2e;
+  --ui:Rubik,"Trebuchet MS",sans-serif; --story:Nunito,"Trebuchet MS",sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:#cfeeff;overflow-x:hidden}
+body{margin:0;min-height:100vh;min-height:100dvh;overflow-x:clip;color:var(--ink);font-family:var(--story);font-size:17px;font-weight:600;line-height:1.5;
+  background:
+    radial-gradient(ellipse 22% 9% at 12% 16%,rgba(255,255,255,.9),transparent 70%),
+    radial-gradient(ellipse 18% 7% at 78% 10%,rgba(255,255,255,.85),transparent 70%),
+    linear-gradient(180deg,#9fdcff 0%,#d8f2ff 45%,#fff6e0 100%);background-attachment:fixed}
+button,input,textarea{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+h1,h2,h3{margin:0;font-family:var(--ui);font-weight:800;line-height:1.1}
+p{margin:0 0 10px}
+b,strong{font-weight:800}
+[hidden]{display:none!important}
+
+.wrap{max-width:1100px;margin:0 auto;padding:18px 18px 110px}
+
+/* шапка */
+.top{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 230px;gap:18px;align-items:center;padding:22px 24px;overflow:hidden;
+  color:#fff;background:linear-gradient(150deg,#16324f 0%,#23476e 55%,#3a5d86 100%);border-radius:26px;box-shadow:0 7px 0 #0f2238}
+.top::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 85% 20%,rgba(255,214,120,.35),transparent 40%);pointer-events:none}
+.top .mark{display:inline-block;padding:3px 10px;font-family:var(--ui);font-size:11px;font-weight:700;letter-spacing:.12em;color:#16324f;background:#ffd36b;border-radius:999px}
+.top h1{margin-top:8px;font-size:clamp(32px,5vw,52px)}
+.top h1 i{display:block;font-style:normal;font-size:.55em;color:#ffd36b}
+.top p{max-width:56ch;margin:8px 0 0;font-size:15.5px;color:rgba(255,255,255,.88)}
+.top-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.top-links a{display:inline-flex;align-items:center;min-height:40px;padding:6px 14px;font-family:var(--ui);font-size:13px;font-weight:700;color:#fff;text-decoration:none;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.3);border-radius:14px}
+.top svg{position:relative;width:100%;height:auto}
+.progress{display:flex;align-items:center;gap:10px;margin-top:14px;font-family:var(--ui);font-size:13px;font-weight:700;color:rgba(255,255,255,.85)}
+.progress .bar{flex:1;max-width:260px;height:10px;background:rgba(255,255,255,.18);border-radius:10px;overflow:hidden}
+.progress .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd36b,#ffb020);border-radius:10px;transition:width .4s}
+
+/* шаги */
+.steps{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:8px;margin:22px 0 0}
+.step{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:74px;padding:8px 4px;text-align:center;background:#fff;border:2px solid var(--line);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
+.step b{display:grid;place-items:center;width:30px;height:30px;font-family:var(--ui);font-size:14px;color:#fff;background:var(--accent);border-radius:50%}
+.step span{font-family:var(--ui);font-size:11.5px;font-weight:700;line-height:1.15;color:var(--ink-soft)}
+.step.done b{background:var(--moss)}
+.step.done b::after{content:"✓";font-size:13px}
+.step.done b em{display:none}
+.step em{font-style:normal}
+.step.on{background:var(--accent);border-color:color-mix(in srgb,var(--accent) 75%,#000);box-shadow:0 4px 0 color-mix(in srgb,var(--accent) 60%,#000)}
+.step.on span{color:#fff}
+.step.on b{color:var(--accent);background:#fff}
+
+/* лист */
+.stage{margin-top:22px;padding:26px;background:#fff;border:2px solid var(--line);border-radius:26px;box-shadow:0 7px 0 var(--shadow)}
+.head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:12px;padding-bottom:14px;margin-bottom:18px;border-bottom:2px dashed var(--line)}
+.kicker{margin:0 0 6px;font-family:var(--ui);font-size:12.5px;font-weight:700;letter-spacing:.08em;color:var(--accent)}
+.head h2{font-size:clamp(26px,3.4vw,38px)}
+.stamp{padding:6px 12px;font-family:var(--ui);font-size:13px;font-weight:700;color:#fff;background:var(--accent);border-radius:999px}
+.task{max-width:72ch;font-size:17px}
+.task b{color:color-mix(in srgb,var(--accent) 85%,#000)}
+.note{max-width:72ch;padding:14px 16px;font-size:15.5px;color:var(--ink-soft);background:#eef8ff;border-radius:16px}
+.note b{color:var(--ink)}
+.teach{margin-top:18px;padding:0;font-size:15px;color:#5a4a1a;background:#fff8dc;border:2px dashed #f0d27a;border-radius:18px}
+.teach summary{padding:12px 16px;font-family:var(--ui);font-size:13px;font-weight:800;color:#b07a00;cursor:pointer}
+.teach p{margin:0;padding:0 16px 14px}
+
+.btn{min-height:46px;padding:10px 20px;font-family:var(--ui);font-size:15px;font-weight:800;color:#fff;background:var(--tide);border:0;border-radius:16px;box-shadow:0 5px 0 color-mix(in srgb,var(--tide) 70%,#000);transition:transform .1s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 color-mix(in srgb,var(--tide) 70%,#000)}
+.btn.ghost{color:var(--ink);background:#fff;border:2px solid var(--line);box-shadow:0 4px 0 var(--shadow)}
+.btn.go{background:linear-gradient(180deg,#5ddc6a,#35c04a);box-shadow:0 5px 0 #248a37}
+.btn.warm{background:var(--accent);box-shadow:0 5px 0 color-mix(in srgb,var(--accent) 65%,#000)}
+.btn.small{min-height:40px;padding:6px 13px;font-size:13.5px;border-radius:13px}
+.btn:disabled{opacity:.4}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.slab{padding:18px;background:var(--paper-2);border:2px solid var(--rule);border-radius:20px}
+.slab h3{font-size:20px;margin-bottom:8px}
+.status{min-height:24px;margin-top:12px;font-size:16px;font-weight:700;color:var(--ink-soft)}
+.status.ok{color:#2e9e3c}
+.status.no{color:var(--signal)}
+.field{width:100%;min-height:48px;padding:11px 14px;color:var(--ink);background:#f6faff;border:2px solid var(--line);border-radius:14px;font-weight:700}
+.field:focus{outline:none;border-color:var(--accent);background:#fff}
+textarea.field{min-height:180px;resize:vertical;line-height:1.5}
+.frame{margin-top:12px;padding-top:10px;border-top:2px dashed var(--line);font-size:15px;color:var(--ink-soft)}
+
+/* выбор вариантов */
+.opts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.opt{display:flex;align-items:center;gap:10px;min-height:54px;padding:10px 14px;text-align:left;font-size:16px;font-weight:700;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
+.opt:hover{border-color:var(--accent)}
+.opt.pick{color:#fff;background:var(--accent);border-color:color-mix(in srgb,var(--accent) 75%,#000)}
+.opt.hit{color:#fff;background:var(--moss);border-color:#2ea343}
+.opt.miss{color:#fff;background:var(--signal);border-color:#d8383e}
+.opt small{display:block;font-size:13px;font-weight:700;opacity:.8}
+
+/* карточки слов */
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.card{display:flex;flex-direction:column;padding:14px;background:#fff;border:2px solid color-mix(in srgb,var(--c) 45%,#fff);border-radius:18px;box-shadow:0 4px 0 color-mix(in srgb,var(--c) 40%,#fff)}
+.cards .card:nth-child(4n+1){--c:#ff8a3d}.cards .card:nth-child(4n+2){--c:#22c3b3}.cards .card:nth-child(4n+3){--c:#8a63d2}.cards .card:nth-child(4n){--c:#38a0ff}
+.card .term{margin:0 0 6px;font-family:var(--ui);font-size:18px;font-weight:800;line-height:1.15}
+.card .ex{margin:0 0 8px;font-size:14px;font-style:italic;color:var(--ink-soft)}
+.card .ru{display:none;margin:0 0 8px;font-size:14.5px;font-weight:800;color:color-mix(in srgb,var(--c) 80%,#000)}
+.card .ru.open{display:block}
+.card .acts{display:flex;gap:6px;margin-top:auto}
+.card .acts button{min-height:36px;padding:4px 10px;font-family:var(--ui);font-size:12.5px;font-weight:800;background:var(--paper-2);border:2px solid var(--line);border-radius:11px}
+.ballast{margin-top:14px}
+.quiz{margin-top:22px;padding:20px;background:var(--paper-2);border:2px solid var(--rule);border-radius:20px}
+.quiz-q{margin:0 0 14px;font-family:var(--ui);font-size:clamp(20px,2.6vw,26px);font-weight:800;text-align:center}
+.quiz-q small{display:block;margin-bottom:4px;font-family:var(--story);font-size:14px;color:var(--ink-soft)}
+
+/* цепь */
+.chain{display:grid;gap:10px;counter-reset:c}
+.link{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;padding:10px 12px;background:#fff;border:2px solid var(--line);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
+.link::before{counter-increment:c;content:counter(c);display:grid;place-items:center;width:34px;height:34px;font-family:var(--ui);font-size:15px;font-weight:800;color:#fff;background:var(--accent);border-radius:50%}
+.link.ok{background:#eafbe9;border-color:#9fe0a5}
+.link.ok::before{background:var(--moss)}
+.link.no{background:#fff0f0;border-color:#ffb3b5}
+.arrows{display:flex;gap:6px}
+.arrows button{width:42px;min-height:42px;font-size:18px;font-weight:800;background:var(--paper-2);border:2px solid var(--line);border-radius:12px;box-shadow:0 3px 0 var(--shadow)}
+
+/* правда / ложь */
+.tf{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;background:#fff;border:2px solid var(--line);border-radius:16px}
+.tf+.tf{margin-top:10px}
+.tf .pair{display:flex;gap:6px}
+.tf .pair button{min-width:86px;min-height:42px;padding:6px 10px;font-family:var(--ui);font-size:14px;font-weight:800;background:var(--paper-2);border:2px solid var(--line);border-radius:12px;box-shadow:0 3px 0 var(--shadow)}
+.tf .pair button.right{color:#fff;background:var(--moss);border-color:#2ea343}
+.tf .pair button.wrong{color:#fff;background:var(--signal);border-color:#d8383e}
+.tf .why{grid-column:1/-1;font-size:14.5px;color:var(--ink-soft)}
+
+/* сундук */
+.chest{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.item{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:112px;padding:12px 8px;text-align:center;background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:0 4px 0 var(--shadow)}
+.item i{font-style:normal;font-size:30px;line-height:1}
+.item b{font-family:var(--ui);font-size:14.5px;line-height:1.15}
+.item span{font-size:12.5px;color:var(--ink-soft)}
+.item.in{background:#fff3df;border-color:#f0b35a;box-shadow:0 4px 0 #f0b35a}
+.item.right{background:#eafbe9;border-color:#9fe0a5;box-shadow:0 4px 0 #9fe0a5}
+.item.wrong{background:#fff0f0;border-color:#ffb3b5;box-shadow:0 4px 0 #ffb3b5}
+
+/* грамматика */
+.rule-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-bottom:18px}
+.rule{padding:16px;background:#eef8ff;border:2px solid #bfe3ff;border-radius:18px}
+.rule.evt{background:#fff3ea;border-color:#ffd0b0}
+.rule h3{font-size:18px;margin-bottom:6px}
+.form{display:inline-block;margin:0 0 8px;padding:3px 11px;font-family:var(--ui);font-size:13px;font-weight:800;color:#fff;background:var(--tide);border-radius:999px}
+.rule.evt .form{background:#ff8a3d}
+.timeline{display:block;width:100%;max-width:560px;height:auto;margin:0 auto 18px}
+.gline{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 14px;background:#fff;border:2px solid var(--line);border-radius:16px}
+.gline+.gline{margin-top:10px}
+.gline .pair{display:flex;gap:6px;flex-wrap:wrap}
+.gline .pair button{min-height:42px;padding:6px 12px;font-family:var(--ui);font-size:14px;font-weight:700;background:var(--paper-2);border:2px solid var(--line);border-radius:12px;box-shadow:0 3px 0 var(--shadow)}
+.gline .pair button.right{color:#fff;background:var(--moss);border-color:#2ea343}
+.gline .pair button.wrong{color:#fff;background:var(--signal);border-color:#d8383e}
+.gline .why{grid-column:1/-1;font-size:14.5px;color:var(--ink-soft)}
+.write{padding:14px;background:#fff;border:2px solid var(--line);border-radius:18px}
+.write+.write{margin-top:10px}
+.write.ok{background:#eafbe9;border-color:#9fe0a5}
+.write.no{background:#fff0f0;border-color:#ffb3b5}
+.write .q{margin-bottom:8px;font-weight:800}
+.fb{min-height:20px;margin-top:8px;font-size:15px;color:var(--ink-soft)}
+.fb .model{display:block;margin-top:4px;font-weight:800;color:#2a8fd6}
+
+/* разговор */
+.talk{display:grid;grid-template-columns:minmax(170px,.35fr) minmax(0,1fr);gap:18px;align-items:center;margin-top:18px;padding:20px;color:#fff;
+  background:radial-gradient(circle at 1px 1px,rgba(255,255,255,.18) 1.5px,transparent 2px) 0 0/18px 18px,linear-gradient(135deg,#e07a2e,#8a4fc0);border-radius:22px;box-shadow:0 6px 0 #6a3a90}
+.talk h3{font-size:24px;color:#fff}
+.talk p{font-size:15px;color:rgba(255,255,255,.92)}
+.talk-card{padding:18px;color:var(--ink);background:#fff;border-radius:18px}
+.talk-q{min-height:52px;margin:0 0 14px;font-family:var(--ui);font-size:clamp(18px,2vw,22px);font-weight:700;line-height:1.3}
+.twist{margin-top:12px;padding:9px 12px;font-size:15px;font-weight:700;color:#8a4a00;background:#fff3cf;border-radius:12px}
+.clock{padding:16px;text-align:center;background:#fff;border:2px solid var(--line);border-radius:18px}
+.clock b{display:block;font-family:var(--ui);font-size:46px;font-weight:800;font-variant-numeric:tabular-nums}
+.check{display:flex;gap:10px;align-items:flex-start;margin-bottom:8px;font-size:16px}
+.check input{width:20px;height:20px;margin-top:3px;accent-color:var(--moss)}
+
+/* дневник */
+.targets{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.targets span{padding:4px 10px;font-family:var(--ui);font-size:13px;font-weight:700;color:var(--ink-soft);background:var(--paper-2);border:2px solid var(--line);border-radius:999px}
+.targets span.hit{color:#fff;background:var(--moss);border-color:#2ea343}
+.meter-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-family:var(--ui);font-size:14px;font-weight:700;color:var(--ink-soft)}
+.meter-row b{color:var(--ink)}
+
+/* финал */
+.gapline{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,.35fr);gap:12px;align-items:center;padding:12px 14px;background:#fff;border:2px solid var(--line);border-radius:16px}
+.gapline+.gapline{margin-top:10px}
+.gapline.ok{background:#eafbe9;border-color:#9fe0a5}
+.gapline.no{background:#fff0f0;border-color:#ffb3b5}
+.seal{display:grid;place-items:center;width:160px;height:160px;margin:6px auto 14px;text-align:center;background:radial-gradient(circle at 35% 30%,#ffe066,#ffb020 70%);border:4px solid #fff;border-radius:50%;box-shadow:0 7px 0 #e59400,0 0 0 8px rgba(255,194,26,.25)}
+.seal b{display:block;font-family:var(--ui);font-size:40px;font-weight:800;color:#7a4a00}
+.seal span{font-family:var(--ui);font-size:11px;font-weight:800;color:#7a4a00}
+
+/* низ */
+.foot{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:12px;
+  padding:12px max(18px,env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));background:rgba(255,255,255,.96);border-top:2px solid var(--line)}
+.foot .mid{font-family:var(--ui);font-size:13px;font-weight:700;color:var(--ink-soft)}
+.toast{position:fixed;left:50%;bottom:92px;z-index:50;max-width:min(440px,calc(100vw - 32px));padding:12px 18px;font-size:15.5px;font-weight:700;color:#fff;background:var(--ink);border-radius:16px;box-shadow:0 5px 0 rgba(0,0,0,.2);transform:translate(-50%,14px);opacity:0;transition:.25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.pop{animation:pop .4s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes pop{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.shake{animation:shake .38s linear}
+@keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(6px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+
+@media (max-width:900px){
+  .steps{grid-template-columns:repeat(5,minmax(0,1fr))}
+  .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .chest{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:640px){
+  .wrap{padding:10px 10px 100px}
+  .top{grid-template-columns:1fr;padding:18px 16px;border-radius:20px}
+  .top svg{display:none}
+  .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .stage{padding:16px;border-radius:20px}
+  .opts,.grid2,.rule-pair,.talk,.cards{grid-template-columns:1fr}
+  .chest{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tf,.gline,.gapline{grid-template-columns:1fr}
+  .foot .mid{display:none}
+  .foot .btn{flex:1}
+  input.field,textarea.field{font-size:16px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <span class="mark">TREASURE ISLAND · ГЛАВА IV</span>
+      <h1>The Sea-Chest<i>Сундук капитана</i></h1>
+      <p>Капитан мёртв, до десяти вечера пираты вернутся. Джим и его мама остаются одни с сундуком, в котором лежат их деньги — и что-то ещё. Девять заданий: от прогноза до дневника Джима.</p>
+      <div class="progress"><span>Выполнено</span><div class="bar"><i id="progFill"></i></div><span id="progText">0 / 9</span></div>
+      <div class="top-links">
+        <a href="index.html">← Главы I–II</a>
+        <a href="a2-words.html">Тренажёр слов A2</a>
+      </div>
+    </div>
+    <svg viewBox="0 0 230 170" role="img" aria-label="Открытый морской сундук с золотом и свёртком бумаг при свече">
+      <ellipse cx="115" cy="152" rx="100" ry="10" fill="#0c1d30" opacity=".5"/>
+      <circle cx="196" cy="42" r="30" fill="#ffd36b" opacity=".18"/>
+      <rect x="190" y="52" width="12" height="40" rx="3" fill="#f6ead0"/>
+      <path d="M196 30 q8 12 0 22 q-8 -10 0 -22z" fill="#ffb020"/>
+      <path d="M38 60 L42 28 Q115 2 188 28 L192 60 Z" fill="#7a4b26" stroke="#3d2412" stroke-width="3" transform="rotate(-8 115 60)"/>
+      <rect x="34" y="70" width="162" height="78" rx="8" fill="#8b5a2b" stroke="#3d2412" stroke-width="3"/>
+      <rect x="34" y="62" width="162" height="16" rx="5" fill="#5e3a1b" stroke="#3d2412" stroke-width="3"/>
+      <g fill="#ffcf3f" stroke="#c98a12" stroke-width="2">
+        <circle cx="70" cy="66" r="9"/><circle cx="88" cy="60" r="9"/><circle cx="106" cy="64" r="9"/><circle cx="124" cy="58" r="9"/><circle cx="142" cy="64" r="9"/><circle cx="160" cy="60" r="9"/>
+      </g>
+      <rect x="100" y="38" width="44" height="28" rx="4" fill="#d9c79c" stroke="#7a6640" stroke-width="2" transform="rotate(-10 122 52)"/>
+      <path d="M104 46 h34 M104 53 h28" stroke="#7a6640" stroke-width="2" transform="rotate(-10 122 52)"/>
+      <rect x="104" y="96" width="22" height="26" rx="4" fill="#ffcf3f" stroke="#c98a12" stroke-width="2"/>
+      <circle cx="115" cy="107" r="4" fill="#3d2412"/>
+      <path d="M56 78 v70 M174 78 v70" stroke="#3d2412" stroke-width="3"/>
+      <text x="115" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-style="italic" fill="#f6ead0">B</text>
+    </svg>
+  </header>
+
+  <nav class="steps" id="steps" aria-label="Задания главы IV"></nav>
+  <main class="stage" id="stage" aria-live="polite"></main>
+</div>
+
+<div class="foot">
+  <button class="btn ghost" id="prevBtn">← Назад</button>
+  <span class="mid" id="footLabel"></span>
+  <button class="btn go" id="nextBtn">Дальше →</button>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+'use strict';
+
+/* ============ данные ============ */
+const WORDS = [
+  { id:'tell',   en:'tell somebody everything', ru:'рассказать кому-то всё',               ex:'Jim told his mother everything he knew.' },
+  { id:'help',   en:'ask for help',             ru:'попросить о помощи',                   ex:'They ran to the village to ask for help.' },
+  { id:'afraid', en:'be too afraid to do',      ru:'слишком бояться, чтобы что-то сделать', ex:'The men were too afraid to come back to the inn.' },
+  { id:'dare',   en:'dare to do',               ru:'осмелиться, решиться',                 ex:'“If you don’t dare, Jim and I dare,” said his mother.' },
+  { id:'lock',   en:'lock the door',            ru:'запереть дверь',                       ex:'They went back home and locked the door.' },
+  { id:'owe',    en:'owe somebody money',       ru:'быть должным кому-то',                 ex:'The captain owed them a lot of money.' },
+  { id:'hurry',  en:'in a hurry',               ru:'в спешке, второпях',                   ex:'They left the inn in a hurry.' },
+  { id:'faint',  en:'faint',                    ru:'упасть в обморок',                     ex:'Near the bridge, Jim’s mother fainted.' }
+];
+
+const EVENTS = [
+  'Jim tells his mother everything he knows about the captain.',
+  'They run to the nearby village to ask for help.',
+  'The men are too afraid of Captain Flint’s name to come with them.',
+  'Jim and his mother go back to the inn alone and lock the door.',
+  'Jim finds the key on a string around the dead captain’s neck.',
+  'They open the chest and find a bag of gold and a packet of papers.',
+  'His mother starts counting only the money the captain owed her.',
+  'They hear the blind man’s stick and a whistle, so they run away with the packet.'
+];
+
+const TRUTH = [
+  { t:'The men from the village agreed to defend the inn with Jim and his mother.', a:false, why:'Защищать трактир не согласился никто. Согласились только послать одного парня верхом к доктору Ливси.' },
+  { t:'Someone from the village rode to Dr Livesey’s house for help.', a:true, why:'Да: один парень поскакал к доктору за вооружённой помощью.' },
+  { t:'Jim found the key in the captain’s pocket.', a:false, why:'В карманах были монетки, напёрсток, нитки, табак и нож. Ключ висел на просмолённой верёвке на шее капитана.' },
+  { t:'Under an old sea-cloak there was a bag of gold.', a:true, why:'Да: под старым морским плащом лежали свёрток в промасленной ткани и холщовый мешочек с золотом.' },
+  { t:'All the coins in the bag were English guineas.', a:false, why:'Монеты были из разных стран: дублоны, луидоры, гинеи, пиастры. Мама умела считать только гинеи, поэтому дело шло медленно.' },
+  { t:'Jim’s mother wanted to take all the money in the bag.', a:false, why:'Нет: только то, что капитан был им должен, — и ни пенни больше. Она хотела показать, что она честная женщина.' },
+  { t:'The blind man tried to open the door of the inn.', a:true, why:'Да: он стучал палкой и дёргал ручку, но дверь была заперта.' },
+  { t:'Jim took the gold, and his mother took the packet.', a:false, why:'Наоборот: мама взяла деньги, которые успела отсчитать, а Джим — свёрток в промасленной ткани.' }
+];
+
+const CHEST = [
+  { id:'clothes', icon:'🧥', en:'a suit of good clothes', ru:'хороший костюм', in:true },
+  { id:'pistols', icon:'🔫', en:'two pairs of pistols',   ru:'две пары пистолетов', in:true },
+  { id:'silver',  icon:'🪙', en:'a bar of silver',        ru:'слиток серебра', in:true },
+  { id:'watch',   icon:'⌚', en:'an old Spanish watch',   ru:'старые испанские часы', in:true },
+  { id:'parrot',  icon:'🦜', en:'a parrot in a cage',     ru:'попугай в клетке', in:false },
+  { id:'shells',  icon:'🐚', en:'five or six sea shells', ru:'пять-шесть морских ракушек', in:true },
+  { id:'tobacco', icon:'🍂', en:'some tobacco',           ru:'табак', in:true },
+  { id:'crown',   icon:'👑', en:'a diamond crown',        ru:'алмазная корона', in:false },
+  { id:'gold',    icon:'💰', en:'a bag of gold',          ru:'мешочек с золотом', in:true },
+  { id:'leg',     icon:'🦵', en:'a wooden leg',           ru:'деревянная нога', in:false },
+  { id:'packet',  icon:'📜', en:'a packet of papers',     ru:'свёрток с бумагами', in:true },
+  { id:'rum',     icon:'🍾', en:'a bottle of rum',        ru:'бутылка рома', in:false }
+];
+
+const GRAM = [
+  { pre:'Mother', opts:['was counting','counted'], post:'the coins when they heard a stick on the road.', a:0, why:'Долгое действие (считала) прервано коротким (услышали) — was counting.' },
+  { pre:'They were counting the money when somebody', opts:['turned','was turning'], post:'the door handle.', a:0, why:'Короткое действие, которое прервало длинное, — Past Simple.' },
+  { pre:'Jim', opts:['searched','was searching'], post:'the captain’s pockets when he noticed a string round his neck.', a:1, why:'Он был в процессе поиска, когда заметил верёвку, — was searching.' },
+  { pre:'When they opened the chest, they', opts:['noticed','were noticing'], post:'a smell of tobacco and tar.', a:0, why:'Два коротких действия одно за другим — оба в Past Simple.' },
+  { pre:'While they', opts:['ran','were running'], post:'to the bridge, Jim’s mother felt weak.', a:1, why:'После while обычно идёт длительное действие — were running.' },
+  { pre:'The blind man', opts:['knocked','was knocking'], post:'on the door, and then he went away.', a:0, why:'Цепочка коротких событий (постучал, потом ушёл) — Past Simple.' }
+];
+
+const TALK = {
+  qs:[
+    'Is Jim’s mother honest, brave or foolish? Prove it with one detail from the chapter.',
+    'Why were the men in the village too afraid to help? Would you help?',
+    'Why does Jim take the packet and not the gold? What could be inside?',
+    'What would you take from the chest, and why?',
+    'Who is the real hero of this chapter: Jim or his mother?'
+  ],
+  tw:['Ответь за 30 секунд.','Используй три выражения из задания 2.','Говори от лица мамы Джима.','Поспорь со своим первым ответом.','Добавь одно предложение в Past Continuous.'],
+  frame:'<b>A2:</b> “I think she is … because she …” · <b>B1:</b> “Although she was in danger, she …, which shows that …”'
+};
+const VOTES = [
+  ['honest','Она права', 'берёт только своё — это честно'],
+  ['foolish','Смело, но глупо', 'опасность рядом, надо бежать сразу'],
+  ['all','Надо брать всё', 'пираты сами воры']
+];
+
+const DIARY = [
+  { id:'tell',   label:'told … everything', re:/\b(told|tell)\b[^.!?]*\beverything\b/ },
+  { id:'help',   label:'ask for help',      re:/\bask(ed)?\b[^.!?]*\bfor help\b/ },
+  { id:'afraid', label:'too afraid to',     re:/\btoo (afraid|scared|frightened) to\b/ },
+  { id:'dare',   label:'dare',              re:/\bdare(d|s)?\b/ },
+  { id:'lock',   label:'locked the door',   re:/\block(ed)?\b[^.!?]*\bdoor\b/ },
+  { id:'owe',    label:'owed',              re:/\bowe(d|s)?\b/ },
+  { id:'hurry',  label:'in a hurry',        re:/\bin a hurry\b/ },
+  { id:'faint',  label:'fainted',           re:/\bfaint(ed|s)?\b/ }
+];
+const PASTCONT = /\b(was|were) [a-z]+ing\b/;
+const DIARY_MODEL = 'Dear diary, what a terrible night! I told my mother everything about the captain. We ran to the village to ask for help, but the men were too afraid to come with us. So we went back alone and locked the door. The captain owed us money, so we opened his chest. My mother was counting the coins when we heard the blind man’s stick. Then somebody whistled on the hill. We left in a hurry, and near the bridge my mother fainted. I still have the packet.';
+
+const GAPS = [
+  { pre:'Jim ', post:' his mother everything he knew.', ok:['told'] },
+  { pre:'The men were too ', post:' to come back to the inn.', ok:['afraid','scared','frightened'] },
+  { pre:'They went back home and ', post:' the door.', ok:['locked'] },
+  { pre:'The captain ', post:' them a lot of money.', ok:['owed'] },
+  { pre:'Mother ', post:' counting the coins when they heard a whistle.', ok:['was'] },
+  { pre:'They left the inn in a ', post:'.', ok:['hurry'] },
+  { pre:'Near the bridge, his mother ', post:'.', ok:['fainted'] }
+];
+
+const STEPS = [
+  { id:'recap',   short:'Прогноз',     kicker:'до чтения',             title:'Before the chest opens', min:'5 минут',  render:recap },
+  { id:'words',   short:'Слова',       kicker:'лексика',               title:'Words to take with you', min:'10 минут', render:words },
+  { id:'chain',   short:'Цепь',        kicker:'после чтения',          title:'Rebuild the night',      min:'7 минут',  render:chain },
+  { id:'truth',   short:'Правда?',     kicker:'понимание',             title:'True or false?',         min:'6 минут',  render:truth },
+  { id:'chest',   short:'Сундук',      kicker:'детали',                title:'What was in the chest?', min:'5 минут',  render:chest },
+  { id:'gram',    short:'Грамматика',  kicker:'Past Continuous',       title:'Counting when…',         min:'10 минут', render:gram },
+  { id:'talk',    short:'Разговор',    kicker:'говорение',             title:'Mother’s choice',        min:'10 минут', render:talk },
+  { id:'diary',   short:'Дневник',     kicker:'письмо',                title:'Jim’s diary',            min:'12 минут', render:diary },
+  { id:'exit',    short:'Финал',       kicker:'проверка',              title:'Close the chest',        min:'5 минут',  render:exit }
+];
+
+/* ============ состояние ============ */
+const KEY = 'benbow-ch4-v1';
+let S = { step:0, done:[], predict:[], order:[], learned:[], quiz:null, truth:{}, chest:{}, chestChecked:false,
+  gram:{}, gw:['',''], vote:'', talkQ:0, talkT:-1, req:[], diary:'', gaps:{} };
+try { S = { ...S, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch(e){}
+['done','predict','order','learned','req'].forEach(k => { if(!Array.isArray(S[k])) S[k] = []; });
+if(!Array.isArray(S.gw) || S.gw.length < 2) S.gw = ['',''];
+if(S.order.length !== EVENTS.length) S.order = [3,0,5,1,7,2,6,4];
+const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
+
+/* ============ помощники ============ */
+const $ = id => document.getElementById(id);
+const stage = $('stage');
+const clean = s => (s || '').toLowerCase().replace(/[’']/g, "'").replace(/[^a-z0-9'\s-]/g, ' ').replace(/\s+/g, ' ').trim();
+const shuffle = a => { a = [...a]; for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600); }
+function speak(text, rate){
+  if(!('speechSynthesis' in window)){ toast('В этом браузере нет озвучки'); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = rate || .85;
+  const v = speechSynthesis.getVoices().find(v => /^en[-_]GB/i.test(v.lang)) || speechSynthesis.getVoices().find(v => /^en/i.test(v.lang));
+  if(v) u.voice = v;
+  speechSynthesis.speak(u);
+}
+let actx = null;
+function blip(freq, dur, type){
+  try{
+    actx = actx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = actx.createOscillator(), g = actx.createGain();
+    o.type = type || 'triangle'; o.frequency.value = freq;
+    g.gain.setValueAtTime(.0001, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.12, actx.currentTime + .02);
+    g.gain.exponentialRampToValueAtTime(.0001, actx.currentTime + (dur || .18));
+    o.connect(g); g.connect(actx.destination); o.start(); o.stop(actx.currentTime + (dur || .18) + .02);
+  } catch(e){}
+}
+const good = () => { blip(660,.12); setTimeout(() => blip(990,.16), 90); };
+const bad = () => blip(180,.22,'sawtooth');
+function complete(id){
+  if(S.done.includes(id)) return;
+  S.done.push(id); save(); renderSteps(); good();
+  toast('Задание выполнено: ' + STEPS.find(s => s.id === id).short + ' ✓');
+}
+function head(st, i){
+  return '<div class="head"><div><p class="kicker">Задание ' + (i + 1) + ' · ' + st.kicker + '</p><h2>' + st.title + '</h2></div><span class="stamp">' + st.min + '</span></div>';
+}
+const teach = text => '<details class="teach"><summary>🎓 Для преподавателя</summary><p>' + text + '</p></details>';
+
+/* ============ навигация ============ */
+function renderSteps(){
+  $('steps').innerHTML = STEPS.map((st, i) =>
+    '<button class="step ' + (i === S.step ? 'on ' : '') + (S.done.includes(st.id) ? 'done' : '') + '" data-step="' + i + '" aria-current="' + (i === S.step) + '">' +
+    '<b><em>' + (i + 1) + '</em></b><span>' + st.short + '</span></button>').join('');
+  const n = S.done.length;
+  $('progFill').style.width = Math.round(n / STEPS.length * 100) + '%';
+  $('progText').textContent = n + ' / ' + STEPS.length;
+}
+$('steps').addEventListener('click', e => { const b = e.target.closest('[data-step]'); if(b) go(+b.dataset.step); });
+function go(i){
+  S.step = Math.max(0, Math.min(STEPS.length - 1, i)); save();
+  try { history.replaceState(null, '', '#task-' + (S.step + 1)); } catch(e){}
+  show();
+  stage.scrollIntoView({ block:'start' });
+}
+function show(){
+  const st = STEPS[S.step];
+  renderSteps();
+  stage.innerHTML = '<div class="pop">' + head(st, S.step) + '<div id="body"></div></div>';
+  st.render($('body'));
+  $('prevBtn').disabled = S.step === 0;
+  $('nextBtn').textContent = S.step === STEPS.length - 1 ? 'К заданию 1 ↺' : 'Дальше →';
+  $('footLabel').textContent = 'Задание ' + (S.step + 1) + ' из ' + STEPS.length + ' · ' + st.short;
+}
+$('prevBtn').addEventListener('click', () => go(S.step - 1));
+$('nextBtn').addEventListener('click', () => go(S.step === STEPS.length - 1 ? 0 : S.step + 1));
+
+/* ============ 1. прогноз ============ */
+function recap(el){
+  el.innerHTML =
+    '<div class="note"><b>Что было в главе III.</b> Недавно умер отец Джима, и мама с сыном остались одни. В холодный вечер к трактиру приходит слепой нищий <b>Pew</b>. Он хватает Джима за руку, заставляет отвести его к капитану и вручает Билли Бонсу <b>the black spot</b> — «чёрную метку», пиратское предупреждение. На ней написано: <i>“You have till ten tonight.”</i> Капитан вскакивает, шатается и падает замертво.</div>' +
+    '<p class="task" style="margin-top:16px">Пираты вернутся к десяти вечера. А в комнате стоит сундук капитана, и капитан был должен трактиру деньги. <b>Что, по-твоему, лежит в сундуке?</b> Выбери три предмета. После чтения сравнишь с правдой в задании 5.</p>' +
+    '<div class="opts" id="predict">' + CHEST.map(c =>
+      '<button class="opt ' + (S.predict.includes(c.id) ? 'pick' : '') + '" data-p="' + c.id + '"><span style="font-size:24px">' + c.icon + '</span><span>' + c.en + '<small>' + c.ru + '</small></span></button>').join('') + '</div>' +
+    '<div class="status" id="pStatus"></div>' +
+    '<div class="frame"><b>Скажи вслух:</b> “I think there is/are … in the chest, because the captain …” / “I don’t think there is … because …”</div>' +
+    teach('Не подтверждайте и не опровергайте прогноз до чтения. Вопрос «What would make you change your mind?» удерживает интерес к тексту. Главу лучше читать дома или вслух по абзацам, а задания 3–5 делать сразу после чтения.');
+  const upd = () => {
+    $('pStatus').textContent = S.predict.length === 3 ? 'Прогноз записан. Теперь читай главу IV и проверь себя в задании 5.' : 'Выбрано: ' + S.predict.length + ' из 3';
+    $('pStatus').className = 'status' + (S.predict.length === 3 ? ' ok' : '');
+  };
+  el.querySelectorAll('[data-p]').forEach(b => b.addEventListener('click', () => {
+    const id = b.dataset.p;
+    S.predict = S.predict.includes(id) ? S.predict.filter(x => x !== id) : [...S.predict, id].slice(-3);
+    save();
+    el.querySelectorAll('[data-p]').forEach(x => x.classList.toggle('pick', S.predict.includes(x.dataset.p)));
+    upd();
+    if(S.predict.length === 3) complete('recap');
+  }));
+  upd();
+}
+
+/* ============ 2. слова ============ */
+function words(el){
+  el.innerHTML =
+    '<p class="task">Восемь выражений из главы, которые пригодятся и в обычной речи. Сначала прочитай пример и попробуй догадаться о значении, потом открой перевод. В конце — быстрая проверка.</p>' +
+    '<div class="cards">' + WORDS.map(w =>
+      '<article class="card"><h3 class="term">' + w.en + '</h3><p class="ex">' + w.ex + '</p><p class="ru" id="ru-' + w.id + '">' + w.ru + '</p>' +
+      '<div class="acts"><button data-say="' + esc(w.ex) + '">🔊</button><button data-ru="' + w.id + '">перевод</button></div></article>').join('') + '</div>' +
+    '<div class="note ballast"><b>Понять и отпустить (в активный запас не идут):</b> hamlet — деревушка · quadrant — квадрант, морской прибор · oilskin packet — свёрток в промасленной ткани · guineas, doubloons, louis d’ors, pieces of eight — старинные монеты · latch — щеколда · tarry string — просмолённая верёвка.</div>' +
+    '<div class="quiz" id="quiz"></div>' +
+    teach('Сначала пример, потом догадка, потом перевод. В проверке слова идут в случайном порядке; 6 из 8 и выше — можно переходить к говорению, ниже — повторить карточки.');
+  el.querySelectorAll('[data-say]').forEach(b => b.addEventListener('click', () => speak(b.dataset.say, .85)));
+  el.querySelectorAll('[data-ru]').forEach(b => b.addEventListener('click', () => $('ru-' + b.dataset.ru).classList.toggle('open')));
+  quizStart();
+}
+function quizStart(){
+  const box = $('quiz');
+  if(S.quiz !== null){
+    box.innerHTML = '<p class="quiz-q"><small>Проверка пройдена</small>' + S.quiz + ' из ' + WORDS.length + '</p><div class="row" style="justify-content:center"><button class="btn ghost small" id="qAgain">Пройти ещё раз</button></div>';
+    $('qAgain').addEventListener('click', () => { S.quiz = null; save(); quizRun(); });
+    return;
+  }
+  box.innerHTML = '<p class="quiz-q"><small>Быстрая проверка</small>Русское значение → английское выражение</p><div class="row" style="justify-content:center"><button class="btn warm" id="qGo">Начать проверку</button></div>';
+  $('qGo').addEventListener('click', quizRun);
+}
+function quizRun(){
+  const box = $('quiz'), items = shuffle(WORDS);
+  let n = 0, score = 0, locked = false;
+  const next = () => {
+    if(n >= items.length){ S.quiz = score; save(); if(score >= 6) complete('words'); else toast('Повтори карточки и попробуй ещё раз'); quizStart(); return; }
+    locked = false;
+    const w = items[n], opts = shuffle([w, ...shuffle(WORDS.filter(x => x !== w)).slice(0, 3)]);
+    box.innerHTML = '<p class="quiz-q pop"><small>' + (n + 1) + ' из ' + items.length + '</small>' + w.ru + '</p>' +
+      '<div class="opts">' + opts.map(o => '<button class="opt" data-q="' + o.id + '">' + o.en + '</button>').join('') + '</div><div class="status" id="qFb"></div>';
+    box.querySelectorAll('[data-q]').forEach(b => b.addEventListener('click', () => {
+      if(locked) return; locked = true;
+      const ok = b.dataset.q === w.id;
+      box.querySelectorAll('[data-q]').forEach(x => { if(x.dataset.q === w.id) x.classList.add('hit'); });
+      if(ok){ score++; good(); } else { b.classList.add('miss'); bad(); }
+      $('qFb').className = 'status ' + (ok ? 'ok' : 'no');
+      $('qFb').textContent = w.ex;
+      speak(w.ex, .9);
+      n++; setTimeout(next, ok ? 1300 : 2300);
+    }));
+  };
+  next();
+}
+
+/* ============ 3. цепь ============ */
+function chain(el){
+  el.innerHTML = '<p class="task">Расставь восемь событий главы по порядку. <b>Книгу не открывай</b> — вспоминай. Стрелки двигают строку вверх и вниз.</p>' +
+    '<div class="chain" id="chain"></div>' +
+    '<div class="row" style="margin-top:14px"><button class="btn warm" id="chCheck">Проверить порядок</button><button class="btn ghost" id="chMix">Перемешать</button></div>' +
+    '<div class="status" id="chStatus"></div>' +
+    teach('После проверки — пересказ цепочки за 40 секунд со словами first / then / after that / suddenly / in the end. Ошибки во время пересказа не исправляйте, запишите две и вернитесь к ним в задании 6.');
+  const draw = () => {
+    $('chain').innerHTML = S.order.map((n, pos) =>
+      '<div class="link" data-pos="' + pos + '"><span>' + EVENTS[n] + '</span><div class="arrows"><button data-mv="-1" aria-label="Выше">↑</button><button data-mv="1" aria-label="Ниже">↓</button></div></div>').join('');
+    $('chain').querySelectorAll('[data-mv]').forEach(b => b.addEventListener('click', () => {
+      const p = +b.closest('.link').dataset.pos, q = p + +b.dataset.mv;
+      if(q < 0 || q >= S.order.length) return;
+      [S.order[p], S.order[q]] = [S.order[q], S.order[p]]; save(); draw(); $('chStatus').textContent = '';
+    }));
+  };
+  draw();
+  $('chCheck').addEventListener('click', () => {
+    const all = S.order.every((n, i) => n === i);
+    [...$('chain').children].forEach((row, i) => { row.classList.remove('ok','no'); row.classList.add(S.order[i] === i ? 'ok' : 'no'); });
+    $('chStatus').className = 'status ' + (all ? 'ok' : 'no');
+    $('chStatus').textContent = all ? 'Верно! Перескажи ночь за 40 секунд: first, then, suddenly, in the end.' : 'Есть сбой. Подсказка: сначала просьба о помощи, потом ключ, потом сундук; звуки снаружи — в самом конце.';
+    if(all) complete('chain'); else bad();
+  });
+  $('chMix').addEventListener('click', () => { S.order = shuffle(S.order); save(); draw(); $('chStatus').textContent = ''; });
+}
+
+/* ============ 4. правда или ложь ============ */
+function truth(el){
+  el.innerHTML = '<p class="task">Восемь утверждений о главе. Отметь <b>True</b> или <b>False</b>. После ответа появится объяснение — прочитай его, даже если ответ верный.</p><div id="tfList"></div><div class="status" id="tfStatus"></div>' +
+    teach('Для неверных утверждений просите студента исправить фразу вслух по-английски: “No, they didn’t. Nobody agreed to…”. Это тренирует отрицания в Past Simple.');
+  const draw = () => {
+    $('tfList').innerHTML = TRUTH.map((q, i) => {
+      const ans = S.truth[i];
+      const cls = v => ans === undefined ? '' : (v === q.a ? 'right' : (ans === v ? 'wrong' : ''));
+      return '<div class="tf"><span>' + (i + 1) + '. ' + q.t + '</span><div class="pair">' +
+        '<button class="' + cls(true) + '" data-tf="' + i + '" data-v="1">True</button><button class="' + cls(false) + '" data-tf="' + i + '" data-v="0">False</button></div>' +
+        (ans !== undefined ? '<div class="why">' + (ans === q.a ? '✓ ' : '✗ ') + q.why + '</div>' : '') + '</div>';
+    }).join('');
+    $('tfList').querySelectorAll('[data-tf]').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.tf; if(S.truth[i] !== undefined) return;
+      S.truth[i] = b.dataset.v === '1'; save();
+      (S.truth[i] === TRUTH[i].a ? good : bad)();
+      draw();
+    }));
+    const done = Object.keys(S.truth).length, right = TRUTH.filter((q, i) => S.truth[i] === q.a).length;
+    $('tfStatus').className = 'status' + (done === TRUTH.length ? ' ok' : '');
+    $('tfStatus').innerHTML = done === TRUTH.length
+      ? 'Верно: ' + right + ' из ' + TRUTH.length + '. <button class="btn ghost small" id="tfReset" style="margin-left:8px">Заново</button>'
+      : 'Отвечено: ' + done + ' из ' + TRUTH.length;
+    if(done === TRUTH.length){
+      $('tfReset').addEventListener('click', () => { S.truth = {}; save(); draw(); });
+      complete('truth');
+    }
+  };
+  draw();
+}
+
+/* ============ 5. сундук ============ */
+function chest(el){
+  el.innerHTML = '<p class="task">Нажми на всё, что <b>действительно лежало</b> в сундуке капитана. Четыре предмета здесь лишние. Потом проверь — и сравни со своим прогнозом из задания 1.</p>' +
+    '<div class="chest" id="chestGrid"></div>' +
+    '<div class="row" style="margin-top:16px"><button class="btn warm" id="chCheck2">Открыть сундук</button><button class="btn ghost" id="chReset">Начать заново</button></div>' +
+    '<div class="status" id="chestStatus"></div>' +
+    '<div class="frame"><b>Скажи вслух:</b> “There was a … and some … in the chest, but there wasn’t a …” / “I was right / wrong about …”</div>' +
+    teach('Задание тренирует there was / there were и some / any. Попросите описать сундук по памяти, закрыв экран.');
+  const draw = () => {
+    $('chestGrid').innerHTML = CHEST.map(c => {
+      const picked = !!S.chest[c.id];
+      const cls = S.chestChecked ? (picked === c.in ? 'right' : 'wrong') : (picked ? 'in' : '');
+      return '<button class="item ' + cls + '" data-c="' + c.id + '" aria-pressed="' + picked + '"><i>' + c.icon + '</i><b>' + c.en + '</b><span>' + c.ru + '</span></button>';
+    }).join('');
+    $('chestGrid').querySelectorAll('[data-c]').forEach(b => b.addEventListener('click', () => {
+      if(S.chestChecked) return;
+      S.chest[b.dataset.c] = !S.chest[b.dataset.c]; save(); draw();
+    }));
+  };
+  const report = () => {
+    const right = CHEST.filter(c => !!S.chest[c.id] === c.in).length;
+    const hits = S.predict.filter(id => CHEST.find(c => c.id === id).in).length;
+    $('chestStatus').className = 'status ' + (right >= 10 ? 'ok' : 'no');
+    $('chestStatus').innerHTML = 'Верно: ' + right + ' из ' + CHEST.length + '. ' +
+      (S.predict.length === 3 ? 'Твой прогноз угадал ' + hits + ' из 3. ' : '') +
+      'Лишними были попугай (он у Джона Сильвера — встретишь позже), корона, деревянная нога и ром.';
+    if(right >= 10) complete('chest');
+  };
+  draw();
+  if(S.chestChecked) report();
+  $('chCheck2').addEventListener('click', () => { S.chestChecked = true; save(); draw(); report(); });
+  $('chReset').addEventListener('click', () => { S.chestChecked = false; S.chest = {}; save(); draw(); $('chestStatus').textContent = ''; });
+}
+
+/* ============ 6. грамматика ============ */
+function gram(el){
+  el.innerHTML =
+    '<div class="rule-pair"><div class="rule"><h3>Длинное действие — фон</h3><span class="form">was / were + -ing</span>' +
+    '<p>Mother <b>was counting</b> the coins…</p><p class="note" style="padding:8px 10px;margin:0">Что происходило в тот момент. Действие уже шло и не закончилось.</p></div>' +
+    '<div class="rule evt"><h3>Короткое действие — удар</h3><span class="form">Past Simple</span>' +
+    '<p>…when they <b>heard</b> a whistle.</p><p class="note" style="padding:8px 10px;margin:0">Что случилось и прервало фон. Слова-сигналы: <b>when</b> (короткое), <b>while</b> (длинное).</p></div></div>' +
+    '<svg class="timeline" viewBox="0 0 560 90" role="img" aria-label="Схема: длинная полоса was counting прерывается моментом heard a whistle">' +
+    '<rect x="30" y="34" width="420" height="22" rx="11" fill="#bfe3ff"/><text x="200" y="27" text-anchor="middle" font-family="Rubik,sans-serif" font-size="14" font-weight="700" fill="#1f6fb0">was counting the coins</text>' +
+    '<path d="M330 18 L340 45 L330 72" stroke="#e5533d" stroke-width="4" fill="none"/><circle cx="336" cy="45" r="8" fill="#e5533d"/>' +
+    '<text x="350" y="86" font-family="Rubik,sans-serif" font-size="14" font-weight="700" fill="#e5533d">heard a whistle!</text>' +
+    '<path d="M460 45 h70" stroke="#98a6b8" stroke-width="3" stroke-dasharray="6 6"/><text x="495" y="70" text-anchor="middle" font-family="Nunito,sans-serif" font-size="12" fill="#5d6f88">время</text></svg>' +
+    '<p class="task">Выбери правильную форму.</p><div id="gList"></div><div class="status" id="gStatus"></div>' +
+    '<h3 style="font-size:21px;margin:22px 0 10px">Now write it yourself</h3>' +
+    '<p class="task">Два предложения с <b>was/were + -ing</b> и <b>when</b> или <b>while</b>: одно о главе, одно о себе.</p>' +
+    '<div id="gWrite"></div><div class="row" style="margin-top:12px"><button class="btn warm" id="gwCheck">Проверить предложения</button></div>' +
+    teach('Цель узкая: прерванное действие в рассказе. Не уходите во все значения Past Continuous. Хороший мост к говорению: “What were you doing yesterday at 8 p.m. when…?”');
+  const draw = () => {
+    $('gList').innerHTML = GRAM.map((g, i) => {
+      const ans = S.gram[i];
+      return '<div class="gline"><span>' + (i + 1) + '. ' + g.pre + ' <b>…</b> ' + g.post + '</span><div class="pair">' +
+        g.opts.map((o, n) => '<button class="' + (ans === undefined ? '' : n === g.a ? 'right' : ans === n ? 'wrong' : '') + '" data-g="' + i + '" data-o="' + n + '">' + o + '</button>').join('') +
+        '</div>' + (ans !== undefined ? '<div class="why">' + (ans === g.a ? '✓ ' : '✗ ') + g.why + '</div>' : '') + '</div>';
+    }).join('');
+    $('gList').querySelectorAll('[data-g]').forEach(b => b.addEventListener('click', () => {
+      const i = +b.dataset.g; if(S.gram[i] !== undefined) return;
+      S.gram[i] = +b.dataset.o; save(); (S.gram[i] === GRAM[i].a ? good : bad)(); draw(); checkDone();
+    }));
+    const done = Object.keys(S.gram).length, right = GRAM.filter((g, i) => S.gram[i] === g.a).length;
+    $('gStatus').className = 'status' + (done === GRAM.length ? ' ok' : '');
+    $('gStatus').innerHTML = done === GRAM.length ? 'Верно: ' + right + ' из ' + GRAM.length + ' <button class="btn ghost small" id="gReset" style="margin-left:8px">Заново</button>' : 'Отвечено: ' + done + ' из ' + GRAM.length;
+    if($('gReset')) $('gReset').addEventListener('click', () => { S.gram = {}; save(); draw(); });
+  };
+  const labels = ['О главе: “Jim’s mother was … when …”', 'О себе: “Yesterday I was … when …”'];
+  const models = ['Jim was searching the captain’s pockets when he saw the string.', 'Yesterday I was cooking dinner when my friend called me.'];
+  $('gWrite').innerHTML = labels.map((l, i) =>
+    '<div class="write" data-w="' + i + '"><div class="q">' + l + '</div><input class="field" data-gw="' + i + '" autocomplete="off" spellcheck="false"><div class="fb" data-wfb="' + i + '"></div></div>').join('');
+  $('gWrite').querySelectorAll('[data-gw]').forEach(inp => {
+    const i = +inp.dataset.gw; inp.value = S.gw[i] || '';
+    inp.addEventListener('input', () => { S.gw[i] = inp.value; save(); });
+  });
+  const okLine = v => PASTCONT.test(v) && /\b(when|while)\b/.test(v) && v.split(' ').length >= 6;
+  function checkDone(){
+    const allChoices = Object.keys(S.gram).length === GRAM.length;
+    if(allChoices && S.gw.every(v => okLine(clean(v)))) complete('gram');
+  }
+  $('gwCheck').addEventListener('click', () => {
+    S.gw.forEach((raw, i) => {
+      const v = clean(raw), box = document.querySelector('[data-w="' + i + '"]'), fb = document.querySelector('[data-wfb="' + i + '"]');
+      if(!v){ box.classList.remove('ok','no'); fb.textContent = 'Пусто.'; return; }
+      const ok = okLine(v);
+      box.classList.toggle('ok', ok); box.classList.toggle('no', !ok);
+      const miss = [];
+      if(!PASTCONT.test(v)) miss.push('нет was/were + -ing');
+      if(!/\b(when|while)\b/.test(v)) miss.push('нет when или while');
+      if(v.split(' ').length < 6) miss.push('слишком коротко');
+      fb.innerHTML = (ok ? 'Конструкция на месте.' : 'Пока не так: ' + miss.join(', ') + '.') + '<span class="model">Пример: ' + models[i] + '</span>';
+    });
+    checkDone();
+    if(Object.keys(S.gram).length < GRAM.length) toast('Не забудь выбрать формы в шести предложениях выше');
+  });
+  draw();
+}
+
+/* ============ 7. разговор ============ */
+let clockInt = null, clockLeft = 60;
+function talk(el){
+  el.innerHTML =
+    '<p class="task">Пираты вот-вот вернутся, а мама Джима <b>отказывается брать больше, чем им должны</b>, и медленно считает незнакомые монеты. Твоё решение?</p>' +
+    '<div class="grid2"><div class="slab"><h3>Твой вердикт</h3><div class="opts" style="grid-template-columns:1fr" id="vote">' +
+    VOTES.map(([id, t, d]) => '<button class="opt ' + (S.vote === id ? 'pick' : '') + '" data-vote="' + id + '"><span>' + t + '<small>' + d + '</small></span></button>').join('') + '</div>' +
+    '<div class="frame">' + TALK.frame + '</div></div>' +
+    '<div class="slab"><h3>Одна минута</h3><p class="note" style="padding:8px 10px">Говори без чтения с экрана. Потом отметь, что получилось.</p>' +
+    '<div class="clock"><b id="clockFace">01:00</b><div class="row" style="justify-content:center;margin-top:8px"><button class="btn small" id="clockGo">Старт</button><button class="btn small ghost" id="clockReset">Сброс</button></div></div>' +
+    '<div style="margin-top:12px">' + ['решение названо прямо','деталь из главы','три выражения из задания 2','одно предложение в Past Continuous'].map((t, i) =>
+      '<label class="check"><input type="checkbox" data-req="' + i + '" ' + (S.req[i] ? 'checked' : '') + '> ' + t + '</label>').join('') + '</div></div></div>' +
+    '<div class="talk"><div><p class="kicker" style="color:#ffe1b8">Пауза на разговор</p><h3>Pick a side</h3><p>Вытяни карту, ответь и задай один встречный вопрос.</p></div>' +
+    '<div class="talk-card"><p class="talk-q" id="talkQ"></p><div class="row"><button class="btn small" id="talkDraw">другая карта</button><button class="btn small ghost" id="talkTwist">поворот</button></div><div class="twist" id="talkTw" hidden></div></div></div>' +
+    teach('Сначала монолог без вмешательства, потом один комментарий по содержанию и один по языку. Сильный вопрос для спора: “Is honesty still a virtue when your life is in danger?”');
+  const drawTalk = () => {
+    $('talkQ').textContent = TALK.qs[S.talkQ % TALK.qs.length];
+    $('talkTw').hidden = S.talkT < 0;
+    if(S.talkT >= 0) $('talkTw').textContent = TALK.tw[S.talkT];
+  };
+  drawTalk();
+  $('talkDraw').addEventListener('click', () => { S.talkQ = (S.talkQ + 1 + Math.floor(Math.random() * (TALK.qs.length - 1))) % TALK.qs.length; S.talkT = -1; save(); drawTalk(); });
+  $('talkTwist').addEventListener('click', () => { let n = Math.floor(Math.random() * TALK.tw.length); if(n === S.talkT) n = (n + 1) % TALK.tw.length; S.talkT = n; save(); drawTalk(); });
+  const maybeDone = () => { if(S.vote && S.req.filter(Boolean).length >= 3) complete('talk'); };
+  el.querySelectorAll('[data-vote]').forEach(b => b.addEventListener('click', () => {
+    S.vote = b.dataset.vote; save();
+    el.querySelectorAll('[data-vote]').forEach(x => x.classList.toggle('pick', x.dataset.vote === S.vote));
+    maybeDone();
+  }));
+  el.querySelectorAll('[data-req]').forEach(c => c.addEventListener('change', () => { S.req[+c.dataset.req] = c.checked; save(); maybeDone(); }));
+  const face = () => { $('clockFace').textContent = '0' + Math.floor(clockLeft / 60) + ':' + String(clockLeft % 60).padStart(2, '0'); };
+  clearInterval(clockInt); clockInt = null; clockLeft = 60; face();
+  $('clockGo').addEventListener('click', () => {
+    if(clockInt){ clearInterval(clockInt); clockInt = null; $('clockGo').textContent = 'Продолжить'; return; }
+    if(clockLeft <= 0) clockLeft = 60;
+    $('clockGo').textContent = 'Пауза';
+    clockInt = setInterval(() => {
+      clockLeft--; face();
+      if(clockLeft <= 0){ clearInterval(clockInt); clockInt = null; $('clockGo').textContent = 'Ещё раз'; blip(880,.3); toast('Время! Договори начатое предложение.'); }
+    }, 1000);
+  });
+  $('clockReset').addEventListener('click', () => { clearInterval(clockInt); clockInt = null; clockLeft = 60; face(); $('clockGo').textContent = 'Старт'; });
+}
+
+/* ============ 8. дневник ============ */
+function diary(el){
+  el.innerHTML =
+    '<p class="task">Ты — Джим. Ночью, спрятавшись под мостом, ты пишешь в дневник. <b>50–90 слов</b>, минимум <b>четыре выражения</b> из задания 2 и <b>одно предложение в Past Continuous</b>. Подсветка ниже загорается сама.</p>' +
+    '<div class="targets" id="dTargets"></div>' +
+    '<textarea class="field" id="dText" placeholder="Dear diary, what a night! I told my mother everything…"></textarea>' +
+    '<div class="meter-row"><span>Слов: <b id="dWords">0</b></span><span>Выражений: <b id="dHits">0</b> / 4</span><span>Past Continuous: <b id="dPc">нет</b></span></div>' +
+    '<div class="row" style="margin-top:12px"><button class="btn warm" id="dCheck">Сдать запись</button><button class="btn ghost small" id="dModel">Показать образец</button><button class="btn ghost small" id="dCopy">Скопировать текст</button></div>' +
+    '<div class="status" id="dStatus"></div><div class="note" id="dModelBox" hidden style="margin-top:12px"></div>' +
+    teach('Устное обсуждение (задание 7) лучше провести до письма, иначе текст станет заученным монологом. При проверке смотрите на связность: first / then / suddenly / in the end.');
+  const t = $('dText'); t.value = S.diary || '';
+  const analyse = () => {
+    const v = clean(t.value);
+    const words = v ? v.split(' ').length : 0;
+    const hits = DIARY.filter(d => d.re.test(v)).map(d => d.id);
+    $('dTargets').innerHTML = DIARY.map(d => '<span class="' + (hits.includes(d.id) ? 'hit' : '') + '">' + d.label + '</span>').join('');
+    $('dWords').textContent = words; $('dHits').textContent = hits.length; $('dPc').textContent = PASTCONT.test(v) ? 'есть' : 'нет';
+    return { words, hits:hits.length, pc:PASTCONT.test(v) };
+  };
+  t.addEventListener('input', () => { S.diary = t.value; save(); analyse(); });
+  analyse();
+  $('dCheck').addEventListener('click', () => {
+    const r = analyse(), miss = [];
+    if(r.words < 50) miss.push('добавь слов (сейчас ' + r.words + ')');
+    if(r.words > 90) miss.push('сократи до 90 слов');
+    if(r.hits < 4) miss.push('нужно ещё выражений: ' + (4 - r.hits));
+    if(!r.pc) miss.push('нет предложения с was/were + -ing');
+    $('dStatus').className = 'status ' + (miss.length ? 'no' : 'ok');
+    $('dStatus').textContent = miss.length ? 'Почти: ' + miss.join('; ') + '.' : 'Запись принята! Теперь прочитай её вслух, не глядя в текст через каждое слово.';
+    if(!miss.length) complete('diary'); else bad();
+  });
+  $('dModel').addEventListener('click', () => { const b = $('dModelBox'); b.hidden = !b.hidden; b.textContent = DIARY_MODEL; });
+  $('dCopy').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(t.value); toast('Текст скопирован — можно отправить преподавателю'); }
+    catch(e){ t.select(); toast('Выдели и скопируй текст вручную'); }
+  });
+}
+
+/* ============ 9. финал ============ */
+function exit(el){
+  el.innerHTML = '<div class="grid2"><div><p class="task">Впиши пропущенное слово без подсказок и без задания 2. Форму слова можно менять.</p><div id="gapList"></div>' +
+    '<div class="row" style="margin-top:12px"><button class="btn warm" id="gapCheck">Закрыть сундук</button></div></div>' +
+    '<div class="slab"><div class="seal"><div><b id="sealScore">—</b><span>выражений вспомнено</span></div></div><p id="sealLine" style="text-align:center;font-weight:800;color:var(--ink-soft)">Сундук ещё открыт</p>' +
+    '<h3>Can-do</h3>' + ['Я могу пересказать главу IV по порядку.', 'Я могу объяснить, почему мама Джима взяла не все деньги.', 'Я могу рассказать о прерванном действии: was …ing when …'].map(t =>
+      '<label class="check"><input type="checkbox"> ' + t + '</label>').join('') + '</div></div>' +
+    teach('5 из 7 и выше — тема закрыта, можно переходить к главе V. Меньше — повторите задание 2 через сутки и снова сделайте этот лист.');
+  $('gapList').innerHTML = GAPS.map((g, i) =>
+    '<label class="gapline" data-gl="' + i + '"><span>' + g.pre + '<b>______</b>' + g.post + '</span><input class="field" data-gi="' + i + '" autocomplete="off" spellcheck="false" aria-label="Ответ ' + (i + 1) + '"></label>').join('');
+  $('gapList').querySelectorAll('[data-gi]').forEach(inp => {
+    const i = +inp.dataset.gi; inp.value = S.gaps[i] || '';
+    inp.addEventListener('input', () => { S.gaps[i] = inp.value; save(); });
+  });
+  $('gapCheck').addEventListener('click', () => {
+    let score = 0;
+    GAPS.forEach((g, i) => {
+      const ok = g.ok.includes(clean(S.gaps[i]));
+      if(ok) score++;
+      const row = document.querySelector('[data-gl="' + i + '"]');
+      row.classList.toggle('ok', ok); row.classList.toggle('no', !ok);
+      if(!ok){ row.classList.remove('shake'); void row.offsetWidth; row.classList.add('shake'); }
+    });
+    $('sealScore').textContent = score + '/' + GAPS.length;
+    $('sealLine').textContent = score >= 5 ? 'Сундук закрыт — глава IV пройдена!' : 'Пока рано: повтори задание 2 и попробуй снова';
+    $('sealLine').style.color = score >= 5 ? '#2e9e3c' : 'var(--signal)';
+    if(score >= 5) complete('exit'); else bad();
+  });
+}
+
+/* ============ запуск ============ */
+const fromHash = location.hash.match(/^#task-(\d+)$/);
+if(fromHash) S.step = Math.max(0, Math.min(STEPS.length - 1, +fromHash[1] - 1));
+if('speechSynthesis' in window){ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices(); }
+show();
+})();
+</script>
+</body>
+</html>

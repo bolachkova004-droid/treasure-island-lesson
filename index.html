@@ -2475,11 +2475,12 @@ function init(){
       (saved > 0 ? '<button class="main" data-m="continue">Продолжить <small>' + (pages[saved] ? pages[saved].dataset.tab : '') + '</small></button>' : '') +
       '<button class="' + (saved > 0 ? '' : 'main') + '" data-m="new">Новая игра <small>осмотр берега</small></button>' +
       '<button data-m="rapid">Скоростной рейс <small>60 секунд</small></button>' +
-      '<button data-m="words">Тренажёр слов A2 <small>10 самых частых слов</small></button>' +
+      '<button data-m="ch4">Глава IV · The Sea-Chest <small>9 заданий</small></button>' +
+      '<button data-m="words">Тренажёр слов A2 <small>20 частых слов</small></button>' +
       '<button data-m="settings">Настройки <small>сложность и подсказки</small></button></nav>');
     $('mainMenu').addEventListener('click', e => {
       const b = e.target.closest('[data-m]'); if(!b) return;
-      ({ continue:() => goTab(saved), new:() => goTab(1), rapid:() => goTab(byName('Скоростной рейс')), words:() => { location.href = 'a2-words.html'; }, settings:openSettings })[b.dataset.m]();
+      ({ continue:() => goTab(saved), new:() => goTab(1), rapid:() => goTab(byName('Скоростной рейс')), ch4:() => { location.href = 'chapter-4.html'; }, words:() => { location.href = 'a2-words.html'; }, settings:openSettings })[b.dataset.m]();
     });
   }
 

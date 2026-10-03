@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#9fdcff">
 <meta name="format-detection" content="telephone=no">
-<title>Тренажёр слов A2 · 10 частых слов</title>
+<title>Тренажёр слов A2 · 20 частых слов</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
@@ -41,6 +41,11 @@ p{margin:0 0 10px}
 .back{display:inline-flex;align-items:center;min-height:40px;padding:6px 14px;font-family:var(--ui);font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;background:#fff;border:2px solid var(--line);border-radius:14px;box-shadow:0 3px 0 var(--shadow)}
 
 .section-k{margin:24px 4px 10px;font-family:var(--ui);font-size:13px;font-weight:800;letter-spacing:.08em;color:var(--ink-soft)}
+.sets{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.sets button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:58px;padding:10px 16px;text-align:left;font-family:var(--ui);font-size:18px;font-weight:800;color:var(--ink);background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:0 4px 0 var(--shadow)}
+.sets button small{font-family:var(--story);font-size:13px;font-weight:700;color:var(--ink-soft)}
+.sets button.on{color:#fff;background:#ff8a3d;border-color:#d96a22;box-shadow:0 4px 0 #c85f1c}
+.sets button.on small{color:rgba(255,255,255,.9)}
 .chips{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px}
 .chip{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:64px;padding:10px 12px;text-align:left;background:#fff;border:2px solid var(--line);border-radius:18px;box-shadow:0 4px 0 var(--shadow)}
 .chip b{font-family:var(--ui);font-size:18px;font-weight:800}
@@ -178,14 +183,19 @@ p{margin:0 0 10px}
   <header class="top">
     <div>
       <span class="mark">WORDS · A2</span>
-      <h1>10 самых частых слов A2</h1>
-      <p>Семь тренажёров на одни и те же слова. Пройди все — и слово закрепится и в памяти, и на слух, и в предложении.</p>
+      <h1>20 частых слов A2</h1>
+      <p>Два набора по десять слов и семь тренажёров на каждый. Пройди все — и слово закрепится и в памяти, и на слух, и в предложении.</p>
     </div>
     <div class="top-side">
-      <span class="total">Звёзд собрано: <b id="totalStars">0</b> / 21</span>
+      <span class="total">Звёзд собрано: <b id="totalStars">0</b> / 42</span>
       <a class="back" href="index.html">← К уроку Treasure Island</a>
     </div>
   </header>
+
+  <div class="sets" id="sets" role="group" aria-label="Набор слов">
+    <button data-set="1">Набор 1 <small>already · still · enough…</small></button>
+    <button data-set="2">Набор 2 <small>ago · since · borrow…</small></button>
+  </div>
 
   <p class="section-k">СЛОВА · нажми, чтобы услышать</p>
   <div class="chips" id="chips"></div>
@@ -202,7 +212,7 @@ p{margin:0 0 10px}
 'use strict';
 
 /* ============ слова ============ */
-const WORDS = [
+const WORDS_ALL = [
   { en:'already',  ipa:'/ɔːlˈredi/',   ru:'уже',
     ex:'I have already done my homework.', exRu:'Я уже сделал домашнее задание.',
     tip:'Часто с Present Perfect и стоит перед смысловым глаголом: have already done.' },
@@ -232,10 +242,43 @@ const WORDS = [
     tip:'worry about somebody / something — а не worry for.' },
   { en:'arrive',   ipa:'/əˈraɪv/',     ru:'прибывать, приезжать',
     ex:'We arrived in London at six.', exRu:'Мы приехали в Лондон в шесть.',
-    tip:'arrive in (город, страна) / arrive at (здание, аэропорт). Никогда не arrive to.' }
-];
+    tip:'arrive in (город, страна) / arrive at (здание, аэропорт). Никогда не arrive to.' },
 
-const GAPS = [
+  /* набор 2 */
+  { en:'ago',        ipa:'/əˈɡəʊ/',       ru:'назад (о времени)', set:2,
+    ex:'I moved to this city two years ago.', exRu:'Я переехал в этот город два года назад.',
+    tip:'ago стоит после срока: two years ago. Не before two years.' },
+  { en:'since',      ipa:'/sɪns/',        ru:'с (какого-то момента)', set:2,
+    ex:'I have lived here since 2020.', exRu:'Я живу здесь с 2020 года.',
+    tip:'since + момент (since Monday, since 2020), for + срок (for two years). Обычно с Present Perfect.' },
+  { en:'borrow',     ipa:'/ˈbɒrəʊ/',      ru:'брать взаймы, одалживать у кого-то', set:2,
+    ex:'Can I borrow your pen?', exRu:'Можно взять твою ручку?',
+    tip:'borrow — брать у кого-то; lend — давать кому-то. Can you lend me…? / Can I borrow…?' },
+  { en:'explain',    ipa:'/ɪkˈspleɪn/',   ru:'объяснять', set:2,
+    ex:'Can you explain this rule to me?', exRu:'Можешь объяснить мне это правило?',
+    tip:'explain something to somebody. Нельзя explain me.' },
+  { en:'agree',      ipa:'/əˈɡriː/',      ru:'соглашаться', set:2,
+    ex:'I agree with you.', exRu:'Я с тобой согласен.',
+    tip:'agree — это глагол: I agree. Не I am agree.' },
+  { en:'depend',     ipa:'/dɪˈpend/',     ru:'зависеть', set:2,
+    ex:'It depends on the weather.', exRu:'Это зависит от погоды.',
+    tip:'depend on — зависеть от. Не depend of / from.' },
+  { en:'spend',      ipa:'/spend/',       ru:'тратить; проводить (время)', set:2,
+    ex:'I spend a lot of money on books.', exRu:'Я трачу много денег на книги.',
+    tip:'spend money / time on something. Прошедшее время — spent.' },
+  { en:'suggest',    ipa:'/səˈdʒest/',    ru:'предлагать', set:2,
+    ex:'I suggest going by train.', exRu:'Предлагаю поехать на поезде.',
+    tip:'suggest + -ing или suggest that… Не suggest you to do.' },
+  { en:'interested', ipa:'/ˈɪntrəstɪd/',  ru:'заинтересованный', set:2,
+    ex:'I’m interested in history.', exRu:'Мне интересна история.',
+    tip:'interested in — человеку интересно; interesting — вещь интересная.' },
+  { en:'miss',       ipa:'/mɪs/',         ru:'скучать; пропустить, опоздать на', set:2,
+    ex:'Hurry up, or we’ll miss the bus!', exRu:'Поторопись, а то опоздаем на автобус!',
+    tip:'miss the bus — опоздать на автобус; I miss you — я скучаю по тебе.' }
+];
+WORDS_ALL.forEach(w => { w.set = w.set || 1; });
+
+const GAPS_ALL = [
   { w:'already',  s:'Hurry up! The train has ___ left.', ru:'Поторопись! Поезд уже ушёл.' },
   { w:'still',    s:'It’s eleven o’clock and he is ___ at work.', ru:'Уже одиннадцать, а он всё ещё на работе.' },
   { w:'enough',   s:'Is there ___ milk for everyone?', ru:'Хватит ли молока на всех?' },
@@ -245,10 +288,20 @@ const GAPS = [
   { w:'decide',   s:'We can’t ___ where to go on holiday.', ru:'Мы не можем решить, куда поехать в отпуск.' },
   { w:'believe',  s:'Do you ___ in ghosts?', ru:'Ты веришь в привидения?' },
   { w:'worry',    s:'My parents ___ about me when I come home late.', ru:'Родители волнуются, когда я поздно прихожу домой.' },
-  { w:'arrive',   s:'What time does your plane ___?', ru:'Во сколько прилетает твой самолёт?' }
+  { w:'arrive',   s:'What time does your plane ___?', ru:'Во сколько прилетает твой самолёт?' },
+  { w:'ago',        s:'I met my best friend ten years ___.', ru:'Я познакомился с лучшим другом десять лет назад.' },
+  { w:'since',      s:'We have known each other ___ 2019.', ru:'Мы знаем друг друга с 2019 года.' },
+  { w:'borrow',     s:'Can I ___ your umbrella? I’ll give it back tomorrow.', ru:'Можно взять твой зонт? Верну завтра.' },
+  { w:'explain',    s:'Could you ___ this word to me again?', ru:'Могли бы вы ещё раз объяснить мне это слово?' },
+  { w:'agree',      s:'I don’t ___ with you. I think the film was boring.', ru:'Я с тобой не согласен. По-моему, фильм был скучным.' },
+  { w:'depend',     s:'Our plans for Sunday ___ on the weather.', ru:'Наши планы на воскресенье зависят от погоды.' },
+  { w:'spend',      s:'How much time do you ___ on homework?', ru:'Сколько времени ты тратишь на домашнее задание?' },
+  { w:'suggest',    s:'It’s sunny today. I ___ going to the beach.', ru:'Сегодня солнечно. Предлагаю пойти на пляж.' },
+  { w:'interested', s:'Are you ___ in football?', ru:'Тебе интересен футбол?' },
+  { w:'miss',       s:'Run! We don’t want to ___ the train!', ru:'Бежим! Мы же не хотим опоздать на поезд!' }
 ];
 
-const MISTAKES = [
+const MISTAKES_ALL = [
   { w:'arrive',   good:'We arrived in Paris at night.',          bad:'We arrived to Paris at night.',          why:'arrive in + город. Предлог to после arrive не ставится.' },
   { w:'worry',    good:'Don’t worry about the test.',            bad:'Don’t worry for the test.',              why:'Волноваться о чём-то — worry about.' },
   { w:'decide',   good:'She decided to learn Spanish.',          bad:'She decided learning Spanish.',          why:'После decide нужен to + глагол.' },
@@ -259,21 +312,40 @@ const MISTAKES = [
   { w:'believe',  good:'Do you believe in ghosts?',              bad:'Do you believe to ghosts?',              why:'Верить в существование чего-то — believe in.' },
   { w:'still',    good:'She still lives in Moscow.',             bad:'She lives still in Moscow.',             why:'still стоит перед обычным глаголом: still lives.' },
   { w:'probably', good:'I will probably be late.',               bad:'I will be probably late.',               why:'probably стоит сразу после will: will probably be.' },
-  { w:'however',  good:'The room was small. However, it was clean.', bad:'However the room was small, it was clean.', why:'However связывает два предложения. «Хотя …» в начале — although.' }
+  { w:'however',  good:'The room was small. However, it was clean.', bad:'However the room was small, it was clean.', why:'However связывает два предложения. «Хотя …» в начале — although.' },
+  { w:'ago',        good:'I saw him three days ago.',           bad:'I saw him before three days.',         why:'«Три дня назад» — three days ago: ago стоит после срока.' },
+  { w:'since',      good:'I have lived here since 2020.',       bad:'I live here since 2020.',              why:'С since («с какого-то момента до сих пор») нужен Present Perfect: have lived.' },
+  { w:'borrow',     good:'Can I borrow your pen?',              bad:'Can you borrow me your pen?',          why:'borrow — взять у кого-то. Попросить дать — Can you lend me your pen?' },
+  { w:'explain',    good:'Can you explain it to me?',           bad:'Can you explain me it?',               why:'explain something to somebody — без to нельзя.' },
+  { w:'agree',      good:'I agree with you.',                   bad:'I am agree with you.',                 why:'agree — глагол, am перед ним не нужен.' },
+  { w:'depend',     good:'It depends on the price.',            bad:'It depends of the price.',             why:'«Зависеть от» — depend on.' },
+  { w:'spend',      good:'She spends a lot of money on clothes.', bad:'She spends a lot of money for clothes.', why:'Тратить на что-то — spend on.' },
+  { w:'suggest',    good:'I suggest going to the cinema.',      bad:'I suggest you to go to the cinema.',   why:'suggest + -ing (или suggest that you go). Конструкции suggest you to do нет.' },
+  { w:'interested', good:'I’m interested in music.',            bad:'I’m interesting in music.',            why:'О человеке — interested in. Interesting — это «интересный» о предмете.' },
+  { w:'miss',       good:'I miss you so much.',                 bad:'I miss for you so much.',              why:'Скучать по кому-то — miss somebody, без предлога.' }
 ];
 
 /* ============ состояние ============ */
 const KEY = 'a2-top10-v1';
-let S = { stars:{}, miss:{} };
+let S = { stars:{}, miss:{}, set:1 };
 try { S = { ...S, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch(e){}
-S.stars = S.stars || {}; S.miss = S.miss || {};
+S.stars = S.stars || {}; S.miss = S.miss || {}; S.set = S.set === 2 ? 2 : 1;
+Object.keys(S.stars).forEach(k => { if(!k.includes(':')){ S.stars['1:' + k] = Math.max(S.stars['1:' + k] || 0, S.stars[k]); delete S.stars[k]; } });
+let WORDS = [], GAPS = [], MISTAKES = [];
+function useSet(n){
+  S.set = n;
+  WORDS = WORDS_ALL.filter(w => w.set === n);
+  GAPS = GAPS_ALL.filter(g => WORDS.some(w => w.en === g.w));
+  MISTAKES = MISTAKES_ALL.filter(m => WORDS.some(w => w.en === m.w));
+}
+useSet(S.set);
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
 
 /* ============ помощники ============ */
 const $ = id => document.getElementById(id);
 const shuffle = a => { a = [...a]; for(let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const norm = s => (s || '').toLowerCase().replace(/[’']/g, "'").replace(/[^a-z']/g, '');
-const byEn = en => WORDS.find(w => w.en === en);
+const byEn = en => WORDS_ALL.find(w => w.en === en);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 function others(word, n, key){
   return shuffle(WORDS.filter(w => w.en !== word.en)).slice(0, n).map(w => w[key]);
@@ -332,8 +404,9 @@ let current = 'cards';
 function renderModes(){
   $('modes').innerHTML = MODES.map(m =>
     '<button class="mode ' + (m.id === current ? 'on' : '') + '" data-mode="' + m.id + '"><i>' + m.icon + '</i><div><b>' + m.name + '</b>' +
-    '<span>' + m.sub + '</span><div class="stars">' + starLine(S.stars[m.id] || 0) + '</div></div></button>').join('');
-  $('totalStars').textContent = MODES.reduce((n, m) => n + (S.stars[m.id] || 0), 0);
+    '<span>' + m.sub + '</span><div class="stars">' + starLine(S.stars[S.set + ':' + m.id] || 0) + '</div></div></button>').join('');
+  $('totalStars').textContent = Object.values(S.stars).reduce((n, v) => n + v, 0);
+  $('sets').querySelectorAll('[data-set]').forEach(b => { b.classList.toggle('on', +b.dataset.set === S.set); b.setAttribute('aria-pressed', String(+b.dataset.set === S.set)); });
 }
 $('modes').addEventListener('click', e => { const b = e.target.closest('[data-mode]'); if(b) open(b.dataset.mode, true); });
 function open(id, scroll){
@@ -354,7 +427,8 @@ function progress(done, total){
 }
 function finish(id, score, total, weak, extra){
   const st = starsOf(score, total);
-  if(st > (S.stars[id] || 0)){ S.stars[id] = st; save(); }
+  const key = S.set + ':' + id;
+  if(st > (S.stars[key] || 0)){ S.stars[key] = st; save(); }
   renderModes();
   const idx = MODES.findIndex(m => m.id === id), next = MODES[(idx + 1) % MODES.length];
   const medal = st === 3 ? '🏆' : st === 2 ? '🥈' : st === 1 ? '🥉' : '💪';
@@ -675,6 +749,11 @@ function mistakes(){
 
 /* ============ запуск ============ */
 if('speechSynthesis' in window){ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices(); }
+$('sets').addEventListener('click', e => {
+  const b = e.target.closest('[data-set]'); if(!b || +b.dataset.set === S.set) return;
+  useSet(+b.dataset.set); save(); renderChips(); open(current);
+  toast('Набор ' + S.set + ': ' + WORDS.map(w => w.en).slice(0, 3).join(', ') + '…');
+});
 renderChips(); renderModes(); open('cards');
 })();
 </script>
