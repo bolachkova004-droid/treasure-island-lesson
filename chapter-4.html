@@ -49,7 +49,7 @@ b,strong{font-weight:800}
 .progress .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ffd36b,#ffb020);border-radius:10px;transition:width .4s}
 
 /* шаги */
-.steps{display:grid;grid-template-columns:repeat(9,minmax(0,1fr));gap:8px;margin:22px 0 0}
+.steps{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px;margin:22px 0 0}
 .step{display:flex;flex-direction:column;align-items:center;gap:4px;min-height:74px;padding:8px 4px;text-align:center;background:#fff;border:2px solid var(--line);border-radius:16px;box-shadow:0 4px 0 var(--shadow)}
 .step b{display:grid;place-items:center;width:30px;height:30px;font-family:var(--ui);font-size:14px;color:#fff;background:var(--accent);border-radius:50%}
 .step span{font-family:var(--ui);font-size:11.5px;font-weight:700;line-height:1.15;color:var(--ink-soft)}
@@ -193,6 +193,19 @@ textarea.field{min-height:180px;resize:vertical;line-height:1.5}
 /* финал */
 .gapline{display:grid;grid-template-columns:minmax(0,1fr) minmax(150px,.35fr);gap:12px;align-items:center;padding:12px 14px;background:#fff;border:2px solid var(--line);border-radius:16px}
 .gapline+.gapline{margin-top:10px}
+.hw-part{margin-top:22px;padding:18px;background:var(--paper-2);border:2px solid var(--rule);border-radius:20px}
+.hw-part:first-of-type{margin-top:4px}
+.hw-part h3{display:flex;align-items:center;gap:10px;font-size:21px;margin-bottom:6px}
+.hw-part h3 b{display:grid;place-items:center;width:32px;height:32px;font-size:15px;color:#fff;background:var(--accent);border-radius:50%}
+.hw-part.done h3 b{background:var(--moss)}
+.hw-line{padding:12px 14px;background:#fff;border:2px solid var(--line);border-radius:16px}
+.hw-line+.hw-line{margin-top:10px}
+.hw-line.ok{background:#eafbe9;border-color:#9fe0a5}
+.hw-line.no{background:#fff0f0;border-color:#ffb3b5}
+.hw-line .q{margin-bottom:8px;font-weight:800}
+.hw-line .tools{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.fb .w-ok{color:#2e9e3c;font-weight:800}
+.fb .w-no{color:var(--signal);text-decoration:line-through}
 .gapline.ok{background:#eafbe9;border-color:#9fe0a5}
 .gapline.no{background:#fff0f0;border-color:#ffb3b5}
 .seal{display:grid;place-items:center;width:160px;height:160px;margin:6px auto 14px;text-align:center;background:radial-gradient(circle at 35% 30%,#ffe066,#ffb020 70%);border:4px solid #fff;border-radius:50%;box-shadow:0 7px 0 #e59400,0 0 0 8px rgba(255,194,26,.25)}
@@ -219,7 +232,9 @@ textarea.field{min-height:180px;resize:vertical;line-height:1.5}
   .wrap{padding:10px 10px 100px}
   .top{grid-template-columns:1fr;padding:18px 16px;border-radius:20px}
   .top svg{display:none}
-  .steps{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .steps{display:flex;overflow-x:auto;gap:8px;padding:2px 2px 8px;scroll-snap-type:x proximity;scrollbar-width:none}
+  .steps::-webkit-scrollbar{display:none}
+  .step{flex:0 0 84px;scroll-snap-align:start}
   .stage{padding:16px;border-radius:20px}
   .opts,.grid2,.rule-pair,.talk,.cards{grid-template-columns:1fr}
   .chest{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -237,11 +252,12 @@ textarea.field{min-height:180px;resize:vertical;line-height:1.5}
     <div>
       <span class="mark">TREASURE ISLAND · ГЛАВА IV</span>
       <h1>The Sea-Chest<i>Сундук капитана</i></h1>
-      <p>Капитан мёртв, до десяти вечера пираты вернутся. Джим и его мама остаются одни с сундуком, в котором лежат их деньги — и что-то ещё. Девять заданий: от прогноза до дневника Джима.</p>
-      <div class="progress"><span>Выполнено</span><div class="bar"><i id="progFill"></i></div><span id="progText">0 / 9</span></div>
+      <p>Капитан мёртв, до десяти вечера пираты вернутся. Джим и его мама остаются одни с сундуком, в котором лежат их деньги — и что-то ещё. Девять заданий на урок — от прогноза до дневника Джима — и домашнее задание.</p>
+      <div class="progress"><span>Выполнено</span><div class="bar"><i id="progFill"></i></div><span id="progText">0 / 10</span></div>
       <div class="top-links">
         <a href="index.html">← Главы I–II</a>
         <a href="a2-words.html">Тренажёр слов A2</a>
+        <a href="#" id="voiceBtn" role="button">🔊 Голос</a>
       </div>
     </div>
     <svg viewBox="0 0 230 170" role="img" aria-label="Открытый морской сундук с золотом и свёртком бумаг при свече">
@@ -275,6 +291,7 @@ textarea.field{min-height:180px;resize:vertical;line-height:1.5}
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="speech.js"></script>
 <script>
 (() => {
 'use strict';
@@ -377,6 +394,29 @@ const GAPS = [
   { pre:'Near the bridge, his mother ', post:'.', ok:['fainted'] }
 ];
 
+const HW_TR = [
+  { ru:'Джим рассказал маме всё о капитане.', must:[/\btold\b/, /\beverything\b/], tip:'tell somebody everything', model:'Jim told his mother everything about the captain.' },
+  { ru:'Они побежали в деревню, чтобы попросить о помощи.', must:[/\bask(ed)? for help\b/], tip:'ask for help', model:'They ran to the village to ask for help.' },
+  { ru:'Мужчины слишком боялись, чтобы пойти с ними.', must:[/\btoo (afraid|scared|frightened) to\b/], tip:'too afraid to + глагол', model:'The men were too afraid to go with them.' },
+  { ru:'Капитан был должен им много денег.', must:[/\bowed\b/], tip:'owe somebody money → owed', model:'The captain owed them a lot of money.' },
+  { ru:'Они вернулись домой и заперли дверь.', must:[/\blocked\b/, /\bdoor\b/], tip:'lock the door → locked', model:'They went back home and locked the door.' },
+  { ru:'Они покинули трактир в спешке.', must:[/\bin a hurry\b/], tip:'in a hurry', model:'They left the inn in a hurry.' }
+];
+const HW_BR = [
+  { pre:'Jim’s mother', verb:'count', post:'the money when they heard a whistle.', ok:['was counting'] },
+  { pre:'They were walking to the village when they', verb:'see', post:'a light in a window.', ok:['saw'] },
+  { pre:'I', verb:'watch', post:'TV when my phone rang.', ok:['was watching'] },
+  { pre:'We', verb:'have', post:'dinner when the lights went out.', ok:['were having'] },
+  { pre:'When the blind man knocked, Jim', verb:'stop', post:'breathing for a second.', ok:['stopped'] },
+  { pre:'While she', verb:'read', post:'the letter, she started to cry.', ok:['was reading'] }
+];
+const HW_DICT = [
+  'Nobody in the village wanted to help them.',
+  'The key was on a string around his neck.',
+  'She took only the money that he owed her.',
+  'They were running to the bridge when she fainted.'
+];
+
 const STEPS = [
   { id:'recap',   short:'Прогноз',     kicker:'до чтения',             title:'Before the chest opens', min:'5 минут',  render:recap },
   { id:'words',   short:'Слова',       kicker:'лексика',               title:'Words to take with you', min:'10 минут', render:words },
@@ -386,17 +426,20 @@ const STEPS = [
   { id:'gram',    short:'Грамматика',  kicker:'Past Continuous',       title:'Counting when…',         min:'10 минут', render:gram },
   { id:'talk',    short:'Разговор',    kicker:'говорение',             title:'Mother’s choice',        min:'10 минут', render:talk },
   { id:'diary',   short:'Дневник',     kicker:'письмо',                title:'Jim’s diary',            min:'12 минут', render:diary },
-  { id:'exit',    short:'Финал',       kicker:'проверка',              title:'Close the chest',        min:'5 минут',  render:exit }
+  { id:'exit',    short:'Финал',       kicker:'проверка',              title:'Close the chest',        min:'5 минут',  render:exit },
+  { id:'home',    short:'Домашка',     kicker:'домашнее задание',      title:'Homework: after ten o’clock', min:'30–40 минут', render:homework }
 ];
 
 /* ============ состояние ============ */
 const KEY = 'benbow-ch4-v1';
 let S = { step:0, done:[], predict:[], order:[], learned:[], quiz:null, truth:{}, chest:{}, chestChecked:false,
-  gram:{}, gw:['',''], vote:'', talkQ:0, talkT:-1, req:[], diary:'', gaps:{} };
+  gram:{}, gw:['',''], vote:'', talkQ:0, talkT:-1, req:[], diary:'', gaps:{}, hw:null };
 try { S = { ...S, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch(e){}
 ['done','predict','order','learned','req'].forEach(k => { if(!Array.isArray(S[k])) S[k] = []; });
 if(!Array.isArray(S.gw) || S.gw.length < 2) S.gw = ['',''];
 if(S.order.length !== EVENTS.length) S.order = [3,0,5,1,7,2,6,4];
+if(!S.hw || typeof S.hw !== 'object') S.hw = {};
+S.hw = { tr:{}, br:{}, dc:{}, txt:'', chk:[], ...S.hw };
 const save = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e){} };
 
 /* ============ помощники ============ */
@@ -407,12 +450,8 @@ const shuffle = a => { a = [...a]; for(let i = a.length - 1; i > 0; i--){ const 
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2600); }
 function speak(text, rate){
-  if(!('speechSynthesis' in window)){ toast('В этом браузере нет озвучки'); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = rate || .85;
-  const v = speechSynthesis.getVoices().find(v => /^en[-_]GB/i.test(v.lang)) || speechSynthesis.getVoices().find(v => /^en/i.test(v.lang));
-  if(v) u.voice = v;
-  speechSynthesis.speak(u);
+  if(window.TTS) TTS.speak(text, rate);
+  else toast('Озвучка не загрузилась — обнови страницу');
 }
 let actx = null;
 function blip(freq, dur, type){
@@ -446,6 +485,8 @@ function renderSteps(){
   const n = S.done.length;
   $('progFill').style.width = Math.round(n / STEPS.length * 100) + '%';
   $('progText').textContent = n + ' / ' + STEPS.length;
+  const on = $('steps').querySelector('.step.on');
+  if(on && $('steps').scrollWidth > $('steps').clientWidth) $('steps').scrollLeft = on.offsetLeft - 40;
 }
 $('steps').addEventListener('click', e => { const b = e.target.closest('[data-step]'); if(b) go(+b.dataset.step); });
 function go(i){
@@ -464,6 +505,7 @@ function show(){
   $('footLabel').textContent = 'Задание ' + (S.step + 1) + ' из ' + STEPS.length + ' · ' + st.short;
 }
 $('prevBtn').addEventListener('click', () => go(S.step - 1));
+$('voiceBtn').addEventListener('click', e => { e.preventDefault(); if(window.TTS) TTS.openPicker(); });
 $('nextBtn').addEventListener('click', () => go(S.step === STEPS.length - 1 ? 0 : S.step + 1));
 
 /* ============ 1. прогноз ============ */
@@ -806,10 +848,144 @@ function exit(el){
   });
 }
 
+/* ============ 10. домашнее задание ============ */
+function skeleton(t){ return t.split(' ').map(w => { const l = w.replace(/[^A-Za-z’']/g, ''); return l.length <= 2 ? w : w[0] + '_'.repeat(l.length - 1) + w.slice(l.length); }).join(' '); }
+function homework(el){
+  const H = S.hw;
+  el.innerHTML =
+    '<p class="task">Домашка из пяти частей, около 30–40 минут. Ответы сохраняются сами — можно делать в несколько подходов. В конце нажми <b>«Отправить преподавателю»</b>: все ответы соберутся в одно сообщение.</p>' +
+    '<section class="hw-part" id="hwA"><h3><b>A</b> Переведи на английский</h3><p class="note" style="padding:8px 12px">Используй выражения из задания 2. Проверка смотрит на нужное выражение, а не на точное совпадение слов.</p><div id="hwTr"></div>' +
+      '<div class="row" style="margin-top:12px"><button class="btn warm" id="hwTrCheck">Проверить перевод</button><span class="note" id="hwTrScore" style="padding:6px 12px"></span></div></section>' +
+    '<section class="hw-part" id="hwB"><h3><b>B</b> Раскрой скобки</h3><p class="note" style="padding:8px 12px">Past Continuous (was/were + -ing) или Past Simple? Впиши только глагол в нужной форме.</p><div id="hwBr"></div>' +
+      '<div class="row" style="margin-top:12px"><button class="btn warm" id="hwBrCheck">Проверить формы</button><span class="note" id="hwBrScore" style="padding:6px 12px"></span></div></section>' +
+    '<section class="hw-part" id="hwC"><h3><b>C</b> Диктант на слух</h3><p class="note" style="padding:8px 12px">Четыре новых предложения о главе IV. Слушай сколько угодно и записывай <b>целиком</b>. Голос с акцентом? Нажми <button class="btn ghost small" type="button" id="hwVoice">🔊 Голос</button></p><div id="hwDc"></div>' +
+      '<div class="row" style="margin-top:12px"><button class="btn warm" id="hwDcCheck">Проверить диктант</button><span class="note" id="hwDcScore" style="padding:6px 12px"></span></div></section>' +
+    '<section class="hw-part" id="hwD"><h3><b>D</b> Что будет в десять часов?</h3>' +
+      '<p class="task" style="font-size:16px">Пираты обещали вернуться к десяти. Напиши прогноз к главе V: что они сделают, что будет с Джимом, мамой и свёртком. <b>40–70 слов</b>. Можно вместо текста записать голосовое на 60 секунд и отправить преподавателю.</p>' +
+      '<div class="frame" style="margin:0 0 10px;border:0;padding:0"><b>Опоры:</b> I think the pirates will probably… · Jim will… because… · I don’t think his mother will… · The packet is probably…</div>' +
+      '<textarea class="field" id="hwTxt" style="min-height:140px" placeholder="I think the pirates will probably come back at ten o’clock…"></textarea>' +
+      '<div class="meter-row"><span>Слов: <b id="hwWords">0</b> / 40–70</span><span id="hwTxtState"></span></div></section>' +
+    '<section class="hw-part" id="hwE"><h3><b>E</b> Подготовка к следующему уроку</h3>' +
+      ['Прочитать главу V «The Last of the Blind Man» и проверить свой прогноз из части D.',
+       'Пройти тренажёр слов: «Набор 2 → Найди ошибку» (хотя бы на две звезды).',
+       'Рассказать вслух за одну минуту, что случилось в главе IV, не глядя в текст.'].map((t, i) =>
+        '<label class="check"><input type="checkbox" data-hwchk="' + i + '" ' + (H.chk[i] ? 'checked' : '') + '> ' + t + (i === 1 ? ' <a href="a2-words.html">открыть тренажёр →</a>' : '') + '</label>').join('') + '</section>' +
+    '<div class="tally" style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;margin-top:20px;padding:16px;background:#fff8dc;border:2px dashed #f0d27a;border-radius:20px">' +
+      '<span id="hwSummary" style="font-family:var(--ui);font-weight:800;color:#8a5a00"></span>' +
+      '<button class="btn go" id="hwSend">📨 Отправить преподавателю</button></div>' +
+    teach('Части A–C проверяются автоматически, D и E — вами. Если в части C больше двух ошибок, попросите переслушать с кнопкой «медленнее» и записать заново; сравнение «было/стало» полезнее новой порции. Голосовое в части D оценивайте за беглость и will/probably, а не за точность прогноза.');
+
+  /* A — перевод */
+  $('hwTr').innerHTML = HW_TR.map((it, i) =>
+    '<div class="hw-line" data-tr="' + i + '"><div class="q">' + (i + 1) + '. ' + it.ru + '</div>' +
+    '<input class="field" data-trin="' + i + '" autocomplete="off" spellcheck="false" placeholder="по-английски"><div class="fb" data-trfb="' + i + '"></div></div>').join('');
+  /* B — скобки */
+  $('hwBr').innerHTML = HW_BR.map((it, i) =>
+    '<div class="hw-line" data-br="' + i + '"><div class="q">' + (i + 1) + '. ' + it.pre + ' ____ (<i>' + it.verb + '</i>) ' + it.post + '</div>' +
+    '<input class="field" data-brin="' + i + '" autocomplete="off" spellcheck="false" placeholder="форма глагола"><div class="fb" data-brfb="' + i + '"></div></div>').join('');
+  /* C — диктант */
+  $('hwDc').innerHTML = HW_DICT.map((t, i) =>
+    '<div class="hw-line" data-dc="' + i + '"><div class="tools"><b style="align-self:center;margin-right:4px">№ ' + (i + 1) + '</b>' +
+    '<button class="btn ghost small" data-dcplay="' + i + '">▶ слушать</button><button class="btn ghost small" data-dcslow="' + i + '">🐢 медленнее</button><button class="btn ghost small" data-dctip="' + i + '">подсказка</button></div>' +
+    '<input class="field" data-dcin="' + i + '" autocomplete="off" spellcheck="false" placeholder="запиши предложение целиком"><div class="fb" data-dcfb="' + i + '"></div></div>').join('');
+
+  const bind = (attr, store) => el.querySelectorAll('[' + attr + ']').forEach(inp => {
+    const i = inp.getAttribute(attr); inp.value = store[i] || '';
+    inp.addEventListener('input', () => { store[i] = inp.value; save(); });
+  });
+  bind('data-trin', H.tr); bind('data-brin', H.br); bind('data-dcin', H.dc);
+
+  el.querySelectorAll('[data-dcplay]').forEach(b => b.addEventListener('click', () => speak(HW_DICT[+b.dataset.dcplay], .9)));
+  el.querySelectorAll('[data-dcslow]').forEach(b => b.addEventListener('click', () => speak(HW_DICT[+b.dataset.dcslow], .7)));
+  el.querySelectorAll('[data-dctip]').forEach(b => b.addEventListener('click', () => {
+    document.querySelector('[data-dcfb="' + b.dataset.dctip + '"]').innerHTML = 'Скелет: <b>' + skeleton(HW_DICT[+b.dataset.dctip]) + '</b>';
+  }));
+  $('hwVoice').addEventListener('click', () => window.TTS && TTS.openPicker());
+
+  const mark = (sel, ok) => { const box = document.querySelector(sel); box.classList.toggle('ok', ok); box.classList.toggle('no', !ok); };
+  const trOk = i => { const v = clean(H.tr[i]); return !!v && HW_TR[i].must.every(re => re.test(v)); };
+  const brOk = i => HW_BR[i].ok.includes(clean(H.br[i]));
+  const dcRes = i => {
+    const target = clean(HW_DICT[i]).split(' '), given = clean(H.dc[i]).split(' ').filter(Boolean);
+    let right = 0;
+    const marked = target.map((w, n) => { const ok = given[n] === w; if(ok) right++; return '<span class="' + (ok ? 'w-ok' : 'w-no') + '">' + (given[n] || '…') + '</span>'; }).join(' ');
+    return { full: right === target.length && given.length === target.length, right, total: target.length, marked, empty: !given.length };
+  };
+  const scores = () => ({
+    tr: HW_TR.filter((t, i) => trOk(i)).length,
+    br: HW_BR.filter((t, i) => brOk(i)).length,
+    dc: HW_DICT.filter((t, i) => dcRes(i).full).length,
+    words: clean(H.txt) ? clean(H.txt).split(' ').length : 0
+  });
+  function summary(){
+    const sc = scores();
+    $('hwA').classList.toggle('done', sc.tr >= 4); $('hwB').classList.toggle('done', sc.br >= 4);
+    $('hwC').classList.toggle('done', sc.dc >= 3); $('hwD').classList.toggle('done', sc.words >= 40 && sc.words <= 70);
+    $('hwE').classList.toggle('done', H.chk.filter(Boolean).length === 3);
+    $('hwSummary').textContent = 'A ' + sc.tr + '/6 · B ' + sc.br + '/6 · C ' + sc.dc + '/4 · D ' + sc.words + ' слов';
+    if(sc.tr >= 4 && sc.br >= 4 && sc.dc >= 3 && sc.words >= 40) complete('home');
+  }
+
+  $('hwTrCheck').addEventListener('click', () => {
+    HW_TR.forEach((it, i) => {
+      const fb = document.querySelector('[data-trfb="' + i + '"]');
+      if(!clean(H.tr[i])){ fb.textContent = 'Пусто.'; return; }
+      const ok = trOk(i); mark('[data-tr="' + i + '"]', ok);
+      fb.innerHTML = ok ? 'Выражение на месте. <span class="model">Вариант: ' + it.model + '</span>' : 'Нужно выражение <b>' + it.tip + '</b>. <span class="model">Вариант: ' + it.model + '</span>';
+    });
+    const n = scores().tr; $('hwTrScore').textContent = 'Принято: ' + n + ' из 6'; (n >= 4 ? good : bad)(); summary();
+  });
+  $('hwBrCheck').addEventListener('click', () => {
+    HW_BR.forEach((it, i) => {
+      const fb = document.querySelector('[data-brfb="' + i + '"]');
+      if(!clean(H.br[i])){ fb.textContent = 'Пусто.'; return; }
+      const ok = brOk(i); mark('[data-br="' + i + '"]', ok);
+      fb.innerHTML = ok ? 'Верно.' : 'Правильно: <b>' + it.ok[0] + '</b>' + (/ing$/.test(it.ok[0]) ? ' — действие шло в тот момент.' : ' — короткое действие.');
+    });
+    const n = scores().br; $('hwBrScore').textContent = 'Верно: ' + n + ' из 6'; (n >= 4 ? good : bad)(); summary();
+  });
+  $('hwDcCheck').addEventListener('click', () => {
+    HW_DICT.forEach((t, i) => {
+      const r = dcRes(i), fb = document.querySelector('[data-dcfb="' + i + '"]');
+      if(r.empty){ fb.textContent = 'Пусто.'; return; }
+      mark('[data-dc="' + i + '"]', r.full);
+      fb.innerHTML = (r.full ? 'Точно! ' : 'Верных слов: ' + r.right + ' из ' + r.total + '. ') + r.marked + (r.full ? '' : '<span class="model">Оригинал: ' + t + '</span>');
+    });
+    const n = scores().dc; $('hwDcScore').textContent = 'Точно: ' + n + ' из 4'; (n >= 3 ? good : bad)(); summary();
+  });
+  const t = $('hwTxt'); t.value = H.txt || '';
+  const txtState = () => {
+    const w = scores().words; $('hwWords').textContent = w;
+    $('hwTxtState').textContent = w < 40 ? 'нужно ещё ' + (40 - w) : w > 70 ? 'слишком длинно' : '✓ объём в норме';
+  };
+  t.addEventListener('input', () => { H.txt = t.value; save(); txtState(); summary(); });
+  el.querySelectorAll('[data-hwchk]').forEach(c => c.addEventListener('change', () => { H.chk[+c.dataset.hwchk] = c.checked; save(); summary(); }));
+
+  $('hwSend').addEventListener('click', async () => {
+    const sc = scores();
+    const lines = [
+      'Treasure Island · глава IV · домашнее задание', '',
+      'A. Перевод (' + sc.tr + '/6):', ...HW_TR.map((it, i) => (i + 1) + '. ' + (H.tr[i] || '—')), '',
+      'B. Формы глагола (' + sc.br + '/6):', ...HW_BR.map((it, i) => (i + 1) + '. ' + (H.br[i] || '—')), '',
+      'C. Диктант (' + sc.dc + '/4):', ...HW_DICT.map((it, i) => (i + 1) + '. ' + (H.dc[i] || '—')), '',
+      'D. Прогноз к главе V (' + sc.words + ' слов):', H.txt || '— (голосовое отдельно)', '',
+      'E. Подготовка: ' + H.chk.filter(Boolean).length + '/3'
+    ];
+    const text = lines.join('\n');
+    if(navigator.share){ try { await navigator.share({ title:'Домашнее задание · глава IV', text }); return; } catch(e){ if(e && e.name === 'AbortError') return; } }
+    try { await navigator.clipboard.writeText(text); toast('Ответы скопированы — вставь их в сообщение преподавателю'); }
+    catch(e){
+      let out = $('hwOut');
+      if(!out){ out = document.createElement('textarea'); out.id = 'hwOut'; out.className = 'field'; out.readOnly = true; out.style.marginTop = '12px'; $('hwSend').parentNode.after(out); }
+      out.value = text; out.select(); toast('Скопируй текст из поля ниже и отправь преподавателю');
+    }
+  });
+  txtState(); summary();
+}
+
 /* ============ запуск ============ */
 const fromHash = location.hash.match(/^#task-(\d+)$/);
 if(fromHash) S.step = Math.max(0, Math.min(STEPS.length - 1, +fromHash[1] - 1));
-if('speechSynthesis' in window){ speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices(); }
 show();
 })();
 </script>

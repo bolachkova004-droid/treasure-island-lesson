@@ -547,6 +547,7 @@ input,textarea,select{font-size:16px!important}
       <div class="bar-btns">
         <button class="bar-btn" id="btnWords">Словарь <b id="wordCount">0</b></button>
         <button class="bar-btn" id="btnFile">Выводы <b id="fileCount">0</b></button>
+        <button class="bar-btn" id="btnVoice" type="button">🔊 Голос</button>
       </div>
     </div>
 
@@ -863,7 +864,7 @@ input,textarea,select{font-size:16px!important}
         <p class="task">Пять коротких показаний. Слушай и записывай <b>целое предложение</b>, а не отдельные слова. Слушать можно сколько угодно, подсказка — только после честной попытки: сначала ключевое выражение и скелет из первых букв, потом полный текст.</p>
         <div id="dictList"></div>
         <div class="tally"><span>Записано точно</span><strong id="dictScore">0 / 5</strong><button class="btn flag" id="dictCheck">Проверить записи</button></div>
-        <div class="note-ru">Если браузер молчит, значит в нём нет английского голоса. Тогда листы читает преподаватель — темп и повторы те же.</div>
+        <div class="note-ru">Голос звучит с акцентом или «ломается»? Нажми <button class="btn ghost small" type="button" data-voice-pick>🔊 Выбрать голос</button> и выбери тот, что помечен «хороший». Если английского голоса нет совсем, листы читает преподаватель — темп и повторы те же.</div>
         <div class="teach">Диктовка здесь работает как отложенное извлечение: те же восемь выражений возвращаются через другой канал. Ошибки в окончаниях фиксируйте, но не исправляйте сразу — пусть студентка сама сравнит с оригиналом.</div>
       </div>
     </section>
@@ -1048,6 +1049,7 @@ input,textarea,select{font-size:16px!important}
 </div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<script src="speech.js"></script>
 <script>
 (() => {
 'use strict';
@@ -1162,12 +1164,7 @@ function init(){
     t.textContent = msg; t.classList.add('show');
     clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2400);
   };
-  const say = (text, rate) => {
-    if(!('speechSynthesis' in window)) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = rate || .85;
-    speechSynthesis.speak(u);
-  };
+  const say = (text, rate) => { if(window.TTS) TTS.speak(text, rate); };
 
   /* ---- XP-полоса в шапке ---- */
   const bar = document.querySelector('.bar');
@@ -1703,10 +1700,8 @@ const wordsOf = s => clean(s).split(' ').filter(Boolean);
 let toastT;
 function toast(msg){ const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => t.classList.remove('show'), 2400); }
 function speak(text, rate){
-  if(!('speechSynthesis' in window)) { toast('В этом браузере нет английского голоса'); return; }
-  speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(text); u.lang = 'en-GB'; u.rate = rate || .85;
-  speechSynthesis.speak(u);
+  if(window.TTS) TTS.speak(text, rate);
+  else toast('Озвучка не загрузилась — обнови страницу');
 }
 function stamp(id){
   if(S.seals.includes(id)) return;
@@ -2315,6 +2310,7 @@ function init(){
   $('c2Report').addEventListener('input', e => { S.c2r = e.target.value; save(); });
 
   $('btnFile').addEventListener('click', () => { renderFile(); $('fileBg').classList.add('open'); });
+  document.querySelectorAll('#btnVoice,[data-voice-pick]').forEach(b => b.addEventListener('click', () => window.TTS && TTS.openPicker()));
   $('fileClose').addEventListener('click', () => $('fileBg').classList.remove('open'));
   $('btnWords').addEventListener('click', () => { renderWords(); $('wordsBg').classList.add('open'); });
   $('wordsClose').addEventListener('click', () => $('wordsBg').classList.remove('open'));
@@ -2475,7 +2471,7 @@ function init(){
       (saved > 0 ? '<button class="main" data-m="continue">Продолжить <small>' + (pages[saved] ? pages[saved].dataset.tab : '') + '</small></button>' : '') +
       '<button class="' + (saved > 0 ? '' : 'main') + '" data-m="new">Новая игра <small>осмотр берега</small></button>' +
       '<button data-m="rapid">Скоростной рейс <small>60 секунд</small></button>' +
-      '<button data-m="ch4">Глава IV · The Sea-Chest <small>9 заданий</small></button>' +
+      '<button data-m="ch4">Глава IV · The Sea-Chest <small>9 заданий + домашка</small></button>' +
       '<button data-m="words">Тренажёр слов A2 <small>20 частых слов</small></button>' +
       '<button data-m="settings">Настройки <small>сложность и подсказки</small></button></nav>');
     $('mainMenu').addEventListener('click', e => {
