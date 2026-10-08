@@ -1780,7 +1780,7 @@ function head(g, U, hy, L, skin, o = {}){
 function annaDraw(g, x, dir, move, ph){ if(typeof annaRigReady === 'function' && annaRigReady() && !IMG.s_anna_1) return drawAnnaRig(g, x, 124, dir, ph, move, typeof keys !== 'undefined' && keys.run); const sp = typeof spriteFor === 'function' && spriteFor('anna', ph, move); if(sp) return drawSprite(g, sp, x, 124, dir, move ? Math.abs(Math.sin(ph)) * 2 : 0); figure(g, x, LOOKS.anna, { face:dir, move, ph }); }
 function drawNpc(g, n){
   const sp = typeof spriteFor === 'function' && spriteFor(n.id, 0, false);
-  if(sp){ const H = { grisha:126, grunya:102, nina:112, varya:84, young:122, leshy:176, noon:238, domovoi:44 }[n.id] || 120; if(n.id === 'noon') glow(n.x, GY - 140, 300, 1, '255,248,220'); drawSprite(g, sp, n.x, H, n.id === 'grisha' && n.pose === 'suitcase' ? 1 : -1); return; }
+  if(sp){ const H = { grisha:126, grunya:102, nina:112, varya:84, young:102, leshy:176, noon:238, domovoi:44 }[n.id] || 120; if(n.id === 'noon') glow(n.x, GY - 140, 300, 1, '255,248,220'); drawSprite(g, sp, n.x, H, n.id === 'grisha' && n.pose === 'suitcase' ? 1 : -1); return; }
   switch(n.id){
     case 'grisha': if(n.pose === 'suitcase') figure(g, n.x, LOOKS.grisha, { face:1, carry:true }); else figure(g, n.x, LOOKS.grisha, { face:-1, stoop:.3, work:true }); break;
     case 'nina': figure(g, n.x, LOOKS.nina, { face:-1, armsUp: Math.sin(T * .5) > .3 }); break;
@@ -2292,6 +2292,8 @@ const ASSETS = {
   's_grisha': 'art/s_grisha.png',
   's_nina': 'art/s_nina.png',
   's_varya': 'art/s_varya.png',
+  's_young': 'art/s_young.png',
+  'p_young_neutral': 'art/p_young_neutral.png',
   'p_varya_neutral': 'art/p_varya_neutral.png',
   'p_nina_stern': 'art/p_nina_stern.png',
   'p_nina_guilty': 'art/p_nina_guilty.png',
