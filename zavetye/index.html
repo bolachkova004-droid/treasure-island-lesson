@@ -1780,7 +1780,7 @@ function head(g, U, hy, L, skin, o = {}){
 function annaDraw(g, x, dir, move, ph){ if(typeof annaRigReady === 'function' && annaRigReady() && !IMG.s_anna_1) return drawAnnaRig(g, x, 124, dir, ph, move, typeof keys !== 'undefined' && keys.run); const sp = typeof spriteFor === 'function' && spriteFor('anna', ph, move); if(sp) return drawSprite(g, sp, x, 124, dir, move ? Math.abs(Math.sin(ph)) * 2 : 0); figure(g, x, LOOKS.anna, { face:dir, move, ph }); }
 function drawNpc(g, n){
   const sp = typeof spriteFor === 'function' && spriteFor(n.id, 0, false);
-  if(sp){ const H = { grisha:126, grunya:102, nina:112, varya:84, young:102, leshy:176, noon:238, domovoi:44 }[n.id] || 120; if(n.id === 'noon') glow(n.x, GY - 140, 300, 1, '255,248,220'); drawSprite(g, sp, n.x, H, n.id === 'grisha' && n.pose === 'suitcase' ? 1 : -1); return; }
+  if(sp){ const H = { grisha:136, grunya:110, nina:116, varya:110, young:102, leshy:176, noon:238, domovoi:44 }[n.id] || 120; if(n.id === 'noon') glow(n.x, GY - 140, 300, 1, '255,248,220'); drawSprite(g, sp, n.x, H, n.id === 'grisha' && n.pose === 'suitcase' ? 1 : -1); return; }
   switch(n.id){
     case 'grisha': if(n.pose === 'suitcase') figure(g, n.x, LOOKS.grisha, { face:1, carry:true }); else figure(g, n.x, LOOKS.grisha, { face:-1, stoop:.3, work:true }); break;
     case 'nina': figure(g, n.x, LOOKS.nina, { face:-1, armsUp: Math.sin(T * .5) > .3 }); break;
@@ -2283,6 +2283,7 @@ const ASSETS = {
   'bg_forest_stop': 'art/bg_forest_stop.jpg',
   'bg_aglaya_house': 'art/bg_aglaya_house.jpg',
   'bg_grunya_house': 'art/bg_grunya_house.jpg',
+  'bg_laptev_house': 'art/bg_laptev_house.jpg',
   'p_anna_neutral': 'art/p_anna_neutral.png',
   'p_anna_afraid': 'art/p_anna_afraid.png',
   'p_anna_sad': 'art/p_anna_sad.png',
@@ -2341,9 +2342,9 @@ const STRIP_ART = {
   field:     { parts:['bg_field_l','bg_field'], segs:[0, 480, 2000], charScale:.9, hotPx:{ 'Ельник':[1, 225] }, npcPx:{ leshy:[1, 225] } },
   river:     { parts:['bg_river','bg_river_r'], segs:[0, 1250, 1500], charScale:.9, hotPx:{ 'В деревню':[0, 110], 'Надпись':[0, 560], 'На мостки':[0, 900] } },
   forestroad:{ parts:['bg_forest_stop_l','bg_forest_stop'], segs:[0, 420, 1600], noNight:true, charScale:.9, npcPx:{ young:[1, 880] } },
-  aglaya:    { parts:['bg_aglaya_house'], nightBase:true, charScale:1.3, hotPx:{ 'На улицу':[0, 220], 'Прялка':[0, 400], 'Печь':[0, 720], 'Того, кто за печью':[0, 900], 'Стол':[0, 1150], 'Полка с тетрадями':[0, 1540], 'Лавка':[0, 1610] }, npcPx:{ grunya:[0, 400], domovoi:[0, 905] } },
-  grunya:    { parts:['bg_grunya_house'], nightBase:true, charScale:1.3, hotPx:{ 'На улицу':[0, 310], 'Комод':[0, 590], 'Травы':[0, 840] }, npcPx:{ grunya:[0, 1190] } },
-  laptev:    { parts:['bg_laptev_house'] },
+  aglaya:    { parts:['bg_aglaya_house'], nightBase:true, charScale:2.05, hotPx:{ 'На улицу':[0, 220], 'Прялка':[0, 400], 'Печь':[0, 720], 'Того, кто за печью':[0, 900], 'Стол':[0, 1150], 'Полка с тетрадями':[0, 1540], 'Лавка':[0, 1610] }, npcPx:{ grunya:[0, 400], domovoi:[0, 905] } },
+  grunya:    { parts:['bg_grunya_house'], nightBase:true, charScale:2.05, hotPx:{ 'На улицу':[0, 310], 'Комод':[0, 590], 'Травы':[0, 840] }, npcPx:{ grunya:[0, 1190] } },
+  laptev:    { parts:['bg_laptev_house'], charScale:1.75, hotPx:{ 'Во двор':[0, 270], 'Стекло у вешалки':[0, 585], 'Голландка в сенях':[0, 1540] } },
   school:    { parts:['bg_school'] },
   flat:      { parts:['bg_city_flat'], bright:true },
 };
