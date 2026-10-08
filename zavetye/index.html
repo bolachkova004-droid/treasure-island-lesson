@@ -303,6 +303,8 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .lore-card h5{margin:0 0 6px;font:italic 600 22px var(--display);color:var(--pink)}
 .lore-card p{margin:0;line-height:1.5}
 .nb-title::after{content:"";display:block;height:14px;margin-top:6px;background:var(--orn) repeat-x 0 50%/28px 14px;opacity:.65}
+.load-note{font:italic 16px var(--display,serif);color:var(--gold);margin:6px 0 10px;letter-spacing:.02em}
+.btn:disabled{opacity:.45;cursor:wait}
 </style>
 </head>
 <body>
@@ -358,7 +360,7 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
       <button type="button" data-d="normal" aria-pressed="true"><b>Обычная</b><span>Перевод по нажатию, грамматику разбираете сами.</span></button>
       <button type="button" data-d="hard" aria-pressed="false"><b>Высокая</b><span>Только оригинал, без подсказок.</span></button>
     </div>
-    <div class="acts"><button class="btn" id="bNew" type="button">Начать</button><button class="btn ghost" id="bCont" type="button" hidden>Продолжить</button></div>
+    <p class="load-note" id="loadNote">Загружаем Заветье…</p><div class="acts"><button class="btn" id="bNew" type="button">Начать</button><button class="btn ghost" id="bCont" type="button" hidden>Продолжить</button></div>
     <p class="t-foot">Пролог и первое дело, около часа. Лес примет любую версию, если вы достаточно крепко её докажете. Со звуком лучше.</p>
   </div>
 </div>
@@ -2192,6 +2194,7 @@ function drawFrame(v, camX, anna){
   const ph = v.phase; C = palette(ph); GLOWS = []; CAM = { x:camX, w:VIEW.viewW };
   const P = artParts(v.strip, ph);
   if(P) return drawArtFrame(v, camX, anna, P, ph);
+  if(artPending(v.strip)){ g.setTransform(1, 0, 0, 1, 0, 0); const gr = g.createLinearGradient(0, 0, 0, ch); gr.addColorStop(0, '#14161b'); gr.addColorStop(1, '#0b0b0e'); g.fillStyle = gr; g.fillRect(0, 0, cw, ch); drawFog(g, ph, camX, .6); return; }
   g.setTransform(1, 0, 0, 1, 0, 0); g.globalCompositeOperation = 'source-over'; g.globalAlpha = 1;
   const world = () => g.setTransform(s, 0, 0, s, -camX * s, oy);
   if(!strip.indoor){
@@ -2252,7 +2255,8 @@ function drawArtFrame(v, camX, anna, P, ph){
   if(!a.bright){ g.setTransform(1, 0, 0, 1, 0, 0); drawFog(g, ph, camX, fogK, 'back'); }
   g.setTransform(s, 0, 0, s, -camX * s, oy);
   // герои рисуются на отдельный слой и подкрашиваются светом сцены (огонь, туман, закат)
-  const tint = charTint(v.strip, ph), lc = tint ? charLayer(cw, ch) : null;
+  const tint = LOWQ.off ? null : charTint(v.strip, ph), lc = tint ? charLayer(cw, ch) : null;
+  if(anna && tint) sampleScene(g, (rx(anna.x) - camX) * s, oy + (GY - 124 * k) * s, 124 * k * s, v.strip + ph);
   const drawChars = g => {
   SIL = a.bright ? 'rgba(40,34,30,.9)' : strip.indoor ? 'rgba(22,16,12,.92)' : 'rgba(14,15,20,.9)';
   try{
@@ -2278,21 +2282,37 @@ function drawArtFrame(v, camX, anna, P, ph){
     drawFx(g, true);
   } finally { SIL = null; }
   };
-  if(lc){ const L = lc.getContext('2d'); L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'source-over'; L.clearRect(0, 0, cw, ch);
-    L.setTransform(s, 0, 0, s, -camX * s, oy); drawChars(L);
+  if(lc){
+    // работаем только в полосе, где стоят герои: так в разы быстрее
+    const xs = []; if(anna) xs.push(rx(anna.x)); for(const n of npcsFor(v)) xs.push(rx(n.x)); if(v.bus) xs.push(rx(v.bus.x) + 190);
+    const lo = xs.length ? Math.min(...xs) : camX, hi = xs.length ? Math.max(...xs) : camX;
+    const X0 = Math.max(0, Math.floor((lo - 220 - camX) * s)), X1 = Math.min(cw, Math.ceil((hi + 220 - camX) * s));
+    const Y0 = Math.max(0, Math.floor(oy + (GY - 300 * Math.max(1, k)) * s)), Y1 = Math.min(ch, Math.ceil(oy + (GY + 30) * s));
+    const BW = Math.max(1, X1 - X0), BH = Math.max(1, Y1 - Y0);
+    const L = lc.getContext('2d'); L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'source-over'; L.clearRect(X0, Y0, BW, BH);
+    L.save(); L.beginPath(); L.rect(X0, Y0, BW, BH); L.clip();
+    L.setTransform(s, 0, 0, s, -camX * s, oy); drawChars(L); L.restore();
     L.setTransform(1, 0, 0, 1, 0, 0);
-    // цвет сцены через «мягкий свет»: тон меняется, контраст лица и одежды остаётся
-    const mk = maskLayer(cw, ch), M = mk.getContext('2d'); M.globalCompositeOperation = 'copy'; M.drawImage(lc, 0, 0);
-    L.globalCompositeOperation = 'soft-light'; L.fillStyle = tint[0]; L.fillRect(0, 0, cw, ch);
-    L.globalCompositeOperation = 'destination-in'; L.drawImage(mk, 0, 0);
-    if(tint[1]){ L.globalCompositeOperation = 'source-atop'; const gr = L.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, tint[1]); gr.addColorStop(1, 'rgba(0,0,0,0)'); L.fillStyle = gr; L.fillRect(0, 0, cw, ch); }
-    if(tint[2]){ // контровой свет: светлая кромка с той стороны, откуда падает свет
-      const [col, side] = tint[2], rim = rimLayer(cw, ch), Rm = rim.getContext('2d');
-      Rm.globalCompositeOperation = 'source-over'; Rm.clearRect(0, 0, cw, ch); Rm.drawImage(lc, 0, 0);
-      Rm.globalCompositeOperation = 'source-in'; Rm.fillStyle = col; Rm.fillRect(0, 0, cw, ch);
-      Rm.globalCompositeOperation = 'destination-out'; Rm.drawImage(lc, -side * Math.max(2, 3.5 * s), 0);
-      L.globalCompositeOperation = 'source-atop'; L.filter = 'blur(1px)'; L.drawImage(rim, 0, 0); L.filter = 'none'; }
-    L.globalCompositeOperation = 'source-over'; g.setTransform(1, 0, 0, 1, 0, 0); g.save(); g.filter = 'blur(' + (0.35 * s).toFixed(2) + 'px)'; g.drawImage(lc, 0, 0); g.restore(); g.setTransform(s, 0, 0, s, -camX * s, oy); }
+    const mk = maskLayer(cw, ch), M = mk.getContext('2d'); M.globalCompositeOperation = 'copy'; M.drawImage(lc, X0, Y0, BW, BH, X0, Y0, BW, BH);
+    // 1) яркость как у фона вокруг (герой не светится ярче сцены), 2) немного цвета самой сцены
+    const SC = SCENE_LIGHT, f = SC.f;
+    if(f < .99){ L.globalCompositeOperation = 'multiply'; const q = Math.round(255 * f); L.fillStyle = `rgb(${q},${q},${q})`; L.fillRect(X0, Y0, BW, BH); }
+    else if(f > 1.01){ L.globalCompositeOperation = 'screen'; const q = Math.round(255 * Math.min(.35, f - 1)); L.fillStyle = `rgb(${q},${q},${q})`; L.fillRect(X0, Y0, BW, BH); }
+    L.globalCompositeOperation = 'color'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.16)`; L.fillRect(X0, Y0, BW, BH);
+    L.globalCompositeOperation = 'soft-light'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.45)`; L.fillRect(X0, Y0, BW, BH);
+    if(!strip.indoor && !a.bright){ L.globalCompositeOperation = 'source-over'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.13)`; L.fillRect(X0, Y0, BW, BH); } // воздух между зрителем и героем
+    L.globalCompositeOperation = 'destination-in'; L.drawImage(mk, X0, Y0, BW, BH, X0, Y0, BW, BH);
+    if(tint[1]){ L.globalCompositeOperation = 'source-atop'; const gr = L.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, tint[1]); gr.addColorStop(1, 'rgba(0,0,0,0)'); L.fillStyle = gr; L.fillRect(X0, Y0, BW, BH); }
+    if(tint[2] && !LOWQ.on){ // контровой свет: светлая кромка с той стороны, откуда падает свет
+      const [col, side] = tint[2], rim = rimLayer(cw, ch), Rm = rim.getContext('2d'), dx = -side * Math.max(2, 3.5 * s);
+      Rm.globalCompositeOperation = 'copy'; Rm.drawImage(lc, X0, Y0, BW, BH, X0, Y0, BW, BH);
+      Rm.globalCompositeOperation = 'source-in'; Rm.fillStyle = col; Rm.fillRect(X0, Y0, BW, BH);
+      Rm.globalCompositeOperation = 'destination-out'; Rm.drawImage(lc, X0, Y0, BW, BH, X0 + dx, Y0, BW, BH);
+      L.globalCompositeOperation = 'source-atop'; L.drawImage(rim, X0, Y0, BW, BH, X0, Y0, BW, BH); }
+    L.globalCompositeOperation = 'source-over'; g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(lc, X0, Y0, BW, BH, X0, Y0, BW, BH);
+    if(!LOWQ.on && ['village', 'road', 'forestroad', 'river'].includes(v.strip)){ // отражение в мокрой земле и лужах
+      const yG = oy + GY * s + 2, h = Math.min(BH, Math.max(0, yG - Y0)); if(h > 0){ g.save(); g.globalAlpha = .12; g.translate(0, 2 * yG); g.scale(1, -1); g.drawImage(lc, X0, yG - h, BW, h, X0, yG - h, BW, h); g.restore(); } }
+    g.setTransform(s, 0, 0, s, -camX * s, oy); }
   else drawChars(g);
   if(anna && ph === 3) glow(rx(anna.x), GY - 70, strip.indoor ? 130 : 170, .8);
   drawParticles(g, v);
@@ -2369,13 +2389,25 @@ const ASSETS = {
 const IMG = {};
 /* места, куда игра переносит Анну, следуют за нарисованными домами */
 function syncPlaces(){ PLACES.house = ['village', spot('village', 'Дом Аглаи', 600)]; PLACES.grisha = ['village', spot('village', 'Дом Лаптевых', 3430) - 100]; }
+/* загрузка: игра не стартует, пока не загружены картины, чтобы не мелькал старый рисунок */
+const LOAD = { total:0, done:0, ready:false };
 function loadAssets(){
-  for(const [k, src] of Object.entries(ASSETS)){
-    const im = new Image(); im.decoding = 'async';
-    im.onload = () => { IMG[k] = im; fadedCache.clear(); syncPlaces(); };
-    im.src = src;
-  }
+  const keys = Object.keys(ASSETS); LOAD.total = keys.length;
+  const one = (k, tries = 0) => { const im = new Image(); im.decoding = 'async';
+    im.onload = () => { IMG[k] = im; fadedCache.clear(); syncPlaces(); LOAD.done++; loadTick(); };
+    im.onerror = () => { if(tries < 3) setTimeout(() => one(k, tries + 1), 600 * (tries + 1)); else { LOAD.done++; loadTick(); } };
+    im.src = ASSETS[k] + (tries ? '?r=' + tries : ''); };
+  keys.forEach(k => one(k));
+  setTimeout(() => { if(!LOAD.ready){ LOAD.ready = true; loadTick(); } }, 25000);
 }
+function loadTick(){
+  if(LOAD.done >= LOAD.total) LOAD.ready = true;
+  const el = $('loadNote'), b = $('bNew'), c = $('bCont');
+  if(el){ el.hidden = LOAD.ready; el.textContent = `Загружаем Заветье… ${Math.round(100 * LOAD.done / Math.max(1, LOAD.total))}%`; }
+  if(b) b.disabled = !LOAD.ready; if(c) c.disabled = !LOAD.ready;
+}
+/* у места есть живопись, но она ещё не загрузилась — рисуем тёмную сцену с туманом, а не старый рисунок */
+function artPending(strip){ return !!STRIP_ART[strip] && !artParts(strip, 0); }
 /* какие фоны у какой полосы: части склеиваются слева направо */
 const STRIP_ART = {
   // улица из четырёх картин; segs — какие участки логической улицы покрывает каждая картина
@@ -2724,6 +2756,30 @@ function drawFx(g, air = false){
   }
 }
 
+/* свет сцены вокруг Анны: средний цвет и яркость фона рядом с ней (замер раз в несколько кадров) */
+/* если компьютер не тянет — сначала убираем кромку и отражения, потом весь слой света; звук шагов привязан к кадрам, так что плавность важна */
+const LOWQ = { on:false, off:false, acc:0, n:0 };
+function qualityTick(dt){ if(dt <= 0 || dt > .25) return; LOWQ.acc += dt; LOWQ.n++; if(LOWQ.n < 90) return; const avg = LOWQ.acc / LOWQ.n; LOWQ.acc = 0; LOWQ.n = 0;
+  if(avg > 1 / 38){ if(!LOWQ.on) LOWQ.on = true; else LOWQ.off = true; } }
+const SCENE_LIGHT = { f:1, r:128, g:128, b:128, key:null, n:0, la:0 };
+function spriteLum(){
+  if(SCENE_LIGHT.la) return SCENE_LIGHT.la; const im = IMG.s_anna; if(!im) return .3;
+  const c = document.createElement('canvas'); c.width = 40; c.height = 150; const x = c.getContext('2d', { willReadFrequently:true }); x.drawImage(im, 0, 0, 40, 150);
+  const d = x.getImageData(0, 0, 40, 150).data; let L = 0, n = 0; for(let i = 0; i < d.length; i += 4) if(d[i + 3] > 200){ L += (.3 * d[i] + .59 * d[i + 1] + .11 * d[i + 2]) / 255; n++; }
+  return SCENE_LIGHT.la = n ? L / n : .3;
+}
+function sampleScene(g, ax, top, h, key){
+  const SL = SCENE_LIGHT; SL.n++;
+  if(SL.key === key && SL.n % 12) return;
+  try{
+    const w = Math.max(8, h * 1.6), x0 = Math.max(0, ax - w / 2), y0 = Math.max(0, top), hh = Math.max(8, h);
+    const d = g.getImageData(x0 | 0, y0 | 0, Math.max(1, w | 0), Math.max(1, hh | 0)).data;
+    let r = 0, gg = 0, b = 0, n = 0; for(let i = 0; i < d.length; i += 16){ r += d[i]; gg += d[i + 1]; b += d[i + 2]; n++; }
+    r /= n; gg /= n; b /= n; const Lb = (.3 * r + .59 * gg + .11 * b) / 255, La = spriteLum();
+    const tf = Math.max(.42, Math.min(1.25, (Lb * 1.25 + .04) / La)), first = SL.key !== key;
+    const a = first ? 1 : .35; SL.f += (tf - SL.f) * a; SL.r += (r - SL.r) * a; SL.g += (gg - SL.g) * a; SL.b += (b - SL.b) * a; SL.key = key;
+  }catch(e){}
+}
 /* камера не заезжает на дорисованные по краям полосы, если экран позволяет */
 function camClamp(strip, x, vw){
   const W = RW(strip), a = STRIP_ART[strip], pad = a && artParts(strip, 0) ? (a.pad || 0) : 0;
@@ -2737,7 +2793,7 @@ let _rl = null, _ml = null;
 function maskLayer(w, h){ if(!_ml) _ml = document.createElement('canvas'); if(_ml.width !== w || _ml.height !== h){ _ml.width = w; _ml.height = h; } return _ml; }
 function rimLayer(w, h){ if(!_rl) _rl = document.createElement('canvas'); if(_rl.width !== w || _rl.height !== h){ _rl.width = w; _rl.height = h; } return _rl; }
 function charLayer(w, h){ if(!_cl) _cl = document.createElement('canvas'); if(_cl.width !== w || _cl.height !== h){ _cl.width = w; _cl.height = h; } return _cl; }
-function charTint(strip, ph){
+function charTint(strip, ph){ if(window.NOTINT) return null;
   // [тон сцены (мягкий свет, плотный цвет), отсвет сверху, контровой свет [цвет, сторона]]
   const T = {
     aglaya:     ['rgba(255,140,60,.55)',  'rgba(255,190,120,.07)', ['rgba(255,150,60,.30)', -1]],
@@ -2954,7 +3010,7 @@ function loop(now){
   const dt = Math.min(.05, (now - last) / 1000); last = now; T += dt;
   resize();
   if(ui.title && !st){ drawTitle(dt); }
-  else if(st){ update(dt); drawFrame(st, camX, { x:st.x, dir:st.dir, move:moving, ph:walkPh }); }
+  else if(st){ update(dt); drawFrame(st, camX, { x:st.x, dir:st.dir, move:moving, ph:walkPh }); qualityTick(dt); }
   audioTick(dt);
   requestAnimationFrame(loop);
 }
@@ -3400,8 +3456,8 @@ function startGame(s){
   snapCam(); updateHud(); showArea();
   if(st.scene) resumeDlg(); else if(!F('parcelSeen')){ setF('parcelSeen'); setTimeout(() => { showHint(); }, 900); }
 }
-$('bNew').onclick = () => { wipeSave(); startGame(fresh(pickDiff)); };
-$('bCont').onclick = () => { const sv = loadSave(); if(sv) startGame(sv); };
+$('bNew').onclick = () => { if(!LOAD.ready) return; wipeSave(); startGame(fresh(pickDiff)); };
+$('bCont').onclick = () => { if(!LOAD.ready) return; const sv = loadSave(); if(sv) startGame(sv); };
 function setDiff(d){
   st.diff = d; if(d === 'easy') for(const id of st.order) if(CLUES[id].kind === 'en' && !st.clues[id].lens) st.clues[id].lens = CLUES[id].lens;
   if(bookTab === 'leads' && d === 'hard') bookTab = 'case';
