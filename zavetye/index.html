@@ -2280,9 +2280,19 @@ function drawArtFrame(v, camX, anna, P, ph){
   };
   if(lc){ const L = lc.getContext('2d'); L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'source-over'; L.clearRect(0, 0, cw, ch);
     L.setTransform(s, 0, 0, s, -camX * s, oy); drawChars(L);
-    L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'source-atop'; L.fillStyle = tint[0]; L.fillRect(0, 0, cw, ch);
+    L.setTransform(1, 0, 0, 1, 0, 0);
+    // цвет сцены через «мягкий свет»: тон меняется, контраст лица и одежды остаётся
+    const mk = maskLayer(cw, ch), M = mk.getContext('2d'); M.globalCompositeOperation = 'copy'; M.drawImage(lc, 0, 0);
+    L.globalCompositeOperation = 'soft-light'; L.fillStyle = tint[0]; L.fillRect(0, 0, cw, ch);
+    L.globalCompositeOperation = 'destination-in'; L.drawImage(mk, 0, 0);
     if(tint[1]){ L.globalCompositeOperation = 'source-atop'; const gr = L.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, tint[1]); gr.addColorStop(1, 'rgba(0,0,0,0)'); L.fillStyle = gr; L.fillRect(0, 0, cw, ch); }
-    L.globalCompositeOperation = 'source-over'; g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(lc, 0, 0); g.setTransform(s, 0, 0, s, -camX * s, oy); }
+    if(tint[2]){ // контровой свет: светлая кромка с той стороны, откуда падает свет
+      const [col, side] = tint[2], rim = rimLayer(cw, ch), Rm = rim.getContext('2d');
+      Rm.globalCompositeOperation = 'source-over'; Rm.clearRect(0, 0, cw, ch); Rm.drawImage(lc, 0, 0);
+      Rm.globalCompositeOperation = 'source-in'; Rm.fillStyle = col; Rm.fillRect(0, 0, cw, ch);
+      Rm.globalCompositeOperation = 'destination-out'; Rm.drawImage(lc, -side * Math.max(2, 3.5 * s), 0);
+      L.globalCompositeOperation = 'source-atop'; L.filter = 'blur(1px)'; L.drawImage(rim, 0, 0); L.filter = 'none'; }
+    L.globalCompositeOperation = 'source-over'; g.setTransform(1, 0, 0, 1, 0, 0); g.save(); g.filter = 'blur(' + (0.35 * s).toFixed(2) + 'px)'; g.drawImage(lc, 0, 0); g.restore(); g.setTransform(s, 0, 0, s, -camX * s, oy); }
   else drawChars(g);
   if(anna && ph === 3) glow(rx(anna.x), GY - 70, strip.indoor ? 130 : 170, .8);
   drawParticles(g, v);
@@ -2378,11 +2388,11 @@ const STRIP_ART = {
   field:     { parts:['bg_field_l','bg_field'], segs:[0, 480, 2000], charScale:.9, hotPx:{ 'Ельник':[1, 225] }, npcPx:{ leshy:[1, 225] } },
   river:     { parts:['bg_river','bg_river_r'], segs:[0, 1250, 1500], charScale:.9, hotPx:{ 'В деревню':[0, 110], 'Надпись':[0, 560], 'На мостки':[0, 900] } },
   forestroad:{ parts:['bg_forest_stop_l','bg_forest_stop'], segs:[0, 420, 1600], noNight:true, charScale:.9, npcPx:{ young:[1, 880] } },
-  aglaya:    { parts:['bg_aglaya_house'], nightBase:true, charScale:2.05, hotPx:{ 'На улицу':[0, 220], 'Прялка':[0, 400], 'Печь':[0, 720], 'Того, кто за печью':[0, 900], 'Стол':[0, 1150], 'Полка с тетрадями':[0, 1540], 'Лавка':[0, 1610] }, npcPx:{ grunya:[0, 400], domovoi:[0, 905] } },
-  grunya:    { parts:['bg_grunya_house'], nightBase:true, charScale:2.05, hotPx:{ 'На улицу':[0, 310], 'Комод':[0, 590], 'Травы':[0, 840] }, npcPx:{ grunya:[0, 1190] } },
-  laptev:    { parts:['bg_laptev_house'], charScale:1.75, hotPx:{ 'Во двор':[0, 270], 'Стекло у вешалки':[0, 585], 'Голландка в сенях':[0, 1540] } },
-  school:    { parts:['bg_school'], charScale:1.6, hotPx:{ 'В окно':[0, 630], 'Учительский стол':[0, 1310], 'Доска':[0, 1480], 'Стенгазета':[0, 1650] } },
-  flat:      { parts:['bg_city_flat'], bright:true, charScale:2.15, hotPx:{ 'Шкаф':[0, 330] } },
+  aglaya:    { pad:68, parts:['bg_aglaya_house'], nightBase:true, charScale:2.05, hotPx:{ 'На улицу':[0, 220], 'Прялка':[0, 400], 'Печь':[0, 720], 'Того, кто за печью':[0, 900], 'Стол':[0, 1150], 'Полка с тетрадями':[0, 1540], 'Лавка':[0, 1610] }, npcPx:{ grunya:[0, 400], domovoi:[0, 905] } },
+  grunya:    { pad:68, parts:['bg_grunya_house'], nightBase:true, charScale:2.05, hotPx:{ 'На улицу':[0, 310], 'Комод':[0, 590], 'Травы':[0, 840] }, npcPx:{ grunya:[0, 1190] } },
+  laptev:    { pad:68, parts:['bg_laptev_house'], charScale:1.75, hotPx:{ 'Во двор':[0, 270], 'Стекло у вешалки':[0, 585], 'Голландка в сенях':[0, 1540] } },
+  school:    { pad:68, parts:['bg_school'], charScale:1.6, hotPx:{ 'В окно':[0, 630], 'Учительский стол':[0, 1310], 'Доска':[0, 1480], 'Стенгазета':[0, 1650] } },
+  flat:      { pad:68, parts:['bg_city_flat'], bright:true, charScale:2.15, hotPx:{ 'Шкаф':[0, 330] } },
 };
 function artParts(strip, ph){
   const a = STRIP_ART[strip]; if(!a) return null;
@@ -2570,9 +2580,10 @@ function spriteFor(who, walkPh, moving){
   if(frames.length && moving) return frames[Math.floor(walkPh / Math.PI * 1.2) % frames.length];
   return IMG[`s_${who}`] || frames[0] || null;
 }
+function softShadow(g, x, r){ g.save(); g.translate(x, GY + 2); g.scale(1, .16); const gr = g.createRadialGradient(0, 0, 0, 0, 0, r); gr.addColorStop(0, 'rgba(8,6,6,.42)'); gr.addColorStop(.55, 'rgba(8,6,6,.2)'); gr.addColorStop(1, 'rgba(8,6,6,0)'); g.fillStyle = gr; g.fillRect(-r, -r, 2 * r, 2 * r); g.restore(); }
 function drawSprite(g, im, x, h, face, bob = 0){
   const w = im.width / im.height * h;
-  g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, w * .32, 5, 0, 0, Math.PI * 2); g.fill();
+  softShadow(g, x, w * .42);
   g.save(); g.translate(x, GY - bob); g.scale(face, 1); g.drawImage(im, -w / 2, -h, w, h); g.restore();
 }
 
@@ -2606,7 +2617,7 @@ function drawAnnaRig(g, x, h, face, ph, moving, run){
   let th = Math.acos(Math.max(-1, Math.min(1, AN.face)));
   const lookTh = AN.look * Math.PI / 2; th = th <= Math.PI / 2 ? Math.max(th, lookTh) : Math.min(th, Math.PI - lookTh);
   const via = AN.look > .05 ? 'front' : AN.via, V = annaViews(via);
-  g.fillStyle = 'rgba(10,10,14,.28)'; g.beginPath(); g.ellipse(x, GY + 3, ANNA_RIG.W * k * .4, 5, 0, 0, Math.PI * 2); g.fill();
+  softShadow(g, x, ANNA_RIG.W * k * .5);
   let i = 0; while(i < V.length - 2 && th > V[i + 1].th) i++;
   const A = V[i], B = V[i + 1], lp = (th - A.th) / (B.th - A.th), w = smooth(.4, .6, lp);
   // между ракурсами фигура сужается — как будто поворачивается в глубину
@@ -2713,20 +2724,32 @@ function drawFx(g, air = false){
   }
 }
 
+/* камера не заезжает на дорисованные по краям полосы, если экран позволяет */
+function camClamp(strip, x, vw){
+  const W = RW(strip), a = STRIP_ART[strip], pad = a && artParts(strip, 0) ? (a.pad || 0) : 0;
+  if(W <= vw) return (W - vw) / 2;
+  const lo = W - 2 * pad >= vw ? pad : Math.max(0, (W - vw) / 2 - Math.max(0, W - vw - 0) / 2), hi = W - 2 * pad >= vw ? W - pad - vw : W - vw - lo;
+  return Math.max(lo, Math.min(hi, x));
+}
 /* свет сцены на героях: [заливка поверх, отсвет сверху] по месту и времени суток */
 let _cl = null;
+let _rl = null, _ml = null;
+function maskLayer(w, h){ if(!_ml) _ml = document.createElement('canvas'); if(_ml.width !== w || _ml.height !== h){ _ml.width = w; _ml.height = h; } return _ml; }
+function rimLayer(w, h){ if(!_rl) _rl = document.createElement('canvas'); if(_rl.width !== w || _rl.height !== h){ _rl.width = w; _rl.height = h; } return _rl; }
 function charLayer(w, h){ if(!_cl) _cl = document.createElement('canvas'); if(_cl.width !== w || _cl.height !== h){ _cl.width = w; _cl.height = h; } return _cl; }
 function charTint(strip, ph){
+  // [тон сцены (мягкий свет, плотный цвет), отсвет сверху, контровой свет [цвет, сторона]]
   const T = {
-    aglaya:     ['rgba(255,150,70,.13)', 'rgba(255,190,120,.10)'],
-    grunya:     ['rgba(255,160,80,.12)', 'rgba(255,200,130,.08)'],
-    laptev:     ['rgba(120,130,150,.10)', null],
-    school:     ['rgba(150,145,140,.08)', 'rgba(230,230,240,.06)'],
-    forestroad: ['rgba(110,135,175,.20)', 'rgba(170,190,220,.08)'],
-    flat:       ['rgba(255,200,130,.07)', 'rgba(255,230,180,.08)'],
+    aglaya:     ['rgba(255,140,60,.55)',  'rgba(255,190,120,.07)', ['rgba(255,150,60,.30)', -1]],
+    grunya:     ['rgba(255,150,70,.50)',  'rgba(255,200,130,.06)', ['rgba(255,190,110,.24)', 1]],
+    laptev:     ['rgba(120,130,150,.45)', null,                    ['rgba(220,228,240,.16)', -1]],
+    school:     ['rgba(140,140,145,.40)', null,                    ['rgba(235,238,245,.18)', -1]],
+    forestroad: ['rgba(90,120,170,.60)',  'rgba(170,190,220,.05)', ['rgba(255,170,130,.10)', 1]],
+    flat:       ['rgba(255,200,130,.55)', null,                    ['rgba(255,225,170,.34)', 1]],
   }[strip];
   if(T) return T;
-  return [['rgba(170,190,215,.12)', null], ['rgba(255,235,190,.07)', 'rgba(255,250,230,.08)'], ['rgba(255,140,80,.12)', 'rgba(255,170,110,.10)'], ['rgba(60,80,140,.22)', null]][ph];
+  return [['rgba(160,185,215,.55)', null, null], ['rgba(255,230,180,.45)', null, ['rgba(255,245,215,.16)', 1]],
+          ['rgba(255,135,70,.55)', 'rgba(255,175,115,.06)', ['rgba(255,150,70,.26)', 1]], ['rgba(50,70,140,.70)', null, ['rgba(170,190,255,.10)', 1]]][ph];
 }
 
 /* ---------- туман и цветокоррекция ---------- */
@@ -2846,7 +2869,7 @@ function teleport(dest, then){
     setTimeout(() => { ui.fading = false; if(changed) showArea(); save(); if(then) then(); }, 300);
   }, 460);
 }
-function snapCam(){ const W = RW(st.strip), ax = R(st.strip, st.x), vw = VIEW.viewW; camX = W <= vw ? (W - vw) / 2 : Math.max(0, Math.min(W - vw, ax - vw / 2)); }
+function snapCam(){ const W = RW(st.strip), ax = R(st.strip, st.x), vw = VIEW.viewW; camX = camClamp(st.strip, ax - vw / 2, vw); }
 let areaT = null;
 function showArea(){
   const s = STRIPS[st.strip]; $('areaName').textContent = s.name; $('areaSub').textContent = s.sub || `${dayName(st.day)} · ${PHASES[st.phase]}`;
@@ -2980,7 +3003,7 @@ function update(dt){
   if(breathT <= 0){ breathT = 2.4 + Math.random() * .8; if(cold && !STRIPS[st.strip].frozen) breathFx(st.strip, st.x, AN.face >= 0 ? 1 : -1); }
   fxStep(dt);
   annaHist.push({ x:st.x, dir:st.dir, move:moving, ph:walkPh }); if(annaHist.length > 32) annaHist.shift();
-  const vw = VIEW.viewW, W = RW(st.strip), ax = R(st.strip, st.x), tx = W <= vw ? (W - vw) / 2 : Math.max(0, Math.min(W - vw, ax - vw / 2 + st.dir * vw * .08));
+  const vw = VIEW.viewW, W = RW(st.strip), ax = R(st.strip, st.x), tx = camClamp(st.strip, ax - vw / 2 + st.dir * vw * .08, vw);
   camX += (tx - camX) * Math.min(1, dt * 3.2);
   tickParticles(dt, st, camX, vw);
   curHot = blocked() ? null : nearestHot();
@@ -3178,7 +3201,7 @@ const AU = { ctx:null, muted:false };
 try{ AU.muted = localStorage.getItem('zavetye.mute') === '1'; }catch(e){}
 function audioInit(){
   if(AU.ctx || AU.muted) return;
-  try{ AU.ctx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){ return; }
+  try{ AU.ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint:'interactive' }); }catch(e){ return; }
   const c = AU.ctx; AU.master = c.createGain(); AU.master.gain.value = .9; AU.master.connect(c.destination);
   const len = c.sampleRate * 2, buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0); let b = 0; for(let i = 0; i < len; i++){ b = (b + .02 * (Math.random() * 2 - 1)) / 1.02; d[i] = b * 3.5; }
   AU.noise = buf;
@@ -3365,7 +3388,7 @@ function showEnd(kind){
 let pickDiff = 'normal';
 const TITLE_V = { strip:'road', phase:2, day:0, x:1130, dir:-1, flags:{}, bus:null, scene:null, outcome:null };
 let titleCam = 700;
-function drawTitle(dt){ const vw = VIEW.viewW; titleCam = 1150 - vw * (innerWidth < 760 ? .5 : .72) + Math.sin(T * .05) * 30; drawFrame(TITLE_V, titleCam, { x:1150, dir:-1, move:false, ph:0 }); }
+function drawTitle(dt){ const vw = VIEW.viewW, ax = R('road', 1150), W = RW('road'); titleCam = Math.max(0, Math.min(W - vw, ax - vw * (innerWidth < 760 ? .5 : .62) + Math.sin(T * .05) * 20)); drawFrame(TITLE_V, titleCam, { x:1150, dir:-1, move:false, ph:0 }); }
 function showTitle(){
   ui.title = true; ui.dlg = false; hideDlg(); closeBook(); $('hud').hidden = true; $('prompt').hidden = true; $('endScr').hidden = true;
   const sv = loadSave(); $('bCont').hidden = !sv || !!(sv.flags && sv.flags.ended);
