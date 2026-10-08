@@ -2285,6 +2285,7 @@ const ASSETS = {
   'bg_grunya_house': 'art/bg_grunya_house.jpg',
   'bg_laptev_house': 'art/bg_laptev_house.jpg',
   'bg_school': 'art/bg_school.jpg',
+  'bg_city_flat': 'art/bg_city_flat.jpg',
   'p_anna_neutral': 'art/p_anna_neutral.png',
   'p_anna_afraid': 'art/p_anna_afraid.png',
   'p_anna_sad': 'art/p_anna_sad.png',
@@ -2347,7 +2348,7 @@ const STRIP_ART = {
   grunya:    { parts:['bg_grunya_house'], nightBase:true, charScale:2.05, hotPx:{ 'На улицу':[0, 310], 'Комод':[0, 590], 'Травы':[0, 840] }, npcPx:{ grunya:[0, 1190] } },
   laptev:    { parts:['bg_laptev_house'], charScale:1.75, hotPx:{ 'Во двор':[0, 270], 'Стекло у вешалки':[0, 585], 'Голландка в сенях':[0, 1540] } },
   school:    { parts:['bg_school'], charScale:1.6, hotPx:{ 'В окно':[0, 630], 'Учительский стол':[0, 1310], 'Доска':[0, 1480], 'Стенгазета':[0, 1650] } },
-  flat:      { parts:['bg_city_flat'], bright:true },
+  flat:      { parts:['bg_city_flat'], bright:true, charScale:2.15, hotPx:{ 'Шкаф':[0, 330] } },
 };
 function artParts(strip, ph){
   const a = STRIP_ART[strip]; if(!a) return null;
