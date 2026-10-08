@@ -39,6 +39,7 @@
   --hand:"Caveat","Segoe Print",cursive;
   --mono:"PT Mono",ui-monospace,Menlo,monospace;
   --fw:0px;
+  --orn:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'%3E%3Cpath d='M7 1l6 6-6 6-6-6z' fill='none' stroke='%23b3362a' stroke-width='1.2'/%3E%3Cpath d='M7 4v6M4 7h6' stroke='%23b3362a' stroke-width='1'/%3E%3Ccircle cx='3.5' cy='3.5' r='.9' fill='%23d8b46a'/%3E%3Ccircle cx='10.5' cy='3.5' r='.9' fill='%23d8b46a'/%3E%3Ccircle cx='3.5' cy='10.5' r='.9' fill='%23d8b46a'/%3E%3Ccircle cx='10.5' cy='10.5' r='.9' fill='%23d8b46a'/%3E%3Cpath d='M17 7h3M24 7h3M21 4l1.5 3L21 10' fill='none' stroke='%23b3362a' stroke-width='1'/%3E%3C/svg%3E");
   --stitch:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='8' viewBox='0 0 16 8'%3E%3Cpath d='M0 4l4-3 4 3 4-3 4 3M0 4l4 3 4-3 4 3 4-3' fill='none' stroke='%23b3362a' stroke-width='1.3'/%3E%3Ccircle cx='8' cy='4' r='1' fill='%23d8b46a'/%3E%3C/svg%3E");
 }
 *{box-sizing:border-box}
@@ -288,6 +289,20 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 @media (prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+
+/* славянские мотивы: пословица дня, поверья, орнамент «засеянное поле» */
+.saying{font:italic 500 19px/1.35 var(--display);color:var(--gold);text-align:center;margin:2px 0 12px;letter-spacing:.01em}
+.saying::before,.saying::after{content:"";display:block;height:14px;margin:6px auto;width:min(240px,70%);background:var(--orn) repeat-x 0 50%/28px 14px;opacity:.75}
+.lore{margin:14px 0 4px;padding:12px 14px 12px 16px;border-left:2px solid var(--cin-2);background:linear-gradient(90deg,rgba(179,54,42,.12),rgba(179,54,42,0));font-style:italic;line-height:1.5}
+.lore-k{display:block;font:700 12px var(--sc);letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-style:normal;margin-bottom:4px}
+.orn{display:block;height:14px;margin:8px 0 14px;background:var(--orn) repeat-x 0 50%/28px 14px;opacity:.7}
+.lore-list{display:grid;gap:12px}
+.lore-card{padding:14px 16px 12px;border:1px solid rgba(179,54,42,.35);background:rgba(179,54,42,.04);position:relative}
+.lore-card::before{content:"";position:absolute;left:0;right:0;top:-1px;height:4px;background:var(--stitch) repeat-x 0 50%/16px 8px;opacity:.6}
+.lore-card small{font:700 11px var(--sc);letter-spacing:.12em;text-transform:uppercase;color:#8a5a3a}
+.lore-card h5{margin:0 0 6px;font:italic 600 22px var(--display);color:var(--pink)}
+.lore-card p{margin:0;line-height:1.5}
+.nb-title::after{content:"";display:block;height:14px;margin-top:6px;background:var(--orn) repeat-x 0 50%/28px 14px;opacity:.65}
 </style>
 </head>
 <body>
@@ -1786,9 +1801,18 @@ function drawNpc(g, n){
     case 'nina': figure(g, n.x, LOOKS.nina, { face:-1, armsUp: Math.sin(T * .5) > .3 }); break;
     case 'grunya': figure(g, n.x, LOOKS.grunya, { face:-1 }); break;
     case 'young': figure(g, n.x, LOOKS.young, { face:-1, sit:true }); suitcase(g, n.x - 40, GY, C.brown); break;
-    case 'leshy': stump(g, n.x); g.save(); g.translate(0, -30); figure(g, n.x, LOOKS.leshy, { face:1, sit:true, noShadow:true }); g.restore(); glow(n.x + 8, GY - 30 - 176 * .89, 18, .9, '210,240,120'); break;
-    case 'noon': { const x = n.x + Math.sin(T * .8) * 5; glow(x, GY - 140, 300, 1, '255,248,220'); g.save(); g.globalAlpha = .93; figure(g, x, LOOKS.noon, { face:-1, noShadow:true, sickle:true }); g.restore(); break; }
-    case 'domovoi': { const x = n.x; shape(g, C.brown, () => { g.moveTo(x - 20, GY); g.quadraticCurveTo(x - 24, GY - 30, x, GY - 38); g.quadraticCurveTo(x + 24, GY - 30, x + 20, GY); g.closePath(); }, 2);
+    case 'leshy': if(SIL){ const sv = SIL; SIL = 'rgba(18,28,16,.88)'; g.save(); g.translate(0, -30); figure(g, n.x, LOOKS.leshy, { face:1, sit:true, noShadow:true }); g.restore(); SIL = null; for(const ex of [-4, 5]){ g.fillStyle = 'rgba(190,240,110,.95)'; g.beginPath(); g.arc(n.x + 8 + ex, GY - 30 - 176 * .89 + 2, 1.8, 0, Math.PI * 2); g.fill(); } SIL = sv; glow(n.x + 8, GY - 30 - 176 * .89, 26, .9, '190,240,110'); break; } stump(g, n.x); g.save(); g.translate(0, -30); figure(g, n.x, LOOKS.leshy, { face:1, sit:true, noShadow:true }); g.restore(); glow(n.x + 8, GY - 30 - 176 * .89, 18, .9, '210,240,120'); break;
+    case 'noon': { const x = n.x + Math.sin(T * .8) * 5; glow(x, GY - 140, 300, 1, '255,248,220');
+      if(SIL){ // на живописи — сияющий белый призрак, а не тень
+        const sv = SIL; g.save(); g.globalAlpha = .42 + Math.sin(T * 2.3) * .07; SIL = 'rgba(255,250,236,1)'; figure(g, x, LOOKS.noon, { face:-1, noShadow:true, sickle:true });
+        g.globalAlpha = .25; g.translate(x, 0); g.scale(1.06, 1.02); g.translate(-x, 0); figure(g, x, LOOKS.noon, { face:-1, noShadow:true, sickle:true }); g.restore(); SIL = sv;
+        const gr = g.createRadialGradient(x, GY - 120, 10, x, GY - 120, 170); gr.addColorStop(0, 'rgba(255,252,235,.35)'); gr.addColorStop(1, 'rgba(255,252,235,0)'); g.fillStyle = gr; g.fillRect(x - 170, GY - 290, 340, 340); break; }
+      g.save(); g.globalAlpha = .93; figure(g, x, LOOKS.noon, { face:-1, noShadow:true, sickle:true }); g.restore(); break; }
+    case 'domovoi': { const x = n.x;
+      if(SIL){ // на живописи — только косматая тень у печи и два янтарных глаза
+        const gr = g.createRadialGradient(x, GY - 18, 4, x, GY - 18, 34); gr.addColorStop(0, 'rgba(12,8,6,.85)'); gr.addColorStop(1, 'rgba(12,8,6,0)'); g.fillStyle = gr; g.fillRect(x - 40, GY - 56, 80, 60);
+        if((T % 4.3) < 4.05){ const sv = SIL; SIL = null; for(const ex of [-6, 6]){ g.fillStyle = '#ffc24a'; g.beginPath(); g.ellipse(x + ex, GY - 26, 2.4, 1.6 + Math.sin(T * 3) * .3, 0, 0, Math.PI * 2); g.fill(); } SIL = sv; glow(x, GY - 26, 34, .8); } break; }
+      shape(g, C.brown, () => { g.moveTo(x - 20, GY); g.quadraticCurveTo(x - 24, GY - 30, x, GY - 38); g.quadraticCurveTo(x + 24, GY - 30, x + 20, GY); g.closePath(); }, 2);
       shape(g, C.greyL, () => { g.moveTo(x - 12, GY - 22); g.lineTo(x, GY - 2); g.lineTo(x + 12, GY - 22); g.closePath(); }, 1.5);
       const bl = (T % 4) < 3.8; if(bl){ circ(g, x - 6, GY - 26, 2.8, '#ffcc55', 1); circ(g, x + 6, GY - 26, 2.8, '#ffcc55', 1); glow(x, GY - 26, 40, .7); } break; }
   }
@@ -2227,6 +2251,9 @@ function drawArtFrame(v, camX, anna, P, ph){
   // дальний туман — за героями, ближний — полупрозрачно поверх, чтобы фигуры не тонули
   if(!a.bright){ g.setTransform(1, 0, 0, 1, 0, 0); drawFog(g, ph, camX, fogK, 'back'); }
   g.setTransform(s, 0, 0, s, -camX * s, oy);
+  // герои рисуются на отдельный слой и подкрашиваются светом сцены (огонь, туман, закат)
+  const tint = charTint(v.strip, ph), lc = tint ? charLayer(cw, ch) : null;
+  const drawChars = g => {
   SIL = a.bright ? 'rgba(40,34,30,.9)' : strip.indoor ? 'rgba(22,16,12,.92)' : 'rgba(14,15,20,.9)';
   try{
     drawFx(g);
@@ -2250,6 +2277,13 @@ function drawArtFrame(v, camX, anna, P, ph){
     g.setTransform(s, 0, 0, s, -camX * s, oy);
     drawFx(g, true);
   } finally { SIL = null; }
+  };
+  if(lc){ const L = lc.getContext('2d'); L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'source-over'; L.clearRect(0, 0, cw, ch);
+    L.setTransform(s, 0, 0, s, -camX * s, oy); drawChars(L);
+    L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'source-atop'; L.fillStyle = tint[0]; L.fillRect(0, 0, cw, ch);
+    if(tint[1]){ L.globalCompositeOperation = 'source-atop'; const gr = L.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, tint[1]); gr.addColorStop(1, 'rgba(0,0,0,0)'); L.fillStyle = gr; L.fillRect(0, 0, cw, ch); }
+    L.globalCompositeOperation = 'source-over'; g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(lc, 0, 0); g.setTransform(s, 0, 0, s, -camX * s, oy); }
+  else drawChars(g);
   if(anna && ph === 3) glow(rx(anna.x), GY - 70, strip.indoor ? 130 : 170, .8);
   drawParticles(g, v);
   g.setTransform(1, 0, 0, 1, 0, 0);
@@ -2679,6 +2713,22 @@ function drawFx(g, air = false){
   }
 }
 
+/* свет сцены на героях: [заливка поверх, отсвет сверху] по месту и времени суток */
+let _cl = null;
+function charLayer(w, h){ if(!_cl) _cl = document.createElement('canvas'); if(_cl.width !== w || _cl.height !== h){ _cl.width = w; _cl.height = h; } return _cl; }
+function charTint(strip, ph){
+  const T = {
+    aglaya:     ['rgba(255,150,70,.13)', 'rgba(255,190,120,.10)'],
+    grunya:     ['rgba(255,160,80,.12)', 'rgba(255,200,130,.08)'],
+    laptev:     ['rgba(120,130,150,.10)', null],
+    school:     ['rgba(150,145,140,.08)', 'rgba(230,230,240,.06)'],
+    forestroad: ['rgba(110,135,175,.20)', 'rgba(170,190,220,.08)'],
+    flat:       ['rgba(255,200,130,.07)', 'rgba(255,230,180,.08)'],
+  }[strip];
+  if(T) return T;
+  return [['rgba(170,190,215,.12)', null], ['rgba(255,235,190,.07)', 'rgba(255,250,230,.08)'], ['rgba(255,140,80,.12)', 'rgba(255,170,110,.10)'], ['rgba(60,80,140,.22)', null]][ph];
+}
+
 /* ---------- туман и цветокоррекция ---------- */
 const FOGCFG = [ { c:'223,231,236', a:.8 }, { c:'246,240,224', a:.28 }, { c:'233,196,180', a:.5 }, { c:'140,160,196', a:.55 } ];
 const fogCache = {};
@@ -2715,6 +2765,66 @@ function drawArtStrip(g, P, camX, strip){
   Ly.segs.forEach((sg, i) => { const im = P.imgs[i], x = sg.r0, w = sg.rw; if(x + w < camX - 10 || x > camX + VIEW.viewW + 10) return;
     if(im) g.drawImage(i ? fadedLeft(im, OV / w) : im, (x - camX) * s, oy, w * s + 1, VH * s);
     else { const gr = g.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, '#2a2530'); gr.addColorStop(.75, '#3a3530'); gr.addColorStop(1, '#1a1814'); g.fillStyle = gr; g.fillRect((x - camX) * s, oy, w * s + 1, VH * s); } });
+}
+
+/* =====================================================================
+   ПОВЕРЬЯ — народные приметы и обереги, которые Анна узнаёт по ходу игры.
+   Каждое открывается один раз, в своей сцене, и попадает в тетрадь.
+   ===================================================================== */
+const LORE = {
+  porog:   { at:'p_house_in',  t:'Порог', w:'Дом Аглаи',
+             x:'Через порог не здороваются и ничего не передают. Порог — граница между своим и чужим, под ним, говорят, в старину хоронили предков.' },
+  pech:    { at:'h_stove',     t:'Печь и домовой', w:'Дом Аглаи',
+             x:'Печь — сердце дома, за ней живёт домовой, «дедушка-соседушка». Ему оставляют на ночь блюдце молока и горбушку. Уезжая навсегда, зовут с собой: «Пойдём с нами в новый дом».' },
+  pryalka: { at:'h_corner',    t:'Прялка', w:'Дом Аглаи',
+             x:'По пятницам не прядут: это день Параскевы-Пятницы, покровительницы пряхи. Кудель, оставленную на ночь, запутает кикимора.' },
+  hleb:    { at:'h_table',     t:'Хлеб и рушник', w:'Дом Аглаи',
+             x:'Хлеб кладут на стол только корочкой вверх: перевёрнутый — к беде. На рушнике вышивают ромбы — засеянное поле — и птиц-берегинь, души рода.' },
+  son:     { at:'h_bed',       t:'Сон', w:'Дом Аглаи',
+             x:'Ногами к двери не ложатся: так выносят покойников. А что приснится на новом месте, то и сбудется. Поэтому перед сном говорят: «Сплю на новом месте, приснись жених невесте».' },
+  travy:   { at:'gr_herbs',    t:'Купальские травы', w:'Изба Груни',
+             x:'Травы рвут в ночь на Ивана Купалу, до росы и молча. Полынь — от русалок, зверобой — от ста болезней, чертополох над дверью — от нечистой силы.' },
+  nit:     { at:'gr_chest',    t:'Красная нить', w:'Изба Груни',
+             x:'Красную шерстяную нить завязывает на левом запястье старшая в роду, на семь узлов. Сам её не снимают: вместе с нитью уходит защита. Тот, кто завязал, держит и конец.' },
+  gost:    { at:'gr_dinner',   t:'Угощение', w:'Изба Груни',
+             x:'Гостя сначала кормят, потом расспрашивают. От угощения не отказываются: отказ — обида хозяйке и её дому.' },
+  kolodec: { at:'well',        t:'Колодец', w:'Нижняя улица',
+             x:'В колодец не плюют и в полночь в него не заглядывают. В воде можно увидеть суженого, а можно и того, кто за тобой придёт.' },
+  kukushka:{ at:'bench',       t:'Кукушка', w:'Нижняя улица',
+             x:'Кукушку спрашивают: «Кукушка, сколько мне жить?» — и считают. Если замолчит сразу, второй раз не спрашивают.' },
+  doroga:  { at:'suitcase_look', t:'В дорогу', w:'Двор Лаптевых',
+             x:'Уезжая надолго, берут с собой щепоть земли с порога или золы из печи, чтобы дом помнил и пустил назад. Перед дорогой присаживаются на минуту: чтобы она «присела» с тобой и не гналась следом.' },
+  banya:   { at:'banya',       t:'Банник', w:'Двор Лаптевых',
+             x:'Баня — нечистое место, в ней не держат икон. Там живёт банник. Третий пар — его, после полуночи в бане не моются. Уходя, оставляют ему веник и ковш воды.' },
+  voda:    { at:'river_sign',  t:'Вода берёт', w:'Река Кромка',
+             x:'Вода — дорога на тот свет. Река раз в год берёт своё. Отданную воде вещь назад не просят, а в Купальскую ночь на воду пускают венки: чей утонет, той не дождаться жениха.' },
+  rusalki: { at:'river_bridge',t:'Мостки', w:'Река Кромка',
+             x:'С мостков не отвечают на зов с воды: русалки зовут голосами родных. В Русальную неделю в реке не купаются.' },
+  polden:  { at:'field_noon',  t:'Полудница', w:'Поле за околицей',
+             x:'Полудница ходит по ржи в самый жар, высокая, в белом, с серпом. Кто работает в поле в полдень, тому задаст загадку. Ответишь неверно — заберёт.' },
+  les:     { at:'forest_edge', t:'Леший', w:'Ельник',
+             x:'Входя в лес, здороваются с хозяином и оставляют гостинец на пне. Закружило — выверни одежду наизнанку и переобуй сапоги с левой ноги на правую: Леший потеряет след.' },
+  perekr:  { at:'road_slab',   t:'Перекрёсток', w:'Старая дорога',
+             x:'На перекрёстке не оборачиваются и ничего не поднимают. Там оставляют то, от чего хотят избавиться: болезнь, тоску. Или чужую судьбу.' },
+  kolyb:   { at:'varya_song',  t:'Колыбельная', w:'Двор Лаптевых',
+             x:'Колыбельной «заговаривают» сон: зовут Сон и Дрёму, а беду отсылают «за реку, за лес». Чужую колыбельную своему ребёнку не поют: уведёт.' },
+};
+const LORE_AT = Object.fromEntries(Object.entries(LORE).map(([k, L]) => [L.at, k]));
+/* к утренним сценам — пословица дня */
+const SAYINGS = { 1:'Не зная броду, не суйся в воду.', 2:'Утро вечера мудренее.', 3:'Что посеешь, то и пожнёшь.', 4:'Правда в огне не горит и в воде не тонет.', 5:'Куда иголка, туда и нитка.' };
+function loreHook(id, sc){
+  if(!st.lore) st.lore = [];
+  if(id === 'morning' && SAYINGS[st.day]) sc.text.unshift(`<p class="saying">${SAYINGS[st.day]}</p>`);
+  const k = LORE_AT[id]; if(!k || st.lore.includes(k)) return;
+  st.lore.push(k); const L = LORE[k];
+  sc.text.push(`<div class="lore"><span class="lore-k">Поверье · ${L.t}</span>${L.x}</div>`);
+  setTimeout(() => { toast('Поверье записано в тетрадь'); sfx('lore'); }, 400);
+}
+function loreUI(){
+  const known = (st.lore || []).map(k => LORE[k]), n = Object.keys(LORE).length;
+  let h = `<div class="case-h">Поверья Заветья</div><div class="case-q">Что здесь знают все, кроме приезжих. Найдено ${known.length} из ${n}.</div><span class="orn"></span>`;
+  if(!known.length) return h + '<p class="empty">Пока пусто. Поверья рассказывают вещи и люди: печь, колодец, травы, река.</p>';
+  return h + '<div class="lore-list">' + known.map(L => `<article class="lore-card"><small>${L.w}</small><h5>${L.t}</h5><p>${L.x}</p></article>`).join('') + '</div>';
 }
 /* =====================================================================
    ИГРА — цикл, управление, диалоги, тетрадь, звук
@@ -2756,6 +2866,7 @@ function showScene(id){
   if(id === 'morning') st.wake = null;
   st.scene = id;
   const sc = S[id]();
+  loreHook(id, sc);
   st.view = { id, title: sc.title || '', pages: sc.text.filter(Boolean).map(wrapP) };
   DLG = { i:0 }; curChoices = sc.choices || [];
   if(['noon_vision','varya_song'].includes(id) || (id === 'gr_dinner' && F('heardTune') && has('c_lullaby'))) lullaby();
@@ -2934,15 +3045,15 @@ function hideHint(){ $('hint').classList.add('off'); }
 
 /* ---------- тетрадь ---------- */
 let bookTab = 'case';
-const TABS = [ ['case','Улики'], ['ver','Версия'], ['leads','Зацепки'], ['notes','Записки'], ['world','Заветье'], ['gram','Грамматика'] ];
+const TABS = [ ['case','Улики'], ['ver','Версия'], ['leads','Зацепки'], ['notes','Записки'], ['world','Заветье'], ['lore','Поверья'], ['gram','Грамматика'] ];
 function openBook(tab){ if(tab) bookTab = tab; ui.nb = true; $('nbw').hidden = false; st.unseen = 0; renderBook(); updateHud(); sfx('page'); }
 function closeBook(){ ui.nb = false; $('nbw').hidden = true; }
 function renderBook(){
   if(!st) return;
   $('nbSide').innerHTML = '<div class="nb-title">Тетрадь</div>' + TABS.filter(([k]) => k !== 'leads' || st.diff !== 'hard').map(([k, l]) => {
-    const n = k === 'case' ? st.order.length : k === 'notes' ? st.notes.length : k === 'world' ? st.changes.length : 0;
+    const n = k === 'case' ? st.order.length : k === 'notes' ? st.notes.length : k === 'world' ? st.changes.length : k === 'lore' ? (st.lore || []).length : 0;
     return `<button type="button" class="nb-tab" data-tab="${k}" aria-selected="${k === bookTab}">${l}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('') + '<button type="button" class="nb-close" id="nbClose">Закрыть</button>';
-  $('nbMain').innerHTML = ({ case:caseUI, ver:verUI, leads:leadsUI, notes:notesUI, world:worldUI, gram:gramUI })[bookTab]();
+  $('nbMain').innerHTML = ({ case:caseUI, ver:verUI, leads:leadsUI, notes:notesUI, world:worldUI, lore:loreUI, gram:gramUI })[bookTab]();
 }
 function caseUI(){
   let h = '<div class="case-h">Дело первое</div><div class="case-q">Гриша, который уедет в субботу. Какую историю мне рассказывают неправильно?</div>';
@@ -3160,9 +3271,19 @@ function stepSound(surf, run){
     nz({ f0:380 * j, q:.7, dur:.07, vol:.08 * v, type:'lowpass' });
   }
 }
+/* щипок струны, похожий на гусли: шум в линии задержки с затуханием */
+function pluck(freq, when = 0, vol = .12, dec = .996){
+  const c = AU.ctx; if(!c) return; const sr = c.sampleRate, n = Math.floor(sr * 1.8), buf = c.createBuffer(1, n, sr), d = buf.getChannelData(0), P = Math.max(2, Math.round(sr / freq));
+  const line = new Float32Array(P); for(let i = 0; i < P; i++) line[i] = Math.random() * 2 - 1;
+  let prev = 0; for(let i = 0; i < n; i++){ const j = i % P, v = line[j]; d[i] = v; const nv = dec * .5 * (v + prev); prev = v; line[j] = nv; }
+  for(let i = 0; i < 200; i++) d[i] *= i / 200;
+  const s = c.createBufferSource(), f = c.createBiquadFilter(), gn = c.createGain(); s.buffer = buf; f.type = 'lowpass'; f.frequency.value = 3200; gn.gain.value = vol;
+  s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(c.currentTime + when); }
+function cuckoo(n = 2 + (Math.random() * 3 | 0)){ for(let i = 0; i < n; i++){ tone({ f0:740, f1:720, dur:.18, vol:.03, att:.02, when:i * .62 }); tone({ f0:590, f1:575, dur:.3, vol:.03, att:.02, when:i * .62 + .2 }); } }
 function sfx(k){
   if(!AU.ctx || AU.muted) return;
-  if(k === 'clue'){ env(880, 1.2, .06); env(1318, 1.4, .04, 'sine', .12); }
+  if(k === 'clue'){ [392, 523.3, 659.3, 784].forEach((f, i) => pluck(f, i * .09, .1)); }
+  if(k === 'lore'){ [293.7, 392, 440, 587.3].forEach((f, i) => pluck(f, i * .14, .09, .997)); }
   if(k === 'step') stepSound(surfaceAt(st.strip, st.x), keys.run);
   if(k === 'door') burst(.35, .12, 300);
   if(k === 'page') burst(.12, .04, 3000);
@@ -3190,6 +3311,8 @@ function audioTick(dt){
   if((S === 'forestroad' || S === 'laptev') && (AU.tick = (AU.tick || 0) + dt) > 1){ AU.tick = 0; nz({ f0:3500, q:4, dur:.03, vol:S === 'forestroad' ? .03 : .022 }); }
   if(S === 'flat'){ AU.city.gain.setTargetAtTime(.025, t, 1); } else AU.city.gain.setTargetAtTime(0, t, 1);
   if(!out || S === 'forestroad') return;
+  // кукушка в лесу и у реки утром и днём
+  if((S === 'field' || S === 'river' || S === 'village') && ph <= 1 && rnd() < dt * .03) cuckoo();
   // утром птицы
   if(ph === 0 && rnd() < dt * .7){ const f = 2600 + rnd() * 1400; for(let i = 0; i < 2 + (rnd() * 3 | 0); i++) tone({ f0:f, f1:f * (1.2 + rnd() * .4), dur:.07, vol:.018, when:i * .11 }); }
   // в полдень кузнечики в поле
