@@ -2281,6 +2281,7 @@ const ASSETS = {
   'bg_river_r': 'art/bg_river_r.jpg',
   'bg_forest_stop_l': 'art/bg_forest_stop_l.jpg',
   'bg_forest_stop': 'art/bg_forest_stop.jpg',
+  'bg_aglaya_house': 'art/bg_aglaya_house.jpg',
   'p_anna_neutral': 'art/p_anna_neutral.png',
   'p_anna_afraid': 'art/p_anna_afraid.png',
   'p_anna_sad': 'art/p_anna_sad.png',
@@ -2339,7 +2340,7 @@ const STRIP_ART = {
   field:     { parts:['bg_field_l','bg_field'], segs:[0, 480, 2000], charScale:.9, hotPx:{ 'Ельник':[1, 225] }, npcPx:{ leshy:[1, 225] } },
   river:     { parts:['bg_river','bg_river_r'], segs:[0, 1250, 1500], charScale:.9, hotPx:{ 'В деревню':[0, 110], 'Надпись':[0, 560], 'На мостки':[0, 900] } },
   forestroad:{ parts:['bg_forest_stop_l','bg_forest_stop'], segs:[0, 420, 1600], noNight:true, charScale:.9, npcPx:{ young:[1, 880] } },
-  aglaya:    { parts:['bg_aglaya_house'] },
+  aglaya:    { parts:['bg_aglaya_house'], nightBase:true, charScale:1.3, hotPx:{ 'На улицу':[0, 220], 'Прялка':[0, 400], 'Печь':[0, 720], 'Того, кто за печью':[0, 900], 'Стол':[0, 1150], 'Полка с тетрадями':[0, 1540], 'Лавка':[0, 1610] }, npcPx:{ grunya:[0, 400], domovoi:[0, 905] } },
   grunya:    { parts:['bg_grunya_house'] },
   laptev:    { parts:['bg_laptev_house'] },
   school:    { parts:['bg_school'] },
@@ -2350,7 +2351,7 @@ function artParts(strip, ph){
   const night = ph === 3 && !a.noNight;
   const list = a.parts.map(p => (night && IMG[p + '_night']) || IMG[p] || null);
   if(a.segs ? !list.some(Boolean) : !list.every(Boolean)) return null;
-  return { imgs:list, nightArt: night && a.parts.every(p => IMG[p + '_night']) };
+  return { imgs:list, nightArt: night && (a.nightBase || a.parts.every(p => IMG[p + '_night'])) };
 }
 /* раскладка: логические участки полосы → отрезки на картинах.
    Соседние картины заходят друг на друга на OV единиц и плавно перетекают. */
