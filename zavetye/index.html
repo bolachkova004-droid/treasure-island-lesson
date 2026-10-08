@@ -2297,14 +2297,13 @@ function drawArtFrame(v, camX, anna, P, ph){
     // 1) яркость как у фона вокруг (герой не светится ярче сцены), 2) немного цвета самой сцены
     const SC = SCENE_LIGHT, f = SC.f;
     if(f < .99){ L.globalCompositeOperation = 'multiply'; const q = Math.round(255 * f); L.fillStyle = `rgb(${q},${q},${q})`; L.fillRect(X0, Y0, BW, BH); }
-    else if(f > 1.01){ L.globalCompositeOperation = 'screen'; const q = Math.round(255 * Math.min(.35, f - 1)); L.fillStyle = `rgb(${q},${q},${q})`; L.fillRect(X0, Y0, BW, BH); }
     L.globalCompositeOperation = 'color'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.16)`; L.fillRect(X0, Y0, BW, BH);
-    L.globalCompositeOperation = 'soft-light'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.45)`; L.fillRect(X0, Y0, BW, BH);
+    L.globalCompositeOperation = 'soft-light'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.3)`; L.fillRect(X0, Y0, BW, BH);
     if(!strip.indoor && !a.bright){ L.globalCompositeOperation = 'source-over'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.13)`; L.fillRect(X0, Y0, BW, BH); } // воздух между зрителем и героем
     L.globalCompositeOperation = 'destination-in'; L.drawImage(mk, X0, Y0, BW, BH, X0, Y0, BW, BH);
     if(tint[1]){ L.globalCompositeOperation = 'source-atop'; const gr = L.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, tint[1]); gr.addColorStop(1, 'rgba(0,0,0,0)'); L.fillStyle = gr; L.fillRect(X0, Y0, BW, BH); }
     if(tint[2] && !LOWQ.on){ // контровой свет: светлая кромка с той стороны, откуда падает свет
-      const [col, side] = tint[2], rim = rimLayer(cw, ch), Rm = rim.getContext('2d'), dx = -side * Math.max(2, 3.5 * s);
+      const [col, side] = tint[2], rim = rimLayer(cw, ch), Rm = rim.getContext('2d'), dx = -side * Math.max(1, 1.5 * s);
       Rm.globalCompositeOperation = 'copy'; Rm.drawImage(lc, X0, Y0, BW, BH, X0, Y0, BW, BH);
       Rm.globalCompositeOperation = 'source-in'; Rm.fillStyle = col; Rm.fillRect(X0, Y0, BW, BH);
       Rm.globalCompositeOperation = 'destination-out'; Rm.drawImage(lc, X0, Y0, BW, BH, X0 + dx, Y0, BW, BH);
@@ -2776,7 +2775,7 @@ function sampleScene(g, ax, top, h, key){
     const d = g.getImageData(x0 | 0, y0 | 0, Math.max(1, w | 0), Math.max(1, hh | 0)).data;
     let r = 0, gg = 0, b = 0, n = 0; for(let i = 0; i < d.length; i += 16){ r += d[i]; gg += d[i + 1]; b += d[i + 2]; n++; }
     r /= n; gg /= n; b /= n; const Lb = (.3 * r + .59 * gg + .11 * b) / 255, La = spriteLum();
-    const tf = Math.max(.42, Math.min(1.25, (Lb * 1.25 + .04) / La)), first = SL.key !== key;
+    const tf = Math.max(.45, Math.min(1, (Lb * 1.3 + .05) / La)), first = SL.key !== key;
     const a = first ? 1 : .35; SL.f += (tf - SL.f) * a; SL.r += (r - SL.r) * a; SL.g += (gg - SL.g) * a; SL.b += (b - SL.b) * a; SL.key = key;
   }catch(e){}
 }
@@ -2796,16 +2795,16 @@ function charLayer(w, h){ if(!_cl) _cl = document.createElement('canvas'); if(_c
 function charTint(strip, ph){ if(window.NOTINT) return null;
   // [тон сцены (мягкий свет, плотный цвет), отсвет сверху, контровой свет [цвет, сторона]]
   const T = {
-    aglaya:     ['rgba(255,140,60,.55)',  'rgba(255,190,120,.07)', ['rgba(255,150,60,.30)', -1]],
-    grunya:     ['rgba(255,150,70,.50)',  'rgba(255,200,130,.06)', ['rgba(255,190,110,.24)', 1]],
+    aglaya:     ['rgba(255,140,60,.55)',  'rgba(255,190,120,.07)', ['rgba(255,150,60,.18)', -1]],
+    grunya:     ['rgba(255,150,70,.50)',  'rgba(255,200,130,.06)', ['rgba(255,190,110,.15)', 1]],
     laptev:     ['rgba(120,130,150,.45)', null,                    ['rgba(220,228,240,.16)', -1]],
     school:     ['rgba(140,140,145,.40)', null,                    ['rgba(235,238,245,.18)', -1]],
     forestroad: ['rgba(90,120,170,.60)',  'rgba(170,190,220,.05)', ['rgba(255,170,130,.10)', 1]],
-    flat:       ['rgba(255,200,130,.55)', null,                    ['rgba(255,225,170,.34)', 1]],
+    flat:       ['rgba(255,200,130,.55)', null,                    null],
   }[strip];
   if(T) return T;
-  return [['rgba(160,185,215,.55)', null, null], ['rgba(255,230,180,.45)', null, ['rgba(255,245,215,.16)', 1]],
-          ['rgba(255,135,70,.55)', 'rgba(255,175,115,.06)', ['rgba(255,150,70,.26)', 1]], ['rgba(50,70,140,.70)', null, ['rgba(170,190,255,.10)', 1]]][ph];
+  return [['rgba(160,185,215,.55)', null, null], ['rgba(255,230,180,.45)', null, ['rgba(255,245,215,.10)', 1]],
+          ['rgba(255,135,70,.55)', 'rgba(255,175,115,.06)', ['rgba(255,150,70,.16)', 1]], ['rgba(50,70,140,.70)', null, ['rgba(170,190,255,.10)', 1]]][ph];
 }
 
 /* ---------- туман и цветокоррекция ---------- */
