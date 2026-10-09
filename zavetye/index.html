@@ -102,7 +102,7 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 @keyframes rise{from{opacity:0;transform:translate(-50%,14px)}}
 .dlg::before{content:"";display:block;height:8px;margin:0 24px;background:var(--stitch) repeat-x 0 50%/16px 8px;opacity:.8}
 .dlg-head{display:flex;align-items:baseline;gap:12px;padding:10px 26px 0}
-.dlg-who{font:italic 600 21px/1.1 var(--display);color:var(--gold);letter-spacing:.01em}
+.dlg-who{flex:1;min-width:0;font:italic 600 21px/1.15 var(--display);color:var(--gold);letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dlg-pg{margin-left:auto;font:700 12px var(--sc);letter-spacing:.14em;color:var(--dim)}
 .dlg-body{overflow:auto;padding:6px 26px 14px;cursor:pointer}
 .dlg-text p{margin:0 0 .55em;font-size:19.5px;line-height:1.55;color:var(--text);animation:fin .45s ease-out}
@@ -269,6 +269,9 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
   .hb .lbl{display:none}
   .hb{padding:0;width:40px;justify-content:center}
   .dlg-text p{font-size:17.5px}
+  .dlg-who{font-size:18px}
+  .dlg-head{padding:8px 18px 0}.dlg-body{padding:6px 18px 12px}
+  .toast{top:auto;bottom:calc(min(56vh,540px) + 30px + env(safe-area-inset-bottom,0px));font-size:14.5px}
   .ch{font-size:16.5px;padding:9px 12px}
   .portrait{height:56vh;left:0}.portrait.right{right:0}
   .portrait.on.listen{opacity:0}
@@ -2313,11 +2316,11 @@ function drawArtFrame(v, camX, anna, P, ph){
       const yG = oy + GY * s + 2, h = Math.min(BH, Math.max(0, yG - Y0)); if(h > 0){ g.save(); g.globalAlpha = .12; g.translate(0, 2 * yG); g.scale(1, -1); g.drawImage(lc, X0, yG - h, BW, h, X0, yG - h, BW, h); g.restore(); } }
     g.setTransform(s, 0, 0, s, -camX * s, oy); }
   else drawChars(g);
-  if(anna && ph === 3) glow(rx(anna.x), GY - 70, strip.indoor ? 130 : 170, .8);
   drawParticles(g, v);
   g.setTransform(1, 0, 0, 1, 0, 0);
   if(!a.bright) drawFog(g, ph, camX, fogK * .45, 'front');
-  gradeArt(g, ph, P.nightArt, a.bright);
+  gradeArt(g, ph, P.nightArt, a.bright, strip.indoor);
+  if(ph >= 2 && !P.nightArt) drawArtLights(g, camX, v.strip, ph === 3 ? .95 : .4);
   if(GLOWS.length){ g.globalCompositeOperation = 'lighter'; for(const L of GLOWS){ const x = (L.x - camX) * s, y = oy + L.y * s, r = L.r * s; if(r <= 0) continue; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${L.col},${.3 * L.a})`); gr.addColorStop(1, `rgba(${L.col},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); } g.globalCompositeOperation = 'source-over'; }
 }
 /* =====================================================================
@@ -2335,6 +2338,9 @@ const ASSETS = {
   'bg_street_2': 'art/bg_street_2.jpg',
   'bg_street_3': 'art/bg_street_3.jpg',
   'bg_street_4': 'art/bg_street_4.jpg',
+  'l_bg_street_2': 'art/l_bg_street_2.jpg',
+  'l_bg_street_3': 'art/l_bg_street_3.jpg',
+  'l_bg_street_4': 'art/l_bg_street_4.jpg',
   'bg_road_l': 'art/bg_road_l.jpg',
   'bg_road': 'art/bg_road.jpg',
   'bg_field_l': 'art/bg_field_l.jpg',
@@ -2829,14 +2835,28 @@ function drawFog(g, ph, camX, strength = 1, part = 'all'){
   }
   g.globalAlpha = 1;
 }
-function gradeArt(g, ph, nightArt, bright){
+function gradeArt(g, ph, nightArt, bright, indoor){
   const { cw, ch } = VIEW;
   if(bright) return;
-  if(ph === 0){ g.globalCompositeOperation = 'color'; g.fillStyle = 'rgba(170,190,205,.45)'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'screen'; g.fillStyle = 'rgba(120,135,150,.28)'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'source-over'; }
-  if(ph === 1){ g.globalCompositeOperation = 'screen'; g.fillStyle = 'rgba(150,140,110,.3)'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'source-over'; }
-  if(ph === 3 && !nightArt){ g.globalCompositeOperation = 'multiply'; g.fillStyle = 'rgb(62,78,128)'; g.fillRect(0, 0, cw, ch); g.globalCompositeOperation = 'source-over'; }
+  const fill = (op, col) => { g.globalCompositeOperation = op; g.fillStyle = col; g.fillRect(0, 0, cw, ch); };
+  // утро: холодный рассеянный свет, лёгкий туман только на улице
+  if(ph === 0){ fill('color', 'rgba(170,190,205,.4)'); if(!indoor) fill('screen', 'rgba(110,125,140,.14)'); }
+  // полдень: убрать закатную рыжину (картины написаны в золотой час), чуть больше дневного света, без молочной пелены
+  if(ph === 1 && !indoor){ fill('saturation', 'rgba(128,128,128,.22)'); fill('color', 'rgba(200,195,170,.14)'); fill('soft-light', 'rgba(255,250,235,.18)'); }
+  if(ph === 1 && indoor && !nightArt){ fill('soft-light', 'rgba(255,240,215,.12)'); }
+  if(ph === 3 && !nightArt){ fill('multiply', 'rgb(62,78,128)'); }
+  g.globalCompositeOperation = 'source-over';
   const v = g.createRadialGradient(cw / 2, ch * .45, Math.min(cw, ch) * .3, cw / 2, ch * .45, Math.max(cw, ch) * .75);
   v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(8,8,14,${ph === 3 ? .6 : .4})`); g.fillStyle = v; g.fillRect(0, 0, cw, ch);
+}
+/* вечером и ночью окна и огонь в избах светятся: заранее вырезанная из картины карта тёплого света (art/l_*.jpg) */
+function drawArtLights(g, camX, strip, k){
+  const a = STRIP_ART[strip]; if(!a || k <= 0) return;
+  const { s, oy } = VIEW, Ly = layout(strip);
+  g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = k;
+  Ly.segs.forEach((sg, i) => { const im = IMG['l_' + a.parts[i]], x = sg.r0, w = sg.rw; if(!im || x + w < camX - 10 || x > camX + VIEW.viewW + 10) return;
+    g.drawImage(i ? fadedLeft(im, OV / w) : im, (x - camX) * s, oy, w * s + 1, VH * s); });
+  g.restore();
 }
 function drawArtStrip(g, P, camX, strip){
   const { s, oy } = VIEW, Ly = layout(strip);
