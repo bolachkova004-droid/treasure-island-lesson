@@ -177,7 +177,7 @@ bright soft daylight, warm clean colors, calm and cozy, no fog, painterly digita
 **22. `bg_river_night`** — та же река ночью, лунная дорожка на воде, туман.
 
 **23. `bg_city_flat`** — квартира матери в городе (светлый стиль, см. «Исключение» выше).
-> interior side view of a bright modern city apartment, from left to right: a tall wardrobe with an old cardboard parcel tied with string on the top shelf, a big window with soft daylight, a table with cardboard boxes, house plants, light walls, calm and cozy
+> interior side view of a modest Russian city apartment in an old Soviet panel building, late autumn afternoon: a tall old dark polished Soviet wardrobe with a parcel tied with string on top, a patterned wall carpet, a window with lace tulle and a cast-iron radiator, grey panel blocks and yellow birches outside, a small table with cardboard boxes and old books, geranium on the windowsill, parquet floor with a faded rug, soft grey-golden daylight
 
 ---
 
