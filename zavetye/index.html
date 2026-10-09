@@ -97,16 +97,16 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .hint.off{opacity:0;pointer-events:none}
 
 /* ---------- диалог ---------- */
-.dlg{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;transform:translateX(-50%);width:min(900px,calc(100% - 24px));max-height:min(56vh,540px);display:flex;flex-direction:column;
+.dlg{position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;transform:translateX(-50%);width:min(760px,calc(100% - 24px));max-height:min(40vh,400px);display:flex;flex-direction:column;
   background:linear-gradient(180deg,rgba(18,16,20,.88),rgba(10,10,13,.94));border:1px solid var(--line);box-shadow:0 20px 60px rgba(0,0,0,.6);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);animation:rise .35s ease-out}
 @keyframes rise{from{opacity:0;transform:translate(-50%,14px)}}
 .dlg::before{content:"";display:block;height:8px;margin:0 24px;background:var(--stitch) repeat-x 0 50%/16px 8px;opacity:.8}
 .dlg-head{display:flex;align-items:baseline;gap:12px;padding:10px 26px 0}
-.dlg-who{flex:1;min-width:0;font:italic 600 21px/1.15 var(--display);color:var(--gold);letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlg-who{flex:1;min-width:0;font:italic 600 19px/1.15 var(--display);color:var(--gold);letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dlg-pg{margin-left:auto;font:700 12px var(--sc);letter-spacing:.14em;color:var(--dim)}
-.dlg-body{overflow:auto;padding:6px 26px 14px;cursor:pointer}
-.dlg-text p{margin:0 0 .55em;font-size:19.5px;line-height:1.55;color:var(--text);animation:fin .45s ease-out}
-.dlg-text > p:first-child:not(.dl)::first-letter{float:left;margin:6px 8px 0 0;font:500 3.2em/.75 var(--display);color:var(--cin-2)}
+.dlg-body{overflow:auto;padding:4px 26px 10px;cursor:pointer;flex:1 1 auto;min-height:3.2em}
+.dlg-text p{margin:0 0 .45em;font-size:17.5px;line-height:1.5;color:var(--text);animation:fin .45s ease-out}
+.dlg-text > p:first-child:not(.dl)::first-letter{float:left;margin:6px 8px 0 0;font:500 2.6em/.75 var(--display);color:var(--cin-2)}
 @keyframes fin{from{opacity:0;transform:translateY(4px)}}
 .dlg-text p.dl{padding-left:14px;border-left:2px solid rgba(179,54,42,.8)}
 .dlg-text ul{margin:0 0 .6em;padding-left:1.3em;font-size:18px}
@@ -126,8 +126,8 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
 .note .trb,.nb .trb{color:var(--soft)}
 .more{align-self:flex-end;margin:0 22px 10px 0;font:700 12px var(--sc);letter-spacing:.16em;color:var(--gold);animation:blink 1.6s ease-in-out infinite}
 @keyframes blink{50%{opacity:.35}}
-.dlg-ch{display:flex;flex-direction:column;gap:6px;padding:0 18px 16px}
-.ch{display:flex;align-items:baseline;gap:12px;width:100%;text-align:left;padding:10px 14px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text);font-size:17.5px;line-height:1.35;animation:fin .35s ease-out both;transition:background .2s,border-color .2s}
+.dlg-ch{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:5px;padding:2px 18px 12px;overflow:auto;min-height:0;flex:0 1 auto}
+.ch{display:flex;align-items:baseline;gap:12px;width:100%;text-align:left;padding:7px 12px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:var(--text);font-size:16px;line-height:1.3;animation:fin .35s ease-out both;transition:background .2s,border-color .2s}
 .ch:hover,.ch:focus-visible{border-color:var(--cin-2);background:rgba(179,54,42,.2);outline:none}
 .ch .n{flex:none;display:inline-grid;place-items:center;width:20px;height:20px;border:1px solid var(--line-2);transform:rotate(45deg);font:700 11px var(--body);color:var(--dim)}
 .ch .n b{transform:rotate(-45deg)}
@@ -268,12 +268,14 @@ button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:tra
   .goal{font-size:14px;max-width:calc(100vw - 180px)}
   .hb .lbl{display:none}
   .hb{padding:0;width:40px;justify-content:center}
-  .dlg-text p{font-size:17.5px}
-  .dlg-who{font-size:18px}
+  .dlg-text p{font-size:16px}
+  .dlg{max-height:46vh}
+  .dlg-ch{grid-template-columns:1fr;padding:2px 12px 10px}
+  .dlg-who{font-size:16.5px}
   .dlg-head{padding:8px 18px 0}.dlg-body{padding:6px 18px 12px}
-  .toast{top:auto;bottom:calc(min(56vh,540px) + 30px + env(safe-area-inset-bottom,0px));font-size:14.5px}
-  .ch{font-size:16.5px;padding:9px 12px}
-  .portrait{height:56vh;left:0}.portrait.right{right:0}
+  .toast{top:auto;bottom:calc(46vh + 30px + env(safe-area-inset-bottom,0px));font-size:14.5px}
+  .ch{font-size:15px;padding:6px 10px}
+  .portrait{height:44vh;left:0}.portrait.right{right:0}
   .portrait.on.listen{opacity:0}
   .nb{grid-template-columns:1fr;grid-template-rows:auto 1fr;background-image:linear-gradient(90deg,transparent 40px,rgba(179,54,42,.5) 40px,rgba(179,54,42,.5) 42px,transparent 42px),linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px)}
   .nb::before{width:100%;height:100px;bottom:auto}
@@ -2301,7 +2303,7 @@ function drawArtFrame(v, camX, anna, P, ph){
     // 1) яркость как у фона вокруг (герой не светится ярче сцены), 2) немного цвета самой сцены
     const SC = SCENE_LIGHT, f = SC.f;
     if(f < .99){ L.globalCompositeOperation = 'multiply'; const q = Math.round(255 * f); L.fillStyle = `rgb(${q},${q},${q})`; L.fillRect(X0, Y0, BW, BH); }
-    L.globalCompositeOperation = 'color'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.16)`; L.fillRect(X0, Y0, BW, BH);
+    L.globalCompositeOperation = 'color'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.22)`; L.fillRect(X0, Y0, BW, BH);
     L.globalCompositeOperation = 'soft-light'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.3)`; L.fillRect(X0, Y0, BW, BH);
     if(a.bright && anna){ // светлая квартира: свет из окна справа — чуть больше контраста, тёплый тон, теневая сторона слева
       L.globalCompositeOperation = 'overlay'; L.globalAlpha = .3; L.drawImage(mk, X0, Y0, BW, BH, X0, Y0, BW, BH); L.globalAlpha = 1;
@@ -2309,10 +2311,18 @@ function drawArtFrame(v, camX, anna, P, ph){
       const ax = (rx(anna.x) - camX) * s, hw = 46 * k * s, gr = L.createLinearGradient(ax - hw, 0, ax + hw, 0);
       gr.addColorStop(0, 'rgba(70,50,40,.55)'); gr.addColorStop(.6, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
       L.fillStyle = gr; L.fillRect(X0, Y0, BW, BH); }
-    if(!strip.indoor && !a.bright){ L.globalCompositeOperation = 'source-over'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.13)`; L.fillRect(X0, Y0, BW, BH); } // воздух между зрителем и героем
+    if(!strip.indoor && !a.bright){ L.globalCompositeOperation = 'source-over'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.18)`; L.fillRect(X0, Y0, BW, BH); } // воздух между зрителем и героем
+    if(anna && !window.NODIR){ // свет сцены сбоку: со стороны печи/окна/заката — тёплый отсвет, с другой — тень
+      const sd = SC.side, D = sd.lR - sd.lL, st2 = Math.min(1, Math.abs(D) * 4), lit = D > 0 ? 1 : -1;
+      if(st2 > .05){ const ax = (rx(anna.x) - camX) * s, hw = 34 * k * s, c = lit > 0 ? sd.cR : sd.cL, m = Math.max(...c, 1), lc2 = c.map(v => Math.round(v / m * 255)).join(',');
+        const gr = L.createLinearGradient(ax - 3 * hw * lit, 0, ax + 3 * hw * lit, 0); // 0 — тёмная сторона, 1 — светлая
+        gr.addColorStop(0, 'rgba(40,36,40,0)'); gr.addColorStop(.3, `rgba(40,36,40,${.45 * st2})`); gr.addColorStop(.5, 'rgba(128,128,128,0)');
+        gr.addColorStop(.62, `rgba(${lc2},${.3 * st2})`); gr.addColorStop(.72, `rgba(${lc2},${.45 * st2})`); gr.addColorStop(1, `rgba(${lc2},0)`);
+        L.globalCompositeOperation = 'soft-light'; L.fillStyle = gr; L.fillRect(X0, Y0, BW, BH); } }
     L.globalCompositeOperation = 'destination-in'; L.drawImage(mk, X0, Y0, BW, BH, X0, Y0, BW, BH);
+    if(!LOWQ.on) lightWrap(L, g.canvas, lc, X0, Y0, BW, BH, s);
     if(tint[1]){ L.globalCompositeOperation = 'source-atop'; const gr = L.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, tint[1]); gr.addColorStop(1, 'rgba(0,0,0,0)'); L.fillStyle = gr; L.fillRect(X0, Y0, BW, BH); }
-    if(tint[2] && !LOWQ.on){ // контровой свет: светлая кромка с той стороны, откуда падает свет
+    if(tint[2] && !LOWQ.on && window.RIM){ // контровой свет: светлая кромка с той стороны, откуда падает свет
       const [col, side] = tint[2], rim = rimLayer(cw, ch), Rm = rim.getContext('2d'), dx = -side * Math.max(1, 1.5 * s);
       Rm.globalCompositeOperation = 'copy'; Rm.drawImage(lc, X0, Y0, BW, BH, X0, Y0, BW, BH);
       Rm.globalCompositeOperation = 'source-in'; Rm.fillStyle = col; Rm.fillRect(X0, Y0, BW, BH);
@@ -2773,7 +2783,7 @@ function drawFx(g, air = false){
 const LOWQ = { on:false, off:false, acc:0, n:0 };
 function qualityTick(dt){ if(dt <= 0 || dt > .25) return; LOWQ.acc += dt; LOWQ.n++; if(LOWQ.n < 90) return; const avg = LOWQ.acc / LOWQ.n; LOWQ.acc = 0; LOWQ.n = 0;
   if(avg > 1 / 38){ if(!LOWQ.on) LOWQ.on = true; else LOWQ.off = true; } }
-const SCENE_LIGHT = { f:1, r:128, g:128, b:128, key:null, n:0, la:0 };
+const SCENE_LIGHT = { f:1, r:128, g:128, b:128, key:null, n:0, la:0, side:{ lL:0, lR:0, cL:[255,255,255], cR:[255,255,255] } };
 function spriteLum(){
   if(SCENE_LIGHT.la) return SCENE_LIGHT.la; const im = IMG.s_anna; if(!im) return .3;
   const c = document.createElement('canvas'); c.width = 40; c.height = 150; const x = c.getContext('2d', { willReadFrequently:true }); x.drawImage(im, 0, 0, 40, 150);
@@ -2783,13 +2793,20 @@ function spriteLum(){
 function sampleScene(g, ax, top, h, key){
   const SL = SCENE_LIGHT; SL.n++;
   if(SL.key === key && SL.n % 12) return;
-  try{
-    const w = Math.max(8, h * 1.6), x0 = Math.max(0, ax - w / 2), y0 = Math.max(0, top), hh = Math.max(8, h);
-    const d = g.getImageData(x0 | 0, y0 | 0, Math.max(1, w | 0), Math.max(1, hh | 0)).data;
-    let r = 0, gg = 0, b = 0, n = 0; for(let i = 0; i < d.length; i += 16){ r += d[i]; gg += d[i + 1]; b += d[i + 2]; n++; }
+  try{ // одно чтение пикселей: середина — яркость и цвет вокруг героини, края — откуда свет (печь или окно могут быть поодаль)
+    const W2 = Math.max(16, h * 1.5), x0 = Math.max(0, ax - W2) | 0, y0 = Math.max(0, top) | 0, sw = Math.max(2, Math.min(g.canvas.width - x0, 2 * W2) | 0), hh = Math.max(8, h) | 0;
+    const d = g.getImageData(x0, y0, sw, hh).data, side = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]];
+    let r = 0, gg = 0, b = 0, n = 0;
+    for(let i = 0; i < d.length; i += 16){ const dx = x0 + (i >> 2) % sw - ax, l = (.3 * d[i] + .59 * d[i + 1] + .11 * d[i + 2]) / 255;
+      if(Math.abs(dx) < h * .8){ r += d[i]; gg += d[i + 1]; b += d[i + 2]; n++; }
+      if(Math.abs(dx) > h * .18){ const S2 = side[dx < 0 ? 0 : 1], wt = l * l * l; S2[0] += d[i] * wt; S2[1] += d[i + 1] * wt; S2[2] += d[i + 2] * wt; S2[3] += wt; S2[4] += l * l; S2[5]++; } }
+    if(!n) return;
     r /= n; gg /= n; b /= n; const Lb = (.3 * r + .59 * gg + .11 * b) / 255, La = spriteLum();
     const tf = Math.max(.45, Math.min(1, (Lb * 1.3 + .05) / La)), first = SL.key !== key;
     const a = first ? 1 : .35; SL.f += (tf - SL.f) * a; SL.r += (r - SL.r) * a; SL.g += (gg - SL.g) * a; SL.b += (b - SL.b) * a; SL.key = key;
+    const sd = SL.side;
+    [['L', side[0]], ['R', side[1]]].forEach(([k, S2]) => { const lv = S2[5] ? Math.sqrt(S2[4] / S2[5]) : 0, c = S2[3] ? [S2[0] / S2[3], S2[1] / S2[3], S2[2] / S2[3]] : [255, 255, 255];
+      sd['l' + k] += (lv - sd['l' + k]) * a; sd['c' + k] = sd['c' + k].map((v, j) => v + (c[j] - v) * a); });
   }catch(e){}
 }
 /* камера не заезжает на дорисованные по краям полосы, если экран позволяет */
@@ -2804,6 +2821,21 @@ let _cl = null;
 let _rl = null, _ml = null;
 function maskLayer(w, h){ if(!_ml) _ml = document.createElement('canvas'); if(_ml.width !== w || _ml.height !== h){ _ml.width = w; _ml.height = h; } return _ml; }
 function rimLayer(w, h){ if(!_rl) _rl = document.createElement('canvas'); if(_rl.width !== w || _rl.height !== h){ _rl.width = w; _rl.height = h; } return _rl; }
+/* «обволакивающий свет»: по краю фигуры проступают размытые краски фона — фигура не вырезана, а стоит в сцене */
+let _ws = null, _we = null;
+function lightWrap(L, bg, lc, X0, Y0, BW, BH, s){ // считается в половинном размере: край и так мягкий, а кадр дешевле
+  const k = 8, sw = Math.max(1, Math.ceil(BW / k)), sh = Math.max(1, Math.ceil(BH / k)), hw = Math.max(1, BW >> 1), hh = Math.max(1, BH >> 1);
+  if(!_ws){ _ws = document.createElement('canvas'); _we = document.createElement('canvas'); }
+  if(_ws.width !== sw || _ws.height !== sh){ _ws.width = sw; _ws.height = sh; }
+  if(_we.width !== hw || _we.height !== hh){ _we.width = hw; _we.height = hh; }
+  const S = _ws.getContext('2d'), E = _we.getContext('2d');
+  S.drawImage(bg, X0, Y0, BW, BH, 0, 0, sw, sh);                                   // фон вокруг, уменьшенный = размытый
+  E.globalCompositeOperation = 'copy'; E.drawImage(lc, X0, Y0, BW, BH, 0, 0, hw, hh);
+  E.globalCompositeOperation = 'destination-out'; const d = Math.max(.7, .65 * s);
+  for(const [dx, dy] of [[d, 0], [-d, 0], [0, -d]]) E.drawImage(lc, X0, Y0, BW, BH, dx, dy, hw, hh);
+  E.globalCompositeOperation = 'source-in'; E.drawImage(_ws, 0, 0, sw, sh, 0, 0, hw, hh);
+  L.save(); L.globalCompositeOperation = 'source-atop'; L.globalAlpha = .35; L.drawImage(_we, 0, 0, hw, hh, X0, Y0, BW, BH); L.restore();
+}
 function charLayer(w, h){ if(!_cl) _cl = document.createElement('canvas'); if(_cl.width !== w || _cl.height !== h){ _cl.width = w; _cl.height = h; } return _cl; }
 function charTint(strip, ph){ if(window.NOTINT) return null;
   // [тон сцены (мягкий свет, плотный цвет), отсвет сверху, контровой свет [цвет, сторона]]
