@@ -2302,7 +2302,12 @@ function drawArtFrame(v, camX, anna, P, ph){
     if(f < .99){ L.globalCompositeOperation = 'multiply'; const q = Math.round(255 * f); L.fillStyle = `rgb(${q},${q},${q})`; L.fillRect(X0, Y0, BW, BH); }
     L.globalCompositeOperation = 'color'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.16)`; L.fillRect(X0, Y0, BW, BH);
     L.globalCompositeOperation = 'soft-light'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.3)`; L.fillRect(X0, Y0, BW, BH);
-    if(a.bright){ L.globalCompositeOperation = 'soft-light'; L.fillStyle = 'rgba(255,205,150,.5)'; L.fillRect(X0, Y0, BW, BH); } // солнечная комната: тёплый свет из окна на одежде
+    if(a.bright && anna){ // светлая квартира: свет из окна справа — чуть больше контраста, тёплый тон, теневая сторона слева
+      L.globalCompositeOperation = 'overlay'; L.globalAlpha = .3; L.drawImage(mk, X0, Y0, BW, BH, X0, Y0, BW, BH); L.globalAlpha = 1;
+      L.globalCompositeOperation = 'multiply'; L.fillStyle = 'rgb(232,208,180)'; L.fillRect(X0, Y0, BW, BH);
+      const ax = (rx(anna.x) - camX) * s, hw = 46 * k * s, gr = L.createLinearGradient(ax - hw, 0, ax + hw, 0);
+      gr.addColorStop(0, 'rgba(70,50,40,.55)'); gr.addColorStop(.6, 'rgba(255,255,255,0)'); gr.addColorStop(1, 'rgba(255,255,255,0)');
+      L.fillStyle = gr; L.fillRect(X0, Y0, BW, BH); }
     if(!strip.indoor && !a.bright){ L.globalCompositeOperation = 'source-over'; L.fillStyle = `rgba(${SC.r},${SC.g},${SC.b},.13)`; L.fillRect(X0, Y0, BW, BH); } // воздух между зрителем и героем
     L.globalCompositeOperation = 'destination-in'; L.drawImage(mk, X0, Y0, BW, BH, X0, Y0, BW, BH);
     if(tint[1]){ L.globalCompositeOperation = 'source-atop'; const gr = L.createLinearGradient(0, oy, 0, oy + VH * s); gr.addColorStop(0, tint[1]); gr.addColorStop(1, 'rgba(0,0,0,0)'); L.fillStyle = gr; L.fillRect(X0, Y0, BW, BH); }
