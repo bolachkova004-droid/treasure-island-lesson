@@ -427,19 +427,22 @@ function drawFog(g, ph, camX, strength = 1, part = 'all'){
   }
   g.globalAlpha = 1;
 }
-function gradeArt(g, ph, nightArt, bright, indoor){
+/* единая система света: утро — холодное; день — холодный серый; вечер — охра и холодные тени;
+   ночь — серо-синяя, но не провал в чёрный. В дождь всё ещё серее и обычнее. */
+function gradeArt(g, ph, nightArt, bright, indoor, wx){
   const { cw, ch } = VIEW;
   if(bright) return;
   const fill = (op, col) => { g.globalCompositeOperation = op; g.fillStyle = col; g.fillRect(0, 0, cw, ch); };
-  // утро: холодный рассеянный свет, лёгкий туман только на улице
+  const wet = wx ? Math.max(wx.rain, wx.grey || 0) : 0;
   if(ph === 0){ fill('color', 'rgba(170,190,205,.4)'); if(!indoor) fill('screen', 'rgba(110,125,140,.14)'); }
-  // полдень: убрать закатную рыжину (картины написаны в золотой час), чуть больше дневного света, без молочной пелены
-  if(ph === 1 && !indoor){ fill('saturation', 'rgba(128,128,128,.22)'); fill('color', 'rgba(200,195,170,.14)'); fill('soft-light', 'rgba(255,250,235,.18)'); }
+  if(ph === 1 && !indoor){ fill('saturation', `rgba(128,128,128,${.3 + wet * .2})`); fill('color', 'rgba(172,182,192,.16)'); fill('soft-light', 'rgba(235,240,245,.14)'); }
   if(ph === 1 && indoor && !nightArt){ fill('soft-light', 'rgba(255,240,215,.12)'); }
-  if(ph === 3 && !nightArt){ fill('multiply', 'rgb(62,78,128)'); }
+  if(ph === 2 && !indoor){ fill('multiply', 'rgb(222,226,238)'); fill('overlay', 'rgba(196,138,62,.16)'); if(wet) fill('saturation', `rgba(128,128,128,${wet * .25})`); }
+  if(ph === 3 && !nightArt){ fill('saturation', 'rgba(128,128,128,.4)'); fill('multiply', indoor ? 'rgb(96,104,136)' : 'rgb(104,116,156)'); fill('screen', 'rgba(26,32,52,.55)'); }
+  if(ph === 0 && wet && !indoor) fill('saturation', `rgba(128,128,128,${wet * .3})`);
   g.globalCompositeOperation = 'source-over';
   const v = g.createRadialGradient(cw / 2, ch * .45, Math.min(cw, ch) * .3, cw / 2, ch * .45, Math.max(cw, ch) * .75);
-  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(8,8,14,${ph === 3 ? .6 : .4})`); g.fillStyle = v; g.fillRect(0, 0, cw, ch);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, `rgba(8,8,14,${ph === 3 ? .5 : .38})`); g.fillStyle = v; g.fillRect(0, 0, cw, ch);
 }
 /* вечером и ночью окна и огонь в избах светятся: заранее вырезанная из картины карта тёплого света (art/l_*.jpg) */
 function drawArtLights(g, camX, strip, k){

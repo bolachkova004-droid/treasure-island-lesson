@@ -1,6 +1,6 @@
 'use strict';
 /* =====================================================================
-   ИГРА — цикл, управление, диалоги, тетрадь, звук
+   ИГРА — цикл, переходы, управление, запуск
    ===================================================================== */
 const ui = { dlg:false, nb:false, title:false, end:false, fading:false, cut:false };
 let breathT = 1.5, camX = 0, walkPh = 0, moving = false, target = null, targetHot = null, curHot = null, curChoices = [], DLG = null, saveT = 0, lastStep = 0;
@@ -16,7 +16,7 @@ function teleport(dest, then){
     st.strip = strip; st.x = x; st.dir = x > STRIPS[strip].w / 2 ? -1 : 1; target = null; targetHot = null;
     snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = ANNA_ANIM.dirPrev = st.dir; ANNA_ANIM.th = ANNA_ANIM.thTo = st.dir > 0 ? 0 : Math.PI; ANNA_ANIM.look = ANNA_ANIM.idle = 0;
     $('fade').classList.remove('on');
-    setTimeout(() => { ui.fading = false; if(changed) showArea(); save(); if(then) then(); }, 300);
+    setTimeout(() => { ui.fading = false; if(changed) showArea(); saveMark(); if(st.strip === 'village' && F('arrived')) trackOnce('reached_zavetye'); if(then) then(); }, 300);
     preloadNear(strip);
   });
 }
@@ -24,16 +24,11 @@ function teleport(dest, then){
 const NEAR = { flat:['road'], road:['village'], village:['aglaya','grunya','laptev','school','river','field'], field:['forestroad','village'], aglaya:['village'], grunya:['village'], laptev:['village'], school:['village'], river:['village'], forestroad:['field'] };
 function preloadNear(strip){ for(const n of NEAR[strip] || []) ensure(STRIP_KEYS(n), 0); }
 function snapCam(){ const W = RW(st.strip), ax = R(st.strip, st.x), vw = VIEW.viewW; camX = camClamp(st.strip, ax - vw / 2, vw); }
-let areaT = null;
-function showArea(){
-  const s = STRIPS[st.strip]; $('areaName').textContent = s.name; $('areaSub').textContent = s.sub || `${dayName(st.day)} · ${PHASES[st.phase]}`;
-  $('area').classList.add('on'); clearTimeout(areaT); areaT = setTimeout(() => $('area').classList.remove('on'), 2400);
-}
-
 /* ---------- взаимодействие ---------- */
 function interact(h){
   if(!h) return; target = null; targetHot = null;
   const r = h.act(); if(!r) return;
+  trackOnce('first_interaction'); hideHint();
   if(typeof r === 'object'){ if(r.cost){ pass(r.cost); updateHud(); } openScene(r.scene); }
   else openScene(r);
 }
@@ -71,7 +66,7 @@ function update(dt){
       const sp = (keys.run ? 330 : 190) * dt * (.3 + .7 * Math.abs(ANNA_ANIM.face)) * stripPace(); st.x += d * sp; st.dir = d; moving = true; walkPh += dt * (keys.run ? 19 : 13.5);
       const plant = Math.floor((walkPh - Math.PI / 2) / Math.PI);   // момент, когда пятка встаёт на землю
       if(plant !== lastStep){ lastStep = plant; const surf = surfaceAt(st.strip, st.x + st.dir * 14); stepSound(surf, keys.run); footFx(st.strip, st.x + st.dir * 14, surf, keys.run); }
-      hideHint();
+      if(st.tut.move && !st.tut.act) hideHint();
     }
     const minX = S0.minX || 30, maxX = S0.maxX || S0.w - 30;
     if(S0.exits && S0.exits.left && st.x < 26) return teleport(S0.exits.left);
@@ -103,7 +98,8 @@ function update(dt){
   tickParticles(dt, st, camX, vw);
   curHot = blocked() ? null : nearestHot();
   const pr = $('prompt');
-  if(curHot){ pr.hidden = false; $('promptTx').textContent = `${curHot.verb} · ${curHot.label}`;
+  tutTick();
+  if(curHot){ pr.hidden = false; $('promptTx').textContent = curHot.ph;
     const sx = (R(st.strip, curHot.x) - camX) * VIEW.s / VIEW.dpr, sy = (VIEW.oy + (GY - 124 * charK(st.strip) - (curHot.npc ? 40 : 18)) * VIEW.s) / VIEW.dpr; // над головой, не на лице
     pr.style.left = Math.max(90, Math.min(innerWidth - 90, sx)) + 'px'; pr.style.top = Math.max(80, sy) + 'px'; }
   else pr.hidden = true;
@@ -113,10 +109,11 @@ function update(dt){
 const KMAP = { ArrowLeft:'left', KeyA:'left', ArrowRight:'right', KeyD:'right', ShiftLeft:'run', ShiftRight:'run' };
 addEventListener('keydown', e => {
   if(e.target.closest && e.target.closest('input,textarea')) return;
+  if(!$('confirm').hidden){ if(e.code === 'Escape') $('cfNo').click(); return; }
   if(KMAP[e.code]){ keys[KMAP[e.code]] = true; if(!ui.dlg && !ui.nb) e.preventDefault(); }
-  if(e.code === 'Escape'){ if(ui.nb) closeBook(); $('menu').hidden = true; return; }
-  if(e.code === 'Tab' || e.code === 'KeyN'){ if(st && !ui.title && !ui.end){ e.preventDefault(); ui.nb ? closeBook() : openBook(); } return; }
-  if(ui.nb || ui.title || ui.end) return;
+  if(e.code === 'Escape'){ if(!$('menu').hidden) closeMenu(); else if(ui.nb) closeBook(); else if(st && !ui.title && !ui.end) openMenu(); return; }
+  if(e.code === 'Tab' || e.code === 'KeyN'){ if(st && !ui.title && !ui.end){ e.preventDefault(); closeMenu(); ui.nb ? closeBook() : openBook(); } return; }
+  if(ui.nb || ui.title || ui.end || !$('menu').hidden) return;
   if(ui.dlg){
     if(/^Digit[1-9]$/.test(e.code)){ choose(+e.code.slice(5) - 1); e.preventDefault(); return; }
     if(['Space','Enter','KeyE'].includes(e.code)){ if(document.activeElement && document.activeElement.classList.contains('ch') && DLG && DLG.i >= st.view.pages.length - 1) return; e.preventDefault(); advance(); }
@@ -126,20 +123,43 @@ addEventListener('keydown', e => {
 });
 addEventListener('keyup', e => { if(KMAP[e.code]) keys[KMAP[e.code]] = false; });
 addEventListener('blur', () => { for(const k in keys) keys[k] = false; });
+function hotAt(e){
+  const wx = Lg(st.strip, camX + e.clientX * VIEW.dpr / VIEW.s), wy = (e.clientY * VIEW.dpr - VIEW.oy) / VIEW.s;
+  let hit = null, bd = 1e9; for(const h of hotsFor()){ const d = Math.abs(h.x - wx); if(d < 80 && d < bd && wy > GY - 330 && wy < GY + 60){ hit = h; bd = d; } }
+  return { hit, wx };
+}
 cv.addEventListener('pointerdown', e => {
   audioInit();
   if(ui.dlg){ advance(); return; }
+  if(!$('menu').hidden){ closeMenu(); return; }
   if(blocked() || !st) return;
-  const wx = Lg(st.strip, camX + e.clientX * VIEW.dpr / VIEW.s), wy = (e.clientY * VIEW.dpr - VIEW.oy) / VIEW.s;
-  let hit = null, bd = 1e9; for(const h of hotsFor()){ const d = Math.abs(h.x - wx); if(d < 80 && d < bd && wy > GY - 330){ hit = h; bd = d; } }
+  const { hit, wx } = hotAt(e);
   if(hit){ if(Math.abs(hit.x - st.x) < 60) interact(hit); else { target = hit.x - Math.sign(hit.x - st.x) * 30; targetHot = hit; } }
   else { target = Math.max(10, Math.min(STRIPS[st.strip].w - 10, wx)); targetHot = null; }
-  hideHint();
 });
+/* обычный курсор в мире; над тем, с чем можно что-то сделать, — ромб */
+cv.addEventListener('pointermove', e => { if(e.pointerType !== 'mouse' || !st || blocked()){ cv.classList.remove('hot'); return; } cv.classList.toggle('hot', !!hotAt(e).hit); });
 $('prompt').onclick = () => { audioInit(); if(curHot) interact(curHot); };
 $('dlgBody').onclick = () => advance();
 $('dlgMore').onclick = () => advance();
+$('dlgReply').onclick = () => $('dlg').classList.add('chsheet');
 $('dlgCh').onclick = e => { const b = e.target.closest('.ch'); if(b) choose(+b.dataset.i); };
+$('bBook').onclick = () => { closeMenu(); ui.nb ? closeBook() : openBook(); };
+$('bMenu').onclick = e => { e.stopPropagation(); $('menu').hidden ? openMenu() : closeMenu(); };
+$('when').onclick = () => showThought(0);
+document.addEventListener('click', e => {
+  const t = e.target;
+  const mm = t.closest('[data-m]');
+  if(mm){ const m = mm.dataset.m;
+    if(m === 'funnel'){ showFunnel(); return; }
+    closeMenu();
+    if(m === 'title'){ save(); showTitle(); }
+    if(m === 'restart') askConfirm('Начать заново?', 'Текущее сохранение будет удалено: улики, версия и всё, что изменилось в Заветье.', restartGame);
+    return; }
+  const sd = t.closest('[data-sd]'); if(sd && st){ setDiff(sd.dataset.sd); renderMenu(); return; }
+  const sz = t.closest('[data-size]'); if(sz){ SET.size = sz.dataset.size; saveSet(); applySize(); renderMenu(); if(ui.nb) renderBook(); return; }
+  if(!t.closest('#menu') && !t.closest('#bMenu') && !$('menu').hidden) closeMenu();
+});
 
 /* ---------- запуск ---------- */
 function boot(data){

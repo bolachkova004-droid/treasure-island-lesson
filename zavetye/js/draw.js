@@ -169,6 +169,34 @@ DRAW.flat = g => {
 
 /* ---------- частицы ---------- */
 const PARTS = [];
+/* ---------- погода — по сюжету, а не случайно ----------
+   rain — дождь 0..1, fog — сколько тумана, grey — серый «обычный» день, wet — мокро после дождя */
+const WEATHER = {
+  0:[ {}, {}, { rain:.35, grey:.5 }, { wet:1, fog:1.1 } ],                       // пролог: морось на дороге
+  1:[ { fog:1.25 }, { grey:.3 }, { rain:.3, grey:.4 }, { wet:1 } ],              // среда: холодное туманное утро, вечером морось
+  2:[ { rain:.25, grey:.6 }, { grey:.6 }, { rain:.7, grey:.6 }, { wet:1, fog:1.2 } ],   // четверг: серый, вечером дождь, ночь после дождя
+  3:[ { fog:1.4 }, { fog:1.15, grey:.4 }, { rain:.3, grey:.4 }, { rain:.5 } ],   // пятница: туман
+  4:[ { fog:1.5 }, { fog:1.15 }, { rain:.6, grey:.5 }, { wet:1 } ],               // суббота: в 6:40 туман стоит стеной
+  5:[ { fog:1.1 }, {}, {}, {} ],
+};
+function weatherOf(v){
+  const S0 = STRIPS[v.strip]; if(!S0 || S0.frozen || v.strip === 'flat') return { rain:0, fog:1, grey:0, wet:0 };
+  let w = Object.assign({ rain:0, fog:1, grey:0, wet:0 }, (WEATHER[v.day] || WEATHER[5])[v.phase] || {});
+  if(v.outcome === 'truth' && v.day >= 4) w = { rain:0, fog:.8, grey:0, wet:w.wet };        // после правды — ясно
+  if(['convenient','erase'].includes(v.outcome)) w = { rain:0, fog:1.35, grey:.6, wet:0 };     // удобная ложь — мёртвый штиль и туман
+  return w;
+}
+let WX = { rain:0, fog:1, grey:0, wet:0 };
+const RAIN = [];
+function drawRain(g, k, dt){
+  const { cw, ch } = VIEW, n = Math.round(220 * k * Math.min(1.5, cw / 1400));
+  while(RAIN.length < n) RAIN.push({ x:Math.random() * cw, y:Math.random() * ch, l:10 + Math.random() * 16, v:900 + Math.random() * 500 });
+  RAIN.length = Math.min(RAIN.length, n);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.strokeStyle = 'rgba(210,218,228,.28)'; g.lineWidth = Math.max(1, VIEW.dpr * .8); g.beginPath();
+  for(const r of RAIN){ r.y += r.v * dt; r.x -= r.v * dt * .18; if(r.y > ch){ r.y = -r.l; r.x = Math.random() * (cw + 200); } g.moveTo(r.x, r.y); g.lineTo(r.x + r.l * .18 * VIEW.dpr, r.y - r.l * VIEW.dpr); }
+  g.stroke(); g.restore();
+}
+let lastDraw = 0;
 function tickParticles(dt, v, camX, viewW){
   const indoor = STRIPS[v.strip].indoor;
   while(PARTS.length < 34) PARTS.push({ x: camX + Math.random() * viewW, y: 120 + Math.random() * 300, vx: (Math.random() - .5) * 8, vy: (Math.random() - .5) * 4, t: Math.random() * 10 });
@@ -261,7 +289,8 @@ function drawArtFrame(v, camX, anna, P, ph){
   g.setTransform(1, 0, 0, 1, 0, 0); g.fillStyle = '#0b0b0e'; g.fillRect(0, 0, cw, ch);
   drawArtStrip(g, P, camX, v.strip);
   if(oy + VH * s < ch){ g.fillStyle = '#101014'; g.fillRect(0, oy + VH * s - 1, cw, ch); }
-  const fogK = strip.indoor ? .12 : ph === 0 ? .55 : .9;
+  WX = weatherOf(v);
+  const fogK = (strip.indoor ? .12 : ph === 0 ? .55 : .9) * (strip.indoor ? 1 : WX.fog);
   // дальний туман — за героями, ближний — полупрозрачно поверх, чтобы фигуры не тонули
   if(!a.bright){ g.setTransform(1, 0, 0, 1, 0, 0); drawFog(g, ph, camX, fogK, 'back'); }
   g.setTransform(s, 0, 0, s, -camX * s, oy);
@@ -335,13 +364,14 @@ function drawArtFrame(v, camX, anna, P, ph){
       L.globalCompositeOperation = 'source-atop'; L.drawImage(rim, X0, Y0, BW, BH, X0, Y0, BW, BH); }
     L.globalCompositeOperation = 'source-over'; g.setTransform(1, 0, 0, 1, 0, 0); g.drawImage(lc, X0, Y0, BW, BH, X0, Y0, BW, BH);
     if(!LOWQ.on && ['village', 'road', 'forestroad', 'river'].includes(v.strip)){ // отражение в мокрой земле и лужах
-      const yG = oy + GY * s + 2, h = Math.min(BH, Math.max(0, yG - Y0)); if(h > 0){ g.save(); g.globalAlpha = .12; g.translate(0, 2 * yG); g.scale(1, -1); g.drawImage(lc, X0, yG - h, BW, h, X0, yG - h, BW, h); g.restore(); } }
+      const yG = oy + GY * s + 2, h = Math.min(BH, Math.max(0, yG - Y0)); if(h > 0){ g.save(); g.globalAlpha = WX.wet || WX.rain ? .2 : .12; g.translate(0, 2 * yG); g.scale(1, -1); g.drawImage(lc, X0, yG - h, BW, h, X0, yG - h, BW, h); g.restore(); } }
     g.setTransform(s, 0, 0, s, -camX * s, oy); }
   else drawChars(g);
   drawParticles(g, v);
   g.setTransform(1, 0, 0, 1, 0, 0);
   if(!a.bright) drawFog(g, ph, camX, fogK * .45, 'front');
-  gradeArt(g, ph, P.nightArt, a.bright, strip.indoor);
+  { const now = performance.now(), dt = Math.min(.05, (now - (lastDraw || now)) / 1000); lastDraw = now; if(WX.rain && !strip.indoor) drawRain(g, WX.rain, dt); }
+  gradeArt(g, ph, P.nightArt, a.bright, strip.indoor, WX);
   if(ph >= 2 && !P.nightArt) drawArtLights(g, camX, v.strip, ph === 3 ? .95 : .4);
   if(GLOWS.length){ g.globalCompositeOperation = 'lighter'; for(const L of GLOWS){ const x = (L.x - camX) * s, y = oy + L.y * s, r = L.r * s; if(r <= 0) continue; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${L.col},${.3 * L.a})`); gr.addColorStop(1, `rgba(${L.col},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); } g.globalCompositeOperation = 'source-over'; }
 }

@@ -1,25 +1,31 @@
 'use strict';
-/* ---------- звук: ветер, сверчки, печь, шаги, колыбельная ---------- */
-const AU = { ctx:null, muted:false };
-try{ AU.muted = localStorage.getItem('zavetye.mute') === '1'; }catch(e){}
+/* ---------- звук: три канала со своей громкостью ----------
+   Музыка — колыбельная, гусли, гул остановки. Атмосфера — ветер, вода, птицы, дождь.
+   Эффекты — шаги, двери, страницы, мотор. Громкость — из меню (SET). */
+const AU = { ctx:null, muted:false, out:null };
+const volCurve = v => Math.pow(Math.max(0, Math.min(100, v)) / 100, 1.6);
+function applyVolumes(){ if(!AU.ctx) return; const t = AU.ctx.currentTime; AU.music.gain.setTargetAtTime(volCurve(SET.music), t, .05); AU.amb.gain.setTargetAtTime(volCurve(SET.amb), t, .05); AU.fx.gain.setTargetAtTime(volCurve(SET.fx), t, .05); }
+/* звуки, созданные внутри onBus, идут в нужный канал */
+function onBus(bus, fn){ const prev = AU.out; AU.out = bus; try{ fn(); } finally { AU.out = prev; } }
 function audioInit(){
-  if(AU.ctx || AU.muted) return;
+  if(AU.ctx) return;
   try{ AU.ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint:'interactive' }); }catch(e){ return; }
   const c = AU.ctx; AU.master = c.createGain(); AU.master.gain.value = .9; AU.master.connect(c.destination);
+  for(const k of ['music','amb','fx']){ AU[k] = c.createGain(); AU[k].connect(AU.master); } applyVolumes();
   const len = c.sampleRate * 2, buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0); let b = 0; for(let i = 0; i < len; i++){ b = (b + .02 * (Math.random() * 2 - 1)) / 1.02; d[i] = b * 3.5; }
   AU.noise = buf;
-  const mk = (freq, type = 'lowpass') => { const s = c.createBufferSource(); s.buffer = buf; s.loop = true; const f = c.createBiquadFilter(); f.type = type; f.frequency.value = freq; const gn = c.createGain(); gn.gain.value = 0; s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(); return { f, g:gn }; };
+  const mk = (freq, type = 'lowpass') => { const s = c.createBufferSource(); s.buffer = buf; s.loop = true; const f = c.createBiquadFilter(); f.type = type; f.frequency.value = freq; const gn = c.createGain(); gn.gain.value = 0; s.connect(f); f.connect(gn); gn.connect(AU.amb); s.start(); return { f, g:gn }; };
   AU.wind = mk(420); AU.fire = mk(900, 'bandpass'); AU.fire.f.Q.value = .8;
   AU.water = mk(650, 'bandpass'); AU.water.f.Q.value = .6;
+  AU.rain = mk(3200, 'bandpass'); AU.rain.f.Q.value = .35;
   loadStepRecordings(c);
   AU.steps = { mud:[1, 2, 3, 4, 5, 6, 7, 8].map(i => makeStepBuf(c, 'mud', i)), puddle:[11, 12, 13, 14, 15].map(i => makeStepBuf(c, 'puddle', i)) };
   const cityN = mk(160); AU.city = cityN.g;
-  const dr = c.createOscillator(); dr.type = "sine"; dr.frequency.value = 55; AU.drone = c.createGain(); AU.drone.gain.value = 0; dr.connect(AU.drone); AU.drone.connect(AU.master); dr.start();
-  const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 42; const of = c.createBiquadFilter(); of.type = 'lowpass'; of.frequency.value = 180; AU.eng = c.createGain(); AU.eng.gain.value = 0; o.connect(of); of.connect(AU.eng); AU.eng.connect(AU.master); o.start();
-  updateSoundIcon();
+  const dr = c.createOscillator(); dr.type = "sine"; dr.frequency.value = 55; AU.drone = c.createGain(); AU.drone.gain.value = 0; dr.connect(AU.drone); AU.drone.connect(AU.music); dr.start();
+  const o = c.createOscillator(); o.type = 'sawtooth'; o.frequency.value = 42; const of = c.createBiquadFilter(); of.type = 'lowpass'; of.frequency.value = 180; AU.eng = c.createGain(); AU.eng.gain.value = 0; o.connect(of); of.connect(AU.eng); AU.eng.connect(AU.fx); o.start();
 }
-function env(freq, dur, vol, type = 'sine', when = 0){ const c = AU.ctx; if(!c) return; const t = c.currentTime + when, o = c.createOscillator(), gn = c.createGain(); o.type = type; o.frequency.value = freq; gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + .02); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(gn); gn.connect(AU.master); o.start(t); o.stop(t + dur + .05); }
-function burst(dur, vol, freq){ const c = AU.ctx; if(!c) return; const s = c.createBufferSource(); s.buffer = AU.noise; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq; const gn = c.createGain(); const t = c.currentTime; gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(t, Math.random()); s.stop(t + dur); }
+function env(freq, dur, vol, type = 'sine', when = 0){ const c = AU.ctx; if(!c) return; const t = c.currentTime + when, o = c.createOscillator(), gn = c.createGain(); o.type = type; o.frequency.value = freq; gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(vol, t + .02); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(gn); gn.connect(AU.out || AU.amb); o.start(t); o.stop(t + dur + .05); }
+function burst(dur, vol, freq){ const c = AU.ctx; if(!c) return; const s = c.createBufferSource(); s.buffer = AU.noise; const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = freq; const gn = c.createGain(); const t = c.currentTime; gn.gain.setValueAtTime(vol, t); gn.gain.exponentialRampToValueAtTime(.0001, t + dur); s.connect(f); f.connect(gn); gn.connect(AU.out || AU.amb); s.start(t, Math.random()); s.stop(t + dur); }
 /* Шаги по грязи и лужам собираются заранее как звуковые фрагменты.
    Хлюпанье — это лопающиеся пузырьки воды и воздуха под подошвой (затухающий тон с растущей частотой),
    плюс мягкий удар и вязкое продавливание; при отрыве ноги — тихий присос. */
@@ -58,20 +64,20 @@ function loadStepRecordings(c){
     fetch(`sfx/step_${k}_${i}.wav`).then(r => r.ok ? r.arrayBuffer() : Promise.reject()).then(b => new Promise((ok, no) => c.decodeAudioData(b, ok, no)))
       .then(buf => { (AU.rec[k] = AU.rec[k] || []).push(buf); }).catch(() => {});
 }
-function playBuf(buf, vol, rate = 1){ const c = AU.ctx, src = c.createBufferSource(), gn = c.createGain(); src.buffer = buf; src.playbackRate.value = rate; gn.gain.value = vol; src.connect(gn); gn.connect(AU.master); src.start(); }
+function playBuf(buf, vol, rate = 1){ const c = AU.ctx, src = c.createBufferSource(), gn = c.createGain(); src.buffer = buf; src.playbackRate.value = rate; gn.gain.value = vol; src.connect(gn); gn.connect(AU.out || AU.amb); src.start(); }
 /* шум через фильтр со сдвигом частоты: основа для шагов и брызг */
 function nz(o){ const c = AU.ctx; if(!c) return; const t = c.currentTime + (o.when || 0), s = c.createBufferSource(); s.buffer = AU.noise;
   const f = c.createBiquadFilter(); f.type = o.type || 'bandpass'; f.Q.value = o.q || 1; f.frequency.setValueAtTime(o.f0, t); if(o.f1) f.frequency.exponentialRampToValueAtTime(o.f1, t + o.dur);
   const gn = c.createGain(); gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(o.vol, t + (o.att || .006)); gn.gain.exponentialRampToValueAtTime(.0001, t + o.dur);
-  s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(t, Math.random() * 1.5); s.stop(t + o.dur + .05); }
+  s.connect(f); f.connect(gn); gn.connect(AU.out || AU.amb); s.start(t, Math.random() * 1.5); s.stop(t + o.dur + .05); }
 function tone(o){ const c = AU.ctx; if(!c) return; const t = c.currentTime + (o.when || 0), os = c.createOscillator(), gn = c.createGain(); os.type = o.type || 'sine';
   os.frequency.setValueAtTime(o.f0, t); if(o.f1) os.frequency.exponentialRampToValueAtTime(o.f1, t + o.dur);
   gn.gain.setValueAtTime(0, t); gn.gain.linearRampToValueAtTime(o.vol, t + (o.att || .005)); gn.gain.exponentialRampToValueAtTime(.0001, t + o.dur);
   let out = os; if(o.lp){ const f = c.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = o.lp; f.Q.value = o.q || 1; os.connect(f); out = f; }
-  out.connect(gn); gn.connect(AU.master); os.start(t); os.stop(t + o.dur + .05); }
+  out.connect(gn); gn.connect(AU.out || AU.amb); os.start(t); os.stop(t + o.dur + .05); }
 /* шаги: у каждой поверхности свой звук */
-function stepSound(surf, run){
-  if(!AU.ctx || AU.muted) return;
+function stepSound(surf, run){ if(!AU.ctx) return; onBus(AU.fx, () => stepSound0(surf, run)); }
+function stepSound0(surf, run){
   const v = run ? 1.3 : 1, j = .85 + Math.random() * .3;
   const R = STEP_OF[surf], L = R && AU.rec && AU.rec[R[0]];
   if(L && L.length){ let b; do { b = L[Math.floor(Math.random() * L.length)]; } while(L.length > 2 && b === AU.lastStep); AU.lastStep = b;
@@ -104,23 +110,23 @@ function pluck(freq, when = 0, vol = .12, dec = .996){
   let prev = 0; for(let i = 0; i < n; i++){ const j = i % P, v = line[j]; d[i] = v; const nv = dec * .5 * (v + prev); prev = v; line[j] = nv; }
   for(let i = 0; i < 200; i++) d[i] *= i / 200;
   const s = c.createBufferSource(), f = c.createBiquadFilter(), gn = c.createGain(); s.buffer = buf; f.type = 'lowpass'; f.frequency.value = 3200; gn.gain.value = vol;
-  s.connect(f); f.connect(gn); gn.connect(AU.master); s.start(c.currentTime + when); }
+  s.connect(f); f.connect(gn); gn.connect(AU.out || AU.amb); s.start(c.currentTime + when); }
 function cuckoo(n = 2 + (Math.random() * 3 | 0)){ for(let i = 0; i < n; i++){ tone({ f0:740, f1:720, dur:.18, vol:.03, att:.02, when:i * .62 }); tone({ f0:590, f1:575, dur:.3, vol:.03, att:.02, when:i * .62 + .2 }); } }
-function sfx(k){
-  if(!AU.ctx || AU.muted) return;
+function sfx(k){ if(!AU.ctx) return; onBus(k === 'clue' || k === 'lore' ? AU.music : AU.fx, () => sfx0(k)); }
+function sfx0(k){
   if(k === 'clue'){ [392, 523.3, 659.3, 784].forEach((f, i) => pluck(f, i * .09, .1)); }
   if(k === 'lore'){ [293.7, 392, 440, 587.3].forEach((f, i) => pluck(f, i * .14, .09, .997)); }
   if(k === 'step') stepSound(surfaceAt(st.strip, st.x), keys.run);
   if(k === 'door') burst(.35, .12, 300);
   if(k === 'page') burst(.12, .04, 3000);
 }
-function lullaby(){
-  if(!AU.ctx || AU.muted) return;
+function lullaby(){ if(!AU.ctx) return; onBus(AU.music, lullaby0); }
+function lullaby0(){
   const N = [ [329.6, .5], [440, .5], [440, .5], [493.9, .5], [523.3, 1], [493.9, .5], [440, 1], [392, .5], [440, .5], [493.9, .5], [329.6, 1.2] ];
   let t = .3; for(const [f, d] of N){ env(f, d * 1.6, .05, 'triangle', t); t += d * .72; }
 }
-function audioTick(dt){
-  if(!AU.ctx) return; const c = AU.ctx, t = c.currentTime;
+function audioTick(dt){ if(!AU.ctx) return; onBus(AU.amb, () => audioTick0(dt)); }
+function audioTick0(dt){ const c = AU.ctx, t = c.currentTime;
   const v = st, out = v && !STRIPS[v.strip].indoor, ph = v ? phaseOf(v) : 3;
   const wind = AU.muted || !v ? 0 : out ? (.05 + (ph === 3 ? .05 : 0) + Math.sin(T * .3) * .02) : .01;
   AU.wind.g.gain.setTargetAtTime(ui.title ? .06 : wind, t, .5);
@@ -132,6 +138,8 @@ function audioTick(dt){
   const S = v.strip, rnd = Math.random;
   // вода у реки
   AU.water.g.gain.setTargetAtTime(S === 'river' ? .07 + Math.sin(T * .7) * .015 : 0, t, .6);
+  // дождь: на улице шумит, в доме — тихо стучит по крыше
+  { const w = weatherOf(v), r = w.rain || 0; AU.rain.g.gain.setTargetAtTime(r ? (out ? .05 + r * .1 : .02 + r * .02) : 0, t, .8); }
   // мёртвая тишина на лесной остановке: низкий гул и часы
   AU.drone.gain.setTargetAtTime(S === 'forestroad' ? .035 : 0, t, 1.2);
   if((S === 'forestroad' || S === 'laptev') && (AU.tick = (AU.tick || 0) + dt) > 1){ AU.tick = 0; nz({ f0:3500, q:4, dur:.03, vol:S === 'forestroad' ? .03 : .022 }); }
@@ -152,7 +160,3 @@ function audioTick(dt){
   // капли с крыш на мокрой улице
   if(S === 'village' && rnd() < dt * .5) tone({ f0:1500 + rnd() * 1200, f1:2600 + rnd() * 800, dur:.03, vol:.012 });
 }
-function updateSoundIcon(){ $('sndIco').innerHTML = AU.muted ? '<path d="M3 7h3l4-3v10l-4-3H3z"/><path d="M13 7l4 4M17 7l-4 4"/>' : '<path d="M3 7h3l4-3v10l-4-3H3z"/><path d="M13 6.5a3.5 3.5 0 0 1 0 5M15 4.5a6.5 6.5 0 0 1 0 9"/>'; }
-$('bSound').onclick = () => { AU.muted = !AU.muted; try{ localStorage.setItem('zavetye.mute', AU.muted ? '1' : '0'); }catch(e){} if(AU.muted){ if(AU.ctx) AU.master.gain.value = 0; } else { audioInit(); if(AU.ctx) AU.master.gain.value = .9; } updateSoundIcon(); };
-updateSoundIcon();
-

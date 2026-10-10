@@ -4,73 +4,99 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Заветье</title>
-<meta name="description" content="Заветье: Лес хранит несбывшееся. Ходилка в духе лубка: славянский фолк-хоррор и детектив о памяти.">
-<meta name="theme-color" content="#0d0d11">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M8 1l7 7-7 7-7-7z%27 fill=%27%239e2b25%27/%3E%3C/svg%3E">
+<meta name="description" content="Заветье: Лес хранит несбывшееся. Атмосферный детектив о памяти: славянский фолк-хоррор, где английская формулировка меняет то, что можно доказать.">
+<meta name="theme-color" content="#13110f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cpath d=%27M8 1l7 7-7 7-7-7z%27 fill=%27%238e2520%27/%3E%3C/svg%3E">
 <link rel="stylesheet" href="css/fonts.css">
 <link rel="stylesheet" href="css/game.css">
 </head>
 <body>
-<canvas id="cv" aria-label="Игровой мир. Нажмите на землю, чтобы идти."></canvas>
-<div class="paperfx" id="paperfx"></div>
-<div class="frame" aria-hidden="true"><i class="t"></i><i class="b"></i><i class="l"></i><i class="r"></i><i class="c c1"></i><i class="c c2"></i><i class="c c3"></i><i class="c c4"></i></div>
+<canvas id="cv" aria-label="Мир Заветья. Нажмите на землю, чтобы идти."></canvas>
+<div class="grain" id="grain"></div>
 
 <header class="hud" id="hud" hidden>
   <div class="left-col">
-    <div class="clock plaque"><svg id="glyph" viewBox="0 0 22 22" aria-hidden="true"></svg><b id="clk">вторник · вечер</b><div class="signal" id="signal" aria-label="Связь"><i></i><i></i><i></i><i></i></div></div>
-    <div class="goal" id="goal" hidden></div>
+    <button class="when" id="when" type="button" aria-label="День и время. Нажмите, чтобы вспомнить, что Анна собиралась сделать"><svg id="glyph" viewBox="0 0 22 22" aria-hidden="true"></svg><span id="clk">пролог</span><span class="signal" id="signal" aria-label="Связь" hidden><i></i><i></i><i></i><i></i></span></button>
+    <p class="thought" id="thought" aria-live="polite"></p>
   </div>
   <div class="hud-sp"></div>
-  <button class="hb plaque" id="bBook" type="button" aria-label="Тетрадь (Tab)"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="1.5" width="12" height="15"/><path d="M6 1.5v15M8.5 6h4M8.5 9h4"/></svg><span class="lbl">Тетрадь</span><span class="dot" id="bookDot" hidden>0</span></button>
-  <button class="hb icon plaque" id="bSound" type="button" aria-label="Звук"><svg id="sndIco" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6"></svg></button>
-  <button class="hb icon plaque" id="bMenu" type="button" aria-label="Меню"><svg viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 5h12M3 9h12M3 13h12"/></svg></button>
+  <button class="hb" id="bBook" type="button" aria-label="Тетрадь Анны (Tab)"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M6 4.5h14.5a1.5 1.5 0 0 1 1.5 1.5v17.5H7.5A1.5 1.5 0 0 1 6 22z"/><path d="M9 4.5v19M12 9h7M12 12.5h7M12 16h4.5"/><path d="M17 23.5v3l1.5-1.2 1.5 1.2v-3" stroke="#b0372c"/></svg><span class="knot" id="bookDot" hidden></span></button>
+  <button class="hb menu-b" id="bMenu" type="button" aria-label="Меню и звук (Esc)"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M7 9h14M7 14h14M7 19h14"/></svg></button>
 </header>
-<div class="menu panel" id="menu" hidden>
-  <div class="lbl">Сложность</div>
-  <div class="row" id="menuDiff"></div>
-  <button class="it" type="button" data-m="title">На титульный экран</button>
-  <button class="it" type="button" data-m="restart">Начать заново</button>
+
+<div class="menu" id="menu" role="dialog" aria-label="Меню" hidden>
+  <h4>Заветье</h4>
+  <div class="sec"><button class="it" type="button" data-m="continue">Продолжить</button></div>
+  <div class="sec" id="mSound">
+    <span class="label">Звук</span>
+    <label class="slider" for="volMusic"><span>Музыка</span><input id="volMusic" type="range" min="0" max="100" step="5" data-vol="music"><output id="oMusic"></output></label>
+    <label class="slider" for="volAmb"><span>Атмосфера</span><input id="volAmb" type="range" min="0" max="100" step="5" data-vol="amb"><output id="oAmb"></output></label>
+    <label class="slider" for="volFx"><span>Эффекты</span><input id="volFx" type="range" min="0" max="100" step="5" data-vol="fx"><output id="oFx"></output></label>
+  </div>
+  <div class="sec"><span class="label">Размер текста</span><div class="seg" id="mSize"></div></div>
+  <div class="sec"><span class="label">Языковая поддержка</span><div class="seg" id="mLang"></div></div>
+  <div class="sec"><span class="label">Управление</span>
+    <ul class="keys" id="mKeys"></ul></div>
+  <div class="sec"><button class="it" type="button" data-m="title">На титульный экран</button><button class="it warn" type="button" data-m="restart">Начать заново</button></div>
+</div>
+
+<div class="confirm" id="confirm" role="alertdialog" aria-modal="true" aria-labelledby="cfH" hidden>
+  <div class="confirm-card"><h4 id="cfH">Начать заново?</h4><p id="cfP">Текущее сохранение будет удалено: улики, версия и всё, что изменилось в Заветье.</p>
+    <div class="row"><button class="tbtn" type="button" id="cfNo">Оставить как есть</button><button class="tbtn danger" type="button" id="cfYes">Удалить и начать</button></div></div>
 </div>
 
 <div class="area" id="area"><h2 id="areaName"></h2><small id="areaSub"></small></div>
-<button class="prompt" id="prompt" type="button" hidden><kbd>E</kbd><span id="promptTx"></span></button>
-<div class="hint off" id="hint"></div>
+<button class="prompt" id="prompt" type="button" hidden><i class="dia" aria-hidden="true"></i><span id="promptTx"></span><kbd>E</kbd></button>
+<div class="hint off" id="hint" aria-live="polite"></div>
+<div class="caption" id="caption" aria-live="polite"></div>
 
 <div class="portrait" id="portL" aria-hidden="true"><div class="fx"><div class="bob"><img class="cur" alt=""><img alt=""></div></div></div>
 <div class="portrait right" id="portR" aria-hidden="true"><div class="fx"><div class="bob"><img class="cur" alt=""><img alt=""></div></div></div>
 <section class="dlg" id="dlg" hidden aria-live="polite">
-  <div class="dlg-head"><span class="dlg-who" id="dlgWho"></span><span class="dlg-pg" id="dlgPg"></span></div>
-  <div class="dlg-body" id="dlgBody"><div class="dlg-text" id="dlgText"></div></div>
-  <div class="more" id="dlgMore">дальше ▾</div>
-  <div class="dlg-ch" id="dlgCh"></div>
+  <div class="dlg-in">
+    <div class="dlg-who" id="dlgWho"></div>
+    <div class="dlg-body" id="dlgBody"><div class="dlg-text" id="dlgText"></div></div>
+    <button class="dlg-reply" id="dlgReply" type="button">Ответить</button>
+    <div class="dlg-ch" id="dlgCh"></div>
+    <button class="dlg-more" id="dlgMore" type="button" aria-label="Дальше"></button>
+  </div>
 </section>
 
 <div class="nbw" id="nbw" hidden>
-  <div class="nb" role="dialog" aria-modal="true" aria-label="Тетрадь">
-    <nav class="nb-side" id="nbSide"></nav>
-    <div class="nb-main" id="nbMain"></div>
+  <div class="book nb" role="dialog" aria-modal="true" aria-label="Тетрадь Анны">
+    <nav class="marks" id="nbSide" aria-label="Разделы тетради"></nav>
+    <div class="page" id="nbMain"></div>
+    <nav class="mnav" id="nbMob" aria-label="Разделы тетради"></nav>
+    <button class="nb-close" id="nbClose" type="button" aria-label="Закрыть тетрадь">закрыть ×</button>
   </div>
 </div>
 
-<div class="scr" id="titleScr" hidden>
-  <div class="card">
+<div class="scr title" id="titleScr" hidden>
+  <div class="t-wrap">
     <h1 class="t-title">Заветье</h1>
     <p class="t-sub">Лес хранит несбывшееся</p>
-    <span class="t-orn"></span>
-    <p class="t-lead">Анна разбирает вещи умершей матери и находит посылку, которую мама прятала семнадцать лет. Внутри ключ, красная нить, ветка рябины и записка от женщины, которой, по словам семьи, никогда не было.</p>
-    <div class="diff" id="diffPick">
-      <button type="button" data-d="easy" aria-pressed="false"><b>Лёгкая</b><span>Английский с переводом, тетрадь подсказывает.</span></button>
-      <button type="button" data-d="normal" aria-pressed="true"><b>Обычная</b><span>Перевод по нажатию, грамматику разбираете сами.</span></button>
-      <button type="button" data-d="hard" aria-pressed="false"><b>Высокая</b><span>Только оригинал, без подсказок.</span></button>
-    </div>
-    <p class="load-note" id="loadNote">Загружаем Заветье…</p><div class="acts"><button class="btn" id="bNew" type="button">Начать</button><button class="btn ghost" id="bCont" type="button" hidden>Продолжить</button></div>
-    <p class="t-foot">Пролог и первое дело, около часа. Лес примет любую версию, если вы достаточно крепко её докажете. Со звуком лучше.</p>
+    <div class="t-acts"><button class="t-btn" id="bNew" type="button">Начать историю</button><button class="t-btn ghost" id="bCont" type="button" hidden>Продолжить</button></div>
+    <p class="load-note" id="loadNote">Загружаем Заветье…</p>
   </div>
 </div>
-<div class="scr" id="endScr" hidden><div class="card" id="endBody"></div></div>
+<div class="scr lang" id="langScr" hidden>
+  <div class="lang-card">
+    <h2>Языковая поддержка</h2>
+    <p>Записи в деле Гриши сделаны по-английски. Сколько помощи вам нужно, чтобы их читать? Это можно поменять в любой момент в меню.</p>
+    <div class="modes" id="modePick">
+      <button class="mode" type="button" data-d="easy" aria-pressed="false"><b>С поддержкой</b><span>Перевод виден сразу, тетрадь подсказывает, что доказывает каждая запись.</span></button>
+      <button class="mode" type="button" data-d="normal" aria-pressed="true"><b>Самостоятельно</b><span>Перевод можно подсмотреть. Что значит запись, решаете вы, объяснение — после.</span></button>
+      <button class="mode" type="button" data-d="hard" aria-pressed="false"><b>Погружение</b><span>Только оригинал. Ни перевода, ни подсказок.</span></button>
+    </div>
+    <div class="t-acts"><button class="t-btn" id="bGo" type="button">Начать</button><button class="t-btn ghost" id="bBack" type="button">Назад</button></div>
+  </div>
+</div>
+<div class="scr end" id="endScr" hidden><div class="case-file" id="endBody"></div></div>
 <div class="fade" id="fade"></div>
 <div class="toast" id="toast" role="status"></div>
+<div class="saved" id="saved">сохранено</div>
 <script src="js/engine.js"></script>
+<script src="js/analytics.js"></script>
 <script src="js/evidence.js"></script>
 <script src="data/characters.js"></script>
 <script src="data/scenes.js"></script>
@@ -81,6 +107,7 @@
 <script src="js/draw.js"></script>
 <script src="js/audio.js"></script>
 <script src="js/ui.js"></script>
+<script src="js/notebook.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
