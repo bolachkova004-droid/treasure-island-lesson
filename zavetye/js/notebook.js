@@ -9,7 +9,7 @@ let bookTab = 'case';
 const TABS = [ ['case','Дело'], ['people','Люди'], ['world','Заветье'], ['notes','Записи'], ['en','English'] ];
 const MTABS = [ ['case','Дело'], ['people','Люди'], ['world','Мир'], ['en','English'] ];
 const TAB_ALIAS = { ver:'case', leads:'case', lore:'world', gram:'en' };
-const mobile = () => innerWidth <= 760;
+const mobile = () => innerWidth <= 760 || innerHeight <= 500;
 
 function openBook(tab){
   if(tab) bookTab = TAB_ALIAS[tab] || tab;

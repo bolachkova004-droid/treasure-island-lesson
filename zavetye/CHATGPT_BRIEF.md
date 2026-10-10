@@ -181,4 +181,60 @@ bright soft daylight, warm clean colors, calm and cozy, no fog, painterly digita
 
 ---
 
+## Арт-дирекция: единый стандарт для новых картинок
+
+Чтобы новые фоны не выглядели отдельными наборами картинок, у всех одинаковые правила.
+
+**Формат и масштаб.**
+- Фон — **1792 × 1024** (или 1920 × 1080, если не нужна панорама).
+- Камера на уровне глаз человека, вид строго сбоку, как театральная декорация. Это фирменный язык игры: читаемый горизонт и понятный путь слева направо.
+- **Горизонт** — на 40–45 % высоты кадра. **Земля, по которой идёт Анна**, — горизонтальная полоса на 80 % высоты.
+- **Двери** у домов на переднем плане — примерно на 35 % высоты кадра: так Анна ростом 1,65 м стоит у дома в правильном масштабе.
+
+**Свет.** Во всех промтах одна система:
+- утро — холодный рассеянный свет, туман у земли;
+- день — **холодный серый**, пасмурно, без закатной рыжины;
+- вечер — **охра в светах и холодные тени**;
+- ночь — **серо-синяя, но не провал в чёрный**: детали видны, светятся два-три окна.
+
+**Фактура.** Одинаковое мелкое зерно, умеренный контраст, живописный мазок, без «AI-гладкости» кожи и тканей.
+
+**Не всё должно быть открыткой.** Среди красивых кадров нужны обычные: мокрая остановка, серый двор, неуютная кухня, пустая улица. Мистика вторгается в обычное, а не живёт в открытке.
+
+Стилевой блок для этого этапа (вместо прежнего, где был «золотой час»):
+
+```
+painterly digital illustration, semi-realistic, northern Russian village, Slavic folk horror, side view like a theatre set, camera at human eye level, horizon at 42% of the frame height, the walkable ground is a horizontal strip at 80% of the frame height, subtle film grain, moderate contrast, muted palette of moss green, peat brown, slate grey and faded beige, no golden-hour orange, no people, no animals, no text, no letters, no watermark, 1792x1024
+```
+
+### Этап 5. Ночные версии и обычные места
+
+Ночью ключевые места не просто темнеют — в них меняются детали. Каждая ночная картинка — **та же композиция**, что и дневная (лучше всего в ChatGPT: «Edit this exact image» с дневной картинкой).
+
+**24. `bg_aglaya_house_day`** — дом Аглаи днём (сейчас в окне видна луна даже в полдень).
+> Edit this exact image: same room, same camera, same furniture. Make it a grey overcast autumn day: soft cold daylight from the window, no moon, a grey sky and wet birch branches outside, the stove fire is low embers. Keep everything else exactly in place.
+
+**25. `bg_school_night`** — школа ночью: в заброшенном классе горит свет.
+> Edit this exact image: same classroom, same camera. Night. The school is abandoned, but one ceiling lamp is on and glows warm, lighting the first desks and the blackboard; deep grey-blue shadows everywhere else; the windows show a dark blue night with fog. Nobody is in the room.
+
+**26. `bg_street_1_night` … `bg_street_4_night`** — улица ночью.
+> Edit this exact image: same street, same houses, same camera. Night after rain: grey-blue moonlight through fog, wet road with puddles reflecting two or three warm lit windows, the rest of the windows dark, a few fireflies above the grass. Not pitch black: every house is still readable.
+
+**27. `bg_river_night`** — река ночью.
+> Edit this exact image: same river, same footbridge, same camera. Night: grey-blue fog on the water, a pale moon path, the reflection of the footbridge is slightly wrong — it lags behind, as if the water remembers a moment ago. Calm and cold.
+
+**28. `bg_forest_stop_night`** — лесная остановка ночью.
+> Edit this exact image: same bus stop, same forest, same camera. Night: the bus stop roof drips, a single cold street lamp that should not exist here lights the bench, everything else is grey-blue fog.
+
+**29. `bg_yard_grey`** — обычный серый двор (для дневных сцен у Лаптевых).
+> Side view of an ordinary Russian village yard on a grey rainy day: a muddy path, a sagging fence, a plastic basin, laundry that was forgotten in the rain, a rusty Java motorcycle under a tarp, a small banya with a heavy bolt on the outside of its door. Nothing pretty, just tired everyday life. Cold grey light, drizzle.
+
+**30. `bg_kitchen`** — неуютная кухня (для разговоров в доме Лаптевых).
+> Interior side view of a cramped village kitchen: an oilcloth on the table, a dripping tap, a calendar from 2004 that was never changed, a bus timetable under cracked glass by the coat rack, a bare bulb. Grey daylight from a small window. Uncomfortable, quiet, real.
+
+**31. `bg_stop_wet`** — мокрая остановка на старой дороге.
+> Side view of an empty rural bus stop by an old broken asphalt road in the rain: a rusty metal shelter, a bench with peeling paint, a faded timetable, puddles, a grey forest behind. Ordinary and lonely. Cold grey light, steady drizzle.
+
+---
+
 Когда всё будет готово, напомни мне скачать все картинки и отправить их в Claude вместе с именами файлов.
