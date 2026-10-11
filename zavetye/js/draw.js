@@ -296,6 +296,7 @@ function drawArtFrame(v, camX, anna, P, ph){
   // духи — часть картины: стоят глубже героев и светятся своим светом
   const spirits = npcsFor(v).filter(spiritOwn).map(n => ({ ...n, x:rx(n.x) }));
   if(spirits.length){ drawSpirits(g, spirits, ph); g.setTransform(s, 0, 0, s, -camX * s, oy); }
+  for(const n of npcsFor(v)) if(spiritAir(n)){ drawNoonAir(g, rx(n.x)); g.setTransform(s, 0, 0, s, -camX * s, oy); }
   // герои рисуются на отдельный слой и подкрашиваются светом сцены (огонь, туман, закат)
   const tint = LOWQ.off ? null : charTint(v.strip, ph), lc = tint ? charLayer(cw, ch) : null;
   if(anna && tint) sampleScene(g, (rx(anna.x) - camX) * s, oy + (GY - 124 * k) * s, 124 * k * s, v.strip + ph);
@@ -304,7 +305,9 @@ function drawArtFrame(v, camX, anna, P, ph){
   try{
     drawFx(g);
     const at = x => { g.setTransform(s * k, 0, 0, s * k, (x - camX) * s - x * s * k, oy + GY * s * (1 - k)); };
-    for(const n of npcsFor(v)){ if(spiritOwn(n)) continue; const m = { ...n, x:rx(n.x) }; at(m.x); if(n.id === 'young' && v.strip === 'forestroad' && artParts('forestroad', 0)){ g.translate(m.x, GY); g.scale(.8, .8); g.translate(-m.x, -GY - 100); } if(n.id === 'varya' && !IMG.s_varya){ figure(g, m.x, LOOKS.varya, { face:1 }); continue; } drawNpc(g, m); }
+    for(const n of npcsFor(v)){ if(spiritOwn(n)) continue; const m = { ...n, x:rx(n.x) };
+      if(n.id === 'noon' || n.id === 'leshy'){ const sv = SIL; SIL = null; g.setTransform(s, 0, 0, s, -camX * s, oy); (n.id === 'noon' ? drawNoonSprite : drawLeshySprite)(g, m.x); SIL = sv; continue; }   // духи стоят в глубине картины, без масштаба переднего плана
+      at(m.x); if(n.id === 'young' && v.strip === 'forestroad' && artParts('forestroad', 0)){ g.translate(m.x, GY); g.scale(.8, .8); g.translate(-m.x, -GY - 100); } if(n.id === 'varya' && !IMG.s_varya){ figure(g, m.x, LOOKS.varya, { face:1 }); continue; } drawNpc(g, m); }
     if(v.strip === 'road'){ const sx = rx(spot('road', 'Бетонная плита', 1150)) - 60;
       if(v.flags.busstop){ at(sx); busStop(g, sx + 6, 'new'); } else if(v.flags.rustystop){ at(sx); busStop(g, sx + 6, 'rust'); } }
     if(anna){ at(rx(anna.x)); annaDraw(g, rx(anna.x), anna.dir, anna.move, anna.ph); }

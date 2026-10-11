@@ -344,7 +344,7 @@ function drawNpc(g, n){
   const sp = typeof spriteFor === 'function' && spriteFor(n.id, 0, false);
   if(sp && n.id === 'domovoi'){   // Домовой у печи: в тени, видны космы и янтарные глаза
     const H = 46, w = sp.width / sp.height * H, x = n.x;
-    g.save(); g.filter = SIL ? 'brightness(.5) saturate(.8)' : 'none'; g.translate(x, GY); g.scale(-1, 1); g.drawImage(sp, -w / 2, -H, w, H); g.restore(); g.filter = 'none';
+    g.save(); g.filter = SIL ? 'brightness(.86)' : 'none'; g.translate(x, GY); g.scale(-1, 1); g.drawImage(sp, -w / 2, -H, w, H); g.restore(); g.filter = 'none';
     if((T % 4.3) < 4.05){ const ex = x - (.74 - .5) * w, ey = GY - H + .168 * H; g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(ex, ey, 0, ex, ey, 6); gr.addColorStop(0, 'rgba(255,190,80,.7)'); gr.addColorStop(1, 'rgba(255,190,80,0)'); g.fillStyle = gr; g.fillRect(ex - 6, ey - 6, 12, 12); g.restore(); glow(ex, ey, 26, .5); }
     return; }
   if(sp){ const H = { grisha:136, grunya:110, nina:116, varya:110, young:102, leshy:176, noon:238, domovoi:44 }[n.id] || 120; if(n.id === 'noon') glow(n.x, GY - 140, 300, 1, '255,248,220'); drawSprite(g, sp, n.x, H, n.id === 'grisha' && n.pose === 'suitcase' ? 1 : -1); return; }
@@ -441,7 +441,9 @@ function drawTile(g, kind, ph, s, camX, f, oy, cw){
    ДУХИ НА ЖИВОПИСИ — Полудница и Леший рисуются прямо в картину, за героями:
    у них свой свет, и общая подкраска персонажей их не трогает.
    ===================================================================== */
-function spiritOwn(n){ return n.id === 'noon' || n.id === 'leshy'; }
+/* без картинки духи рисуются кодом прямо в картину; с картинкой — как все герои, в общем слое со светом сцены */
+function spiritOwn(n){ return (n.id === 'noon' || n.id === 'leshy') && !IMG['s_' + n.id]; }
+function spiritAir(n){ return n.id === 'noon' && IMG.s_noon; }
 /* если есть картинка духа — рисуем её вместо фигуры из кода (рост в единицах мира, низ — у ног) */
 function spiritImg(L, key, h){ const im = IMG[key]; if(!im) return false; const w = im.width / im.height * h; L.drawImage(im, -w / 2, -h, w, h); return true; }
 const _rnd = i => { const v = Math.sin(i * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
@@ -579,3 +581,38 @@ function drawLeshyArt(g, x0, ph){
     g.restore(); }
 }
 function drawSpirits(g, list, ph){ for(const n of list){ if(n.id === 'noon') drawNoonArt(g, n.x); else if(n.id === 'leshy') drawLeshyArt(g, n.x, ph); } }
+
+/* ---------- духи-картинки в общем слое героев: объёмные, со светом сцены, как остальные ---------- */
+const _NOONF = { c:null, src:null };
+function noonFaded(im){   // подол Полудницы тает в ржи: заранее растворённый низ картинки
+  if(_NOONF.src === im) return _NOONF.c;
+  const c = document.createElement('canvas'); c.width = im.width; c.height = im.height; const L = c.getContext('2d');
+  L.drawImage(im, 0, 0); L.globalCompositeOperation = 'destination-out';
+  const gr = L.createLinearGradient(0, im.height * .8, 0, im.height); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, 'rgba(0,0,0,.85)');
+  L.fillStyle = gr; L.fillRect(0, im.height * .8, im.width, im.height * .2); _NOONF.c = c; _NOONF.src = im; return c;
+}
+const NOON_H = 216, NOON_BASE = GY - 56;
+function noonX(x0){ return x0 + Math.sin(T * .7) * 3; }
+/* воздух вокруг Полудницы: марево и тёплое сияние на картине — до героев */
+function drawNoonAir(g, x0){
+  const x = noonX(x0), base = NOON_BASE, H = NOON_H;
+  heatHaze(g, x - 110, base - H - 40, 220, H + 70, 2.4);
+  g.save(); g.globalCompositeOperation = 'screen';
+  const gr = g.createRadialGradient(x, base - H * .75, 4, x, base - H * .6, 140);
+  gr.addColorStop(0, 'rgba(255,244,210,.22)'); gr.addColorStop(1, 'rgba(255,236,190,0)');
+  g.fillStyle = gr; g.fillRect(x - 150, base - H - 100, 300, H + 140); g.restore();
+}
+function drawNoonSprite(g, x0){
+  const im = IMG.s_noon; if(!im) return; const x = noonX(x0), h = NOON_H, w = im.width / im.height * h;
+  g.save(); g.translate(x, NOON_BASE); g.scale(-1, 1); g.drawImage(noonFaded(im), -w / 2, -h, w, h); g.restore();
+  glow(x - 3, NOON_BASE - h + .07 * h, 26, 1.2, '255,248,225');   // на месте лица — свет
+  // блик пробегает по лезвию серпа
+  const ga = Math.PI + ((T * .5) % 1.8) * Math.PI * .7;
+  if(ga < Math.PI * 2.28) glow(x + 22 - Math.cos(ga) * 12, NOON_BASE - h + 14 + Math.sin(ga) * 12, 9, 1.4, '255,255,255');
+}
+/* Леший на пне у ельника: пень картинки совмещён с пнём на картине поля */
+function drawLeshySprite(g, x0){
+  const im = IMG.s_leshy; if(!im) return; const h = 196, w = im.width / im.height * h, gy = 348, cx = x0 + 2 - w * .3, br = Math.sin(T * 1.1) * .6;
+  g.save(); g.translate(cx, gy); g.scale(-1, 1 + br / h); g.drawImage(im, -w / 2, -h, w, h); g.restore();
+  if((T % 5.7) < 5.5) glow(cx - (.636 - .5) * w, gy - h + .105 * h, 8, .6, '190,240,130');
+}
