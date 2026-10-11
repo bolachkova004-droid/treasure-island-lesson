@@ -342,6 +342,11 @@ function head(g, U, hy, L, skin, o = {}){
 function annaDraw(g, x, dir, move, ph){ if(typeof annaRigReady === 'function' && annaRigReady() && !IMG.s_anna_1) return drawAnnaRig(g, x, 124, dir, ph, move, typeof keys !== 'undefined' && keys.run); const sp = typeof spriteFor === 'function' && spriteFor('anna', ph, move); if(sp) return drawSprite(g, sp, x, 124, dir, move ? Math.abs(Math.sin(ph)) * 2 : 0); figure(g, x, LOOKS.anna, { face:dir, move, ph }); }
 function drawNpc(g, n){
   const sp = typeof spriteFor === 'function' && spriteFor(n.id, 0, false);
+  if(sp && n.id === 'domovoi'){   // Домовой у печи: в тени, видны космы и янтарные глаза
+    const H = 46, w = sp.width / sp.height * H, x = n.x;
+    g.save(); g.filter = SIL ? 'brightness(.5) saturate(.8)' : 'none'; g.translate(x, GY); g.scale(-1, 1); g.drawImage(sp, -w / 2, -H, w, H); g.restore(); g.filter = 'none';
+    if((T % 4.3) < 4.05){ const ex = x - (.74 - .5) * w, ey = GY - H + .168 * H; g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(ex, ey, 0, ex, ey, 6); gr.addColorStop(0, 'rgba(255,190,80,.7)'); gr.addColorStop(1, 'rgba(255,190,80,0)'); g.fillStyle = gr; g.fillRect(ex - 6, ey - 6, 12, 12); g.restore(); glow(ex, ey, 26, .5); }
+    return; }
   if(sp){ const H = { grisha:136, grunya:110, nina:116, varya:110, young:102, leshy:176, noon:238, domovoi:44 }[n.id] || 120; if(n.id === 'noon') glow(n.x, GY - 140, 300, 1, '255,248,220'); drawSprite(g, sp, n.x, H, n.id === 'grisha' && n.pose === 'suitcase' ? 1 : -1); return; }
   switch(n.id){
     case 'grisha': if(n.pose === 'suitcase') figure(g, n.x, LOOKS.grisha, { face:1, carry:true }); else figure(g, n.x, LOOKS.grisha, { face:-1, stoop:.3, work:true }); break;
@@ -505,15 +510,16 @@ function drawNoonArt(g, x0){
     const cx = 32, cy = -H + 4, R = 15; L.fillStyle = 'rgb(206,206,198)'; L.beginPath(); L.arc(cx, cy, R, Math.PI, Math.PI * 2.28, false); L.arc(cx + 3, cy + 3, R - 4, Math.PI * 2.24, Math.PI * 1.05, true); L.closePath(); L.fill();
     L.strokeStyle = 'rgba(255,255,255,.95)'; L.lineWidth = .9; L.beginPath(); L.arc(cx, cy, R - .4, Math.PI * 1.05, Math.PI * 2.2); L.stroke();
   };
-  const post = L => { L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'destination-out'; L.fillStyle = 'rgba(0,0,0,.18)'; L.fillRect(0, 0, L.canvas.width, L.canvas.height); L.globalCompositeOperation = 'source-over';
+  const post = L => { L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'destination-out'; L.fillStyle = `rgba(0,0,0,${IMG.s_noon ? .06 : .18})`; L.fillRect(0, 0, L.canvas.width, L.canvas.height); L.globalCompositeOperation = 'source-over';
     const m = g.getTransform(); L.setTransform(m.a, 0, 0, m.a, -(x - 70) * m.a, -(base - H - 40) * m.a); fadeDown(L, x - 70, 140, base - 70, base + 2, 1); };   // полупрозрачна, а подол тонет в ржи
   const Lr = spiritLayer(g, 'noon', x - 70, base - H - 40, 140, H + 46, paint, post); if(!Lr) return;
-  g.globalAlpha = .42 * br; g.globalCompositeOperation = 'screen'; g.filter = `blur(${Math.max(4, Lr.W / 30)}px)`; g.drawImage(Lr.c, Lr.X, Lr.Y);   // ореол
-  g.filter = `blur(${Math.max(.6, Lr.W / 260)}px)`; g.globalCompositeOperation = 'source-over'; g.globalAlpha = .86 * br; g.drawImage(Lr.c, Lr.X, Lr.Y); g.filter = 'none'; Lr.done();
+  g.globalAlpha = (IMG.s_noon ? .1 : .42) * br; g.globalCompositeOperation = 'screen'; g.filter = `blur(${Math.max(4, Lr.W / 30)}px)`; g.drawImage(Lr.c, Lr.X, Lr.Y);   // ореол
+  g.filter = `blur(${Math.max(.6, Lr.W / 260)}px)`; g.globalCompositeOperation = 'source-over'; g.globalAlpha = IMG.s_noon ? 1 : .86 * br; g.drawImage(Lr.c, Lr.X, Lr.Y); g.filter = 'none'; Lr.done();
   // на месте лица — слепящее пятно, блик бежит по лезвию
   g.save(); g.globalCompositeOperation = 'lighter';
   const fx = x - 1, fy = base - H + 6; gr = g.createRadialGradient(fx, fy, 0, fx, fy, 18); gr.addColorStop(0, `rgba(255,255,250,${.85 * br})`); gr.addColorStop(.4, `rgba(255,248,220,${.3 * br})`); gr.addColorStop(1, 'rgba(255,248,220,0)'); g.fillStyle = gr; g.fillRect(fx - 18, fy - 18, 36, 36);
-  const ga = Math.PI + ((T * .5) % 1.8) * Math.PI * .7; if(ga < Math.PI * 2.28){ const bx = x - (32 + Math.cos(ga) * 15), by = base - H + 4 + Math.sin(ga) * 15;
+  const ga = Math.PI + ((T * .5) % 1.8) * Math.PI * .7, SI = IMG.s_noon, gcx = SI ? x + 22 : x - 32, gcy = SI ? base - H + 14 : base - H + 4, gR = SI ? 12 : 15;
+  if(ga < Math.PI * 2.28){ const bx = gcx - Math.cos(ga) * gR, by = gcy + Math.sin(ga) * gR;
     gr = g.createRadialGradient(bx, by, 0, bx, by, 12); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(bx - 12, by - 12, 24, 24);
     g.strokeStyle = 'rgba(255,255,255,.6)'; g.lineWidth = .7; g.beginPath(); g.moveTo(bx - 9, by); g.lineTo(bx + 9, by); g.moveTo(bx, by - 9); g.lineTo(bx, by + 9); g.stroke(); }
   // пыльца в горячем воздухе
@@ -523,10 +529,21 @@ function drawNoonArt(g, x0){
 }
 /* Леший сидит на пне у развилки: сгорбленный, косматый, мох и ветки вместо волос. Тени у него нет. */
 function drawLeshyArt(g, x0, ph){
+  const im = IMG.s_leshy;
+  if(im){   // картинка: пень на ней совмещён с пнём на картине поля, Леший смотрит влево, на тропинку
+    const h = 196, w = im.width / im.height * h, gy = 348, cx = x0 + 2 - w * .3, br = Math.sin(T * 1.1) * .6;
+    const Lr = spiritLayer(g, 'leshyImg', cx - w / 2 - 4, gy - h - 6, w + 8, h + 10, L => {
+      L.translate(cx, gy); L.scale(-1, 1 + br / h); L.filter = 'brightness(.78) saturate(.8) contrast(1.05)'; L.drawImage(im, -w / 2, -h, w, h); L.filter = 'none'; },
+      L => fadeDown(L, cx - w / 2 - 4, w + 8, gy - 26, gy + 2, .7));   // корни пня уходят в траву и туман
+    if(!Lr) return;
+    g.filter = `blur(${Math.max(.3, Lr.W / 900)}px)`; g.drawImage(Lr.c, Lr.X, Lr.Y); g.filter = 'none'; Lr.done();
+    if((T % 5.7) < 5.5){ const ex = cx - (.636 - .5) * w, ey = gy - h + .105 * h; g.save(); g.globalCompositeOperation = 'lighter';   // глаза чуть светятся
+      const gr = g.createRadialGradient(ex, ey, 0, ex, ey, 9); gr.addColorStop(0, 'rgba(190,240,130,.35)'); gr.addColorStop(1, 'rgba(190,240,130,0)'); g.fillStyle = gr; g.fillRect(ex - 9, ey - 9, 18, 18); g.restore(); }
+    return;
+  }
   const sy = 268, x = x0 + 2, K = .8;      // верх пня — по картине поля
   const bre = Math.sin(T * 1.1) * 1, rot = Math.sin(T * .45) * .012;
   const paint = L => {
-    if(IMG.s_leshy){ L.translate(x, 346); L.scale(-1, 1); spiritImg(L, 's_leshy', 170); return; }   // картинка вместе с пнём: низ — у земли под пнём
     L.translate(x, sy); L.rotate(rot); L.scale(-K, K);   // лицом к тропинке, к Анне
     const mg = L.createLinearGradient(-20, -130, 30, 90); mg.addColorStop(0, 'rgb(40,44,32)'); mg.addColorStop(.4, 'rgb(23,26,19)'); mg.addColorStop(1, 'rgb(12,14,10)');
     L.fillStyle = 'rgb(16,19,13)';   // ноги в онучах, лапти
@@ -549,14 +566,14 @@ function drawLeshyArt(g, x0, ph){
     twig(12, -110 + bre, -Math.PI / 2 - .7, 18, 0); twig(20, -114 + bre, -Math.PI / 2 - .05, 16, 0); twig(27, -110 + bre, -Math.PI / 2 + .55, 13, 1);
     L.filter = 'blur(1.5px)'; L.fillStyle = 'rgba(88,104,58,.22)'; for(const [mx, my, rx, ry] of [[-14, -86, 14, 5], [2, -94, 9, 4], [-28, -40, 5, 12], [40, -8, 10, 4]]){ L.beginPath(); L.ellipse(mx, my, rx, ry, -.3, 0, Math.PI * 2); L.fill(); }
   };
-  const post = L => { if(IMG.s_leshy) return fadeDown(L, x - 80, 160, sy + 40, sy + 84, .6); L.filter = 'none'; L.globalCompositeOperation = 'source-atop'; L.lineWidth = .9;   // свалявшаяся шерсть и мох
+  const post = L => { L.filter = 'none'; L.globalCompositeOperation = 'source-atop'; L.lineWidth = .9;   // свалявшаяся шерсть и мох
       for(let i = 0; i < 260; i++){ const px = x - 60 + _rnd(i) * 120, py = sy - 110 + _rnd(i + 400) * 190, a = (_rnd(i + 900) - .5) * .9 + Math.PI / 2, l = 2 + _rnd(i + 77) * 3;
         L.strokeStyle = i % 3 ? 'rgba(4,5,3,.35)' : 'rgba(78,84,58,.22)'; L.beginPath(); L.moveTo(px, py); L.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); L.stroke(); }
       L.globalCompositeOperation = 'source-over'; fadeDown(L, x - 80, 160, sy + 14, sy + 60, .9); };   // ноги уходят в туман
   const Lr = spiritLayer(g, 'leshy', x - 80, sy - 130, 160, 210, paint, post); if(!Lr) return;
   g.filter = `blur(${Math.max(.5, Lr.W / 300)}px)`; g.globalAlpha = .96; g.drawImage(Lr.c, Lr.X, Lr.Y); g.filter = 'none'; g.globalAlpha = 1; Lr.done();
   // бледно-зелёные глаза из-под бровей, моргают
-  if(!IMG.s_leshy && (T % 5.7) < 5.5){ g.save(); g.globalCompositeOperation = 'lighter';
+  if((T % 5.7) < 5.5){ g.save(); g.globalCompositeOperation = 'lighter';
     for(const ex of [21, 28]){ const ex2 = x - ex * K, ey = sy + (-101 + bre) * K, gr = g.createRadialGradient(ex2, ey, 0, ex2, ey, 6); gr.addColorStop(0, 'rgba(210,250,150,.9)'); gr.addColorStop(.35, 'rgba(160,220,100,.35)'); gr.addColorStop(1, 'rgba(160,220,100,0)'); g.fillStyle = gr; g.fillRect(ex2 - 6, ey - 6, 12, 12);
       g.fillStyle = 'rgba(232,255,190,1)'; g.beginPath(); g.ellipse(ex2, ey, 1.3, .9, 0, 0, Math.PI * 2); g.fill(); }
     g.restore(); }
