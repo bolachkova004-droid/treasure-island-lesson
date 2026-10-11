@@ -436,7 +436,9 @@ function drawTile(g, kind, ph, s, camX, f, oy, cw){
    ДУХИ НА ЖИВОПИСИ — Полудница и Леший рисуются прямо в картину, за героями:
    у них свой свет, и общая подкраска персонажей их не трогает.
    ===================================================================== */
-function spiritOwn(n){ return (n.id === 'noon' || n.id === 'leshy') && !(typeof spriteFor === 'function' && spriteFor(n.id, 0, false)); }
+function spiritOwn(n){ return n.id === 'noon' || n.id === 'leshy'; }
+/* если есть картинка духа — рисуем её вместо фигуры из кода (рост в единицах мира, низ — у ног) */
+function spiritImg(L, key, h){ const im = IMG[key]; if(!im) return false; const w = im.width / im.height * h; L.drawImage(im, -w / 2, -h, w, h); return true; }
 const _rnd = i => { const v = Math.sin(i * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
 /* неровный, «косматый» край: каждый отрезок дробится и чуть сдвигается */
 function shagPath(g, pts, amp, seed){
@@ -480,6 +482,7 @@ function drawNoonArt(g, x0){
   const sw = Math.sin(T * 1.3) * 3, sw2 = Math.sin(T * 1.7 + 1) * 2.5, hw = Math.sin(T * .9) * 4;
   const paint = L => {
     L.translate(x, base); L.scale(-1, 1);   // смотрит влево, к деревне
+    if(spiritImg(L, 's_noon', H + 8)) return;
     // волосы распущены до пояса, ветер их чуть ведёт
     L.fillStyle = 'rgb(236,222,178)'; shagPath(L, [[-3, -H - 2], [-11, -H + 6], [-15, -H + 26], [-17 - hw * .3, -H + 60], [-22 - hw, -H + 104], [-12 - hw * .6, -H + 100], [-8, -H + 64], [-4, -H + 30], [6, -H + 4]], 2.4, 11); L.fill();
     // рубаха до земли: узкие плечи, поясок, подол колоколом
@@ -523,6 +526,7 @@ function drawLeshyArt(g, x0, ph){
   const sy = 268, x = x0 + 2, K = .8;      // верх пня — по картине поля
   const bre = Math.sin(T * 1.1) * 1, rot = Math.sin(T * .45) * .012;
   const paint = L => {
+    if(IMG.s_leshy){ L.translate(x, 346); L.scale(-1, 1); spiritImg(L, 's_leshy', 170); return; }   // картинка вместе с пнём: низ — у земли под пнём
     L.translate(x, sy); L.rotate(rot); L.scale(-K, K);   // лицом к тропинке, к Анне
     const mg = L.createLinearGradient(-20, -130, 30, 90); mg.addColorStop(0, 'rgb(40,44,32)'); mg.addColorStop(.4, 'rgb(23,26,19)'); mg.addColorStop(1, 'rgb(12,14,10)');
     L.fillStyle = 'rgb(16,19,13)';   // ноги в онучах, лапти
@@ -545,14 +549,14 @@ function drawLeshyArt(g, x0, ph){
     twig(12, -110 + bre, -Math.PI / 2 - .7, 18, 0); twig(20, -114 + bre, -Math.PI / 2 - .05, 16, 0); twig(27, -110 + bre, -Math.PI / 2 + .55, 13, 1);
     L.filter = 'blur(1.5px)'; L.fillStyle = 'rgba(88,104,58,.22)'; for(const [mx, my, rx, ry] of [[-14, -86, 14, 5], [2, -94, 9, 4], [-28, -40, 5, 12], [40, -8, 10, 4]]){ L.beginPath(); L.ellipse(mx, my, rx, ry, -.3, 0, Math.PI * 2); L.fill(); }
   };
-  const post = L => { L.filter = 'none'; L.globalCompositeOperation = 'source-atop'; L.lineWidth = .9;   // свалявшаяся шерсть и мох
+  const post = L => { if(IMG.s_leshy) return fadeDown(L, x - 80, 160, sy + 40, sy + 84, .6); L.filter = 'none'; L.globalCompositeOperation = 'source-atop'; L.lineWidth = .9;   // свалявшаяся шерсть и мох
       for(let i = 0; i < 260; i++){ const px = x - 60 + _rnd(i) * 120, py = sy - 110 + _rnd(i + 400) * 190, a = (_rnd(i + 900) - .5) * .9 + Math.PI / 2, l = 2 + _rnd(i + 77) * 3;
         L.strokeStyle = i % 3 ? 'rgba(4,5,3,.35)' : 'rgba(78,84,58,.22)'; L.beginPath(); L.moveTo(px, py); L.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); L.stroke(); }
       L.globalCompositeOperation = 'source-over'; fadeDown(L, x - 80, 160, sy + 14, sy + 60, .9); };   // ноги уходят в туман
   const Lr = spiritLayer(g, 'leshy', x - 80, sy - 130, 160, 210, paint, post); if(!Lr) return;
   g.filter = `blur(${Math.max(.5, Lr.W / 300)}px)`; g.globalAlpha = .96; g.drawImage(Lr.c, Lr.X, Lr.Y); g.filter = 'none'; g.globalAlpha = 1; Lr.done();
   // бледно-зелёные глаза из-под бровей, моргают
-  if((T % 5.7) < 5.5){ g.save(); g.globalCompositeOperation = 'lighter';
+  if(!IMG.s_leshy && (T % 5.7) < 5.5){ g.save(); g.globalCompositeOperation = 'lighter';
     for(const ex of [21, 28]){ const ex2 = x - ex * K, ey = sy + (-101 + bre) * K, gr = g.createRadialGradient(ex2, ey, 0, ex2, ey, 6); gr.addColorStop(0, 'rgba(210,250,150,.9)'); gr.addColorStop(.35, 'rgba(160,220,100,.35)'); gr.addColorStop(1, 'rgba(160,220,100,0)'); g.fillStyle = gr; g.fillRect(ex2 - 6, ey - 6, 12, 12);
       g.fillStyle = 'rgba(232,255,190,1)'; g.beginPath(); g.ellipse(ex2, ey, 1.3, .9, 0, 0, Math.PI * 2); g.fill(); }
     g.restore(); }

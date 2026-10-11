@@ -235,21 +235,25 @@ painterly digital illustration, semi-realistic, northern Russian village, Slavic
 **31. `bg_stop_wet`** — мокрая остановка на старой дороге.
 > Side view of an empty rural bus stop by an old broken asphalt road in the rain: a rusty metal shelter, a bench with peeling paint, a faded timetable, puddles, a grey forest behind. Ordinary and lonely. Cold grey light, steady drizzle.
 
-### Этап 6. Духи: Полудница и Леший
+### Этап 6. Духи: Полудница, Леший, Домовой
 
-Сейчас в игре они нарисованы кодом прямо в картину: Полудница — светящаяся фигура в дрожащем от жары воздухе, Леший — тёмный силуэт на пне у ельника с зелёными глазами. Если сделать для них картинки, игра возьмёт их вместо этого. Фон — **ровный нейтральный серый, без теней и пола**: так их легко вырезать.
+Всего **три картинки**, по одной на каждого. Портрет для диалога я вырежу из той же картинки, отдельно делать не нужно.
 
-**32. `s_noon`** — Полудница в полный рост.
-> Full-body side view, facing right, of Poludnitsa, the noon spirit of Slavic folklore: a very tall thin woman in a long white linen shirt down to the ground with a thin red woven belt, long pale wheat-coloured hair loose to the waist, a small wreath of rye ears. Her right hand rests on her shoulder holding an old sickle, the curved blade above her shoulder catching a spark of sunlight. Her face is lost in a soft blinding glow, no features visible. The hem of the shirt fades into heat haze. Painted in the same muted realistic painterly style as the backgrounds, warm noon light from above. Plain flat neutral grey background, no floor, no shadow, nothing else in the frame.
+Как делать:
+1. Прикрепите к сообщению любой наш фон (например, `bg_field`), чтобы ChatGPT повторил стиль.
+2. Вставьте промт целиком.
+3. Если вышло хорошо, скачайте и пришлите мне с именем файла. Если что-то не так (лицо видно у Полудницы, есть пол или тень, фон не серый), напишите ChatGPT «same image, but …» и поправьте одну вещь.
 
-**33. `p_noon_neutral`** — Полудница, портрет по пояс.
-> Waist-up portrait of the same Poludnitsa, three-quarter view: white linen shirt with faded red embroidery at the collar, pale loose hair, the sickle on her shoulder. Where her face should be there is only bright overexposed light, as if looking at the sun; you can barely sense the eyes. Heat shimmer around her outline. Holy and frightening at once. Muted painterly realism. Plain flat neutral grey background.
+Фон обязательно **ровный серый, без пола и теней**: так я аккуратно вырежу фигуру.
 
-**34. `s_leshy`** — Леший сидит на пне.
-> Full-body side view, facing right, of Leshy, the forest spirit of Slavic folklore, sitting hunched on a low mossy stump: an old gaunt man in a worn dark sheepskin coat buttoned on the wrong (left) side, one arm resting on his knee, a crooked walking stick leaning on his shoulder, bast shoes. His long beard is like dry grey lichen, small bare twigs and moss grow out of his hair instead of a hat, faint pale green eyes. Dark, earthy, desaturated colours — he almost merges with a spruce forest. He casts no shadow. Muted realistic painterly style, cold morning light. Plain flat neutral grey background, the stump included, no ground, nothing else.
+**32. `s_noon`** — Полудница.
+> Use the attached image only as a style reference: same muted, realistic painterly style, same soft light and colour palette. Paint Poludnitsa, the noon spirit of Slavic folklore, full body, standing, three-quarter view turned to the right. A very tall, thin woman in a long plain white linen shirt down to the ground, a narrow red woven belt, faded red embroidery at the collar and cuffs. Long loose pale-wheat hair to the waist, a thin wreath of rye ears. In her right hand, resting on her shoulder, an old iron sickle with a worn wooden handle. Her face cannot be seen: it is lost in a soft white glare, as if you are looking at the sun. The hem of the shirt fades into heat haze. Calm, tall, unsettling. Plain flat neutral grey background, no floor, no shadow, nothing else in the picture. Vertical image.
 
-**35. `p_leshy_neutral`** — Леший, портрет по пояс.
-> Waist-up portrait of the same Leshy, three-quarter view, head slightly lowered, looking up from under heavy brows: weathered face like old bark, lichen beard, twigs and moss in the hair, faintly glowing pale green eyes, the sheepskin collar buttoned on the wrong side. Calm, ancient, indifferent. Muted painterly realism, cold forest light. Plain flat neutral grey background.
+**33. `s_leshy`** — Леший.
+> Use the attached image only as a style reference: same muted, realistic painterly style, same soft light and colour palette. Paint Leshy, the forest spirit of Slavic folklore, full body, sitting hunched on a low mossy tree stump, three-quarter view turned to the right. A gaunt old man in a worn dark sheepskin coat buttoned on the wrong (left) side, one forearm resting on his knee, a crooked walking stick leaning against his shoulder, birch-bark shoes. A long grey beard like dry lichen, small bare twigs and moss growing in his hair instead of a hat, a weathered face like old bark, faint pale green eyes. Dark, earthy, desaturated colours, as if he is part of a spruce forest. Plain flat neutral grey background, only the figure and the stump, no ground, no shadow. Vertical image.
+
+**34. `s_domovoi`** — Домовой.
+> Use the attached image only as a style reference: same muted, realistic painterly style, same soft light and colour palette. Paint Domovoi, the house spirit of Slavic folklore, full body, standing, three-quarter view turned to the right. A tiny hunched old man, the height of a cat, completely overgrown with shaggy grey-brown hair, a long tangled beard, a faded linen shirt with a rope belt, tiny bast shoes, big rough hands. Two small amber eyes glowing softly from under bushy brows. Grumpy but kind, a little funny. Warm stove light from one side. Plain flat neutral grey background, no floor, no shadow, nothing else in the picture. Vertical image.
 
 ---
 
