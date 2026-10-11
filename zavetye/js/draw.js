@@ -207,8 +207,7 @@ function drawParticles(g, v){
   const ph = phaseOf(v), indoor = STRIPS[v.strip].indoor;
   for(const p of PARTS){
     if(ph === 3 && !indoor){ const a = Math.max(0, Math.sin(p.t * 1.7)); if(a < .05) continue; glow(p.x, p.y + 80, 14, a * .8, '255,230,120'); circ(g, p.x, p.y + 80, 2, '#ffe68a', .8); }
-    else if(ph === 2 && !indoor){ g.fillStyle = 'rgba(255,220,160,.5)'; g.fillRect(p.x, p.y, 2, 2); }
-    else if(ph === 1 && !indoor){ circ(g, p.x, p.y, 1.6, '#fff4c8', 0); }
+    // днём и вечером на улице пылинок нет: на картине они выглядели как белые точки-соринки
     else if(indoor){ g.fillStyle = 'rgba(255,240,200,.35)'; g.fillRect(p.x, p.y, 1.8, 1.8); }
   }
 }

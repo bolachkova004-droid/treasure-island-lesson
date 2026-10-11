@@ -523,7 +523,7 @@ function drawNoonArt(g, x0){
     gr = g.createRadialGradient(bx, by, 0, bx, by, 12); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(bx - 12, by - 12, 24, 24);
     g.strokeStyle = 'rgba(255,255,255,.6)'; g.lineWidth = .7; g.beginPath(); g.moveTo(bx - 9, by); g.lineTo(bx + 9, by); g.moveTo(bx, by - 9); g.lineTo(bx, by + 9); g.stroke(); }
   // пыльца в горячем воздухе
-  for(let i = 0; i < 18; i++){ const t = (T * (.05 + .05 * _rnd(i)) + _rnd(i + 50)) % 1, px = x + (_rnd(i + 9) - .5) * 170 + Math.sin(T + i) * 6, py = base + 10 - t * (H + 50), a = Math.sin(Math.PI * t) * .45;
+  for(let i = 0; i < 18; i++){ const t = (T * (.05 + .05 * _rnd(i)) + _rnd(i + 50)) % 1, px = x + (_rnd(i + 9) - .5) * 170 + Math.sin(T + i) * 6, py = base + 10 - t * (H + 50), a = Math.sin(Math.PI * t) * .2;
     g.fillStyle = `rgba(255,244,205,${a})`; g.beginPath(); g.arc(px, py, .8 + _rnd(i + 3), 0, Math.PI * 2); g.fill(); }
   g.restore();
 }
