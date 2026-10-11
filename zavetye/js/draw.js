@@ -43,7 +43,7 @@ DRAW.road = g => {
   else if(VF('rustystop')) busStop(g, sx + 6, 'rust');
   else if(VF('overgrown')){ for(let i = 0; i < 12; i++) shape(g, i % 2 ? C.grass : C.greenL, () => g.arc(sx + 6 + i * 11, GY + 2, 9 + (i * 7) % 6, Math.PI, 0), 1.4); }
   else { for(let i = 0; i < 4; i++) rect(g, sx + 14 + i * 32, GY - 14, 5, 10, '#8a4a2a', 1.2); flower(g, sx + 72, GY - 2, C.white); }
-  rect(g, 1402, GY - 126, 6, 126, C.grey, 1.4); rect(g, 1370, GY - 142, 72, 28, C.cream, 1.8); g.fillStyle = C.ink; g.font = '700 13px Alegreya, serif'; g.fillText('ЗАВЕТЬЕ 2', 1378, GY - 123);
+  rect(g, 1402, GY - 126, 6, 126, C.grey, 1.4); rect(g, 1370, GY - 142, 72, 28, C.cream, 1.8); g.fillStyle = C.ink; g.font = '700 13px "PT Serif", Georgia, serif'; g.fillText('ЗАВЕТЬЕ 2', 1378, GY - 123);
   signpost(g, 1740, 'Трасса 40', 1);
   if(V.bus) bus(g, V.bus.x);
 };

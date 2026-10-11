@@ -32,7 +32,7 @@ function showScene(id){
   if(['noon_vision','varya_song'].includes(id) || (id === 'gr_dinner' && F('heardTune') && has('c_lullaby'))){ lullaby(); caption('♪ Кто-то тихо напевает колыбельную. Мелодия обрывается на последней строке.', 6000); }
   ui.dlg = true; $('dlg').classList.remove('chsheet'); hideHint(); $('area').classList.remove('on');
   trackOnce('first_dialogue');
-  if(!st.tut.dlg){ st.tut.dlg = 1; setTimeout(() => caption(coarse() ? 'Нажмите на текст, чтобы читать дальше.' : 'Щелчок, пробел или Enter — дальше. Цифры 1–9 — выбрать ответ.', 4200), 600); }
+  if(!st.tut.dlg){ st.tut.dlg = 1; setTimeout(() => caption(coarse() ? 'Нажмите на текст, чтобы читать дальше.' : 'Щелчок или пробел — читать дальше.', 4200), 600); }
   showPortrait(id); renderDlg(); updateHud(); focusSync(); save();
 }
 function resumeDlg(){ const id = st.scene; const sc = S[id](); curChoices = sc.choices || []; if(!st.view || st.view.id !== id) st.view = { id, title: sc.title || '', cap: !!sc.cap, away: !!sc.away, pages: sc.text.filter(Boolean).map(wrapP) }; DLG = { i: st.view.pages.length - 1 }; ui.dlg = true; showPortrait(id); renderDlg(); focusSync(); }
@@ -98,7 +98,7 @@ function setSlot(s, who, mood){
     const [a, b] = el.querySelectorAll('img'), cur = a.classList.contains('cur') ? a : b, nxt = cur === a ? b : a;
     if(P.key && el.classList.contains('on')){
       nxt.src = im.src; cur.classList.remove('cur'); nxt.classList.add('cur');
-      const fx = el.querySelector('.fx'); fx.classList.remove('flinch', 'pop'); void fx.offsetWidth; fx.classList.add(['afraid', 'broken', 'cold'].includes(mood) ? 'flinch' : 'pop');
+      const fx = el.querySelector('.fx'); fx.classList.remove('flinch', 'pop'); void fx.offsetWidth; if(['afraid', 'broken'].includes(mood)) fx.classList.add('flinch');   // движение — только на испуге и надломе
     } else cur.src = im.src;
     P.key = im.src;
   }
@@ -293,7 +293,7 @@ $('bBack').onclick = () => { $('langScr').hidden = true; $('titleScr').hidden = 
 $('bGo').onclick = () => { wipeSave(); try{ localStorage.setItem('zavetye.lang', pickDiff); }catch(e){} track('language_mode_selected', { mode:pickDiff }); startGame(fresh(pickDiff)); track('new_game_started', { mode:pickDiff }); };
 $('modePick').onclick = e => { const b = e.target.closest('.mode'); if(!b) return; pickDiff = b.dataset.d; document.querySelectorAll('#modePick .mode').forEach(x => x.setAttribute('aria-pressed', x === b)); };
 function setDiff(d){
-  st.diff = d; if(d === 'easy') for(const id of st.order) if(CLUES[id].kind === 'en' && !st.clues[id].lens) st.clues[id].lens = CLUES[id].lens;
+  st.diff = d;
   save(); if(ui.nb) renderBook(); toast('Языковая поддержка: ' + LANG_NAMES[d].toLowerCase()); track('language_mode_selected', { mode:d });
 }
 

@@ -58,8 +58,8 @@ const enMark = s => s.replace(/\[([^\]]+)\]/g, '<u>$1</u>');
 const enPlain = s => s.replace(/[\[\]]/g, '');
 function en(s, ru){
   const e = `<span class="en" lang="en">${enMark(s)}</span>`;
-  if(!st || st.diff === 'easy') return `<span class="enw">${e}<span class="tr">${ru}</span></span>`;
-  if(st.diff === 'normal') return `<span class="enw">${e}<button type="button" class="trb" data-tr="${esc(ru)}" aria-label="Подсмотреть перевод" title="Подсмотреть перевод">?</button></span>`;
+  // перевод не висит постоянно: его подсматривают по «?» (в режиме поддержки он ещё и открывается после первой попытки)
+  if(!st || st.diff === 'easy' || st.diff === 'normal') return `<span class="enw">${e}<button type="button" class="trb" data-tr="${esc(ru)}" aria-label="Подсмотреть перевод" title="Подсмотреть перевод">?</button></span>`;
   return e;
 }
 

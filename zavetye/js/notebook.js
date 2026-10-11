@@ -83,11 +83,12 @@ function boardUI(){
   const hard = st.diff === 'hard', p = proof();
   let h = '<div class="board" id="board"><svg class="threads" id="threads" aria-hidden="true"></svg>';
   const sel = st.ver.s;
+  h += '<span class="board-k">Тезис</span>';
   if(!sel) h += '<div class="thesis-row">' + Object.entries(STMTS).map(([k, S0]) => `<button type="button" class="thesis" data-stmt="${k}" aria-pressed="false">${S0.t}</button>`).join('') + '</div>';
   else h += `<div class="thesis-row"><button type="button" class="thesis" data-stmt="${sel}" aria-pressed="true"${st.outcome ? ' disabled' : ''}>${STMTS[sel].t}</button></div>`;
   if(sel){
     const pins = st.ver.att.filter(id => has(id));
-    h += '<div class="pins">' + pins.map(id => { const c = CLUES[id], tag = st.diff === 'easy' ? relTag(id) : '';
+    h += '<span class="board-k pins-k">Приколото к версии</span><div class="pins">' + pins.map(id => { const c = CLUES[id], tag = st.diff === 'easy' ? relTag(id) : '';
       return `<div class="pin" data-pinned="${id}"><small>${c.kind === 'en' ? 'по-английски' : KIND[c.kind]}</small>${c.t}${tag}${st.outcome ? '' : `<button type="button" class="x" data-pin="${id}" aria-label="Открепить">×</button>`}</div>`; }).join('');
     for(let i = pins.length; i < NEED; i++) h += '<div class="pin empty-slot">сюда — улику</div>';
     h += '</div>';
@@ -99,7 +100,7 @@ function boardUI(){
   else if(p.con > 0) h += '<p class="status bad">Одна из приколотых улик этой версии противоречит.</p>';
   else if(p.pro >= NEED) h += '<p class="status ok">Версия держится. Её можно рассказать на лесной остановке.</p>';
   else h += `<p class="status">Нужно ещё ${NEED - p.pro}.</p>`;
-  h += '<div class="pool">' + st.order.filter(id => !st.clues[id].blank).map(id => {
+  h += '<h3>Улики в тетради</h3><div class="pool">' + st.order.filter(id => !st.clues[id].blank).map(id => {
     const on = st.ver.att.includes(id), d = st.clues[id].doubt, c = CLUES[id];
     const tag = d ? '<span class="tag">не доверяю</span>' : (c.kind === 'en' && !st.clues[id].lens) ? '<span class="tag">не прочитана — см. English</span>' : st.diff === 'easy' ? relTag(id) : '';
     return `<button type="button" class="chip${on ? ' on' : ''}${d ? ' off' : ''}" data-pin="${id}"${d ? ' disabled' : ''}>${c.t}${tag}</button>`; }).join('') + '</div>';
@@ -143,7 +144,7 @@ const SKETCH = {
   busstop:   { img:'sk_slab', draw:'<path d="M112 128V42M313 128V42M92 44l124-8 124 8"/><path d="M92 44h248"/><path d="M128 106h170M128 112h170"/><path d="M350 128V34" /><circle cx="350" cy="28" r="10" class="red"/><path d="M344 28h12" class="red"/>' },
   rustystop: { img:'sk_slab', draw:'<path d="M112 128V52M313 128V60M92 54l110-6 128 14"/><path d="M180 60l6 10M240 58l-4 12M140 62l3 9" class="red"/><path d="M128 110h120"/>' },
   overgrown: { img:'sk_slab', draw:'<path class="moss" d="M98 122c10-8 18 6 28-2s16 6 26-2 18 6 28-2 16 6 26-2 18 6 28-2 16 6 26-2 18 6 26-2M104 130c12-6 20 4 30-2s18 4 28-2 18 4 28-2 18 4 28-2 18 4 30-2"/><path class="moss" d="M110 104l4 18M130 100l2 22M287 100l-2 22M313 106l-3 16"/>' },
-  loop:      { img:'sk_stop', draw:'<circle cx="352" cy="66" r="28"/><path d="M352 66l-6 16M352 66l-12-16"/><path d="M352 40v4M352 88v4M326 66h4M374 66h4"/><text x="336" y="118" style="font:600 16px var(--hand);fill:#8e2520;stroke:none">6:38</text>' },
+  loop:      { img:'sk_stop', draw:'<circle cx="352" cy="66" r="28"/><path d="M352 66l-6 16M352 66l-12-16"/><path d="M352 40v4M352 88v4M326 66h4M374 66h4"/><text x="336" y="118" style="font:700 15px var(--body);fill:#7a2a26;stroke:none">6:38</text>' },
 };
 function vsUI(c){
   const S0 = SKETCH[c.key];
@@ -185,13 +186,17 @@ function enUI(){
   for(const id of ids){
     const c = CLUES[id], s = st.clues[id];
     if(s.blank){ h += `<div class="ev"><div class="sheet"><span class="src">${c.src}</span><p class="blank">Страница пуста. Здесь было что-то написано.</p></div><div></div></div>`; continue; }
-    let L = `<div class="sheet"><span class="src">${c.src}</span><p>${en(c.en, c.ru)}</p>${c.red ? `<span class="red">${c.red}</span>` : ''}</div>`;
-    let R = `<p class="q">${LENS_Q}</p><div class="opts">` + Object.entries(LENSES).map(([k, Ls]) => `<button type="button" class="opt" data-lens="${id}:${k}" aria-pressed="${s.lens === k}"${st.diff === 'easy' ? ' disabled' : ''}>${Ls.a}</button>`).join('') + '</div>';
+    // поддержка: перевод не выдаётся заранее, а открывается после первой попытки
+    const open = st.diff === 'easy' && s.lens;
+    let L = `<div class="sheet"><span class="src">${c.src}</span><p>${open ? enMark(c.en) + `<span class="tr">${c.ru}</span>` : en(c.en, c.ru)}</p>${c.red ? `<span class="red">${c.red}</span>` : ''}</div>`;
+    let R = `<p class="q">${LENS_Q}</p><div class="opts">` + Object.entries(LENSES).map(([k, Ls]) => `<button type="button" class="opt" data-lens="${id}:${k}" aria-pressed="${s.lens === k}">${Ls.a}</button>`).join('') + '</div>';
     if(s.lens){ const E = lensEffect(s.lens), q = k => '«' + STMT_SHORT[k] + '»';
       R += `<div class="effect"><b>Версия изменилась</b><p>Теперь запись говорит, что ${E.meaning}.${E.pro.length ? ' Это за ' + E.pro.map(q).join(' и ') + '.' : ''}${E.con.length ? ' Против ' + E.con.map(q).join(' и ') + '.' : ''}</p></div>`;
       if(st.diff !== 'hard') R += `<p class="why">${LENSES[s.lens].tip}</p>`; }
     h += `<div class="ev"><div>${L}</div><div>${R}</div></div>`;
   }
+  // перенос навыка: один раз, когда прочитаны две-три записи
+  if(ids.filter(id => st.clues[id].lens).length >= 2) h += '<p class="transfer">Вы сейчас различили мечту, твёрдый план и то, чему помешали. Это тот же навык, что нужен в обычной речи: <i>I want to</i>, <i>I’m going to</i>, <i>I would have</i> говорят о разном.</p>';
   h += '<h3>Заметки Аглаи</h3><div class="agl"><p><u>want to</u>, <u>will</u> — хочу, уеду когда-нибудь. Мечта.</p><p><u>am going to</u>, <u>have bought</u>, <u>have packed</u> — решено и сделано. План.</p><p><u>would have left</u> — уехал бы. Значит, помешали.</p><p class="sig">Для дела это разные вещи. — А. К.</p></div>';
   return h;
 }

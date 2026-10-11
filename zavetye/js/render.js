@@ -163,7 +163,7 @@ function izba(g, x, o = {}){
     rect(g, dx - 30, GY - 118, 60, 10, C.cream, 1.6);
     for(const px of [dx - 40, dx + 36]){ rect(g, px, GY - 116, 5, 92, C.logL, 1.4); }
     if(o.lit) glow(dx, GY - 60, 90, .7);
-    if(o.number){ rect(g, dx + 34, GY - 150, 24, 22, C.blue, 1.6); g.fillStyle = C.cream; g.font = '700 15px Alegreya, Georgia, serif'; g.textAlign = 'center'; g.fillText(o.number, dx + 46, GY - 133); g.textAlign = 'left'; }
+    if(o.number){ rect(g, dx + 34, GY - 150, 24, 22, C.blue, 1.6); g.fillStyle = C.cream; g.font = '700 15px "PT Serif", Georgia, serif'; g.textAlign = 'center'; g.fillText(o.number, dx + 46, GY - 133); g.textAlign = 'left'; }
   }
 }
 function fence(g, x0, x1, h = 52, col){
@@ -189,7 +189,7 @@ function motorcycle(g, x){
   for(const wx of [x - 36, x + 38]){ circ(g, wx, GY - 20, 19, C.ink, 0); circ(g, wx, GY - 20, 13, C.greyL, 1.6); circ(g, wx, GY - 20, 3, C.ink, 0); }
   shape(g, C.cin, () => { g.moveTo(x - 36, GY - 22); g.lineTo(x - 14, GY - 50); g.quadraticCurveTo(x + 6, GY - 62, x + 26, GY - 50); g.lineTo(x + 38, GY - 22); g.lineTo(x + 10, GY - 26); g.closePath(); }, 2);
   shape(g, C.ink, () => { g.moveTo(x - 22, GY - 60); g.quadraticCurveTo(x - 4, GY - 68, x + 12, GY - 60); g.lineTo(x + 10, GY - 54); g.lineTo(x - 20, GY - 54); g.closePath(); }, 1.5);
-  g.fillStyle = C.cream; g.font = 'italic 700 10px Alegreya, serif'; g.fillText('Ява', x - 2, GY - 36);
+  g.fillStyle = C.cream; g.font = 'italic 700 10px "PT Serif", Georgia, serif'; g.fillText('Ява', x - 2, GY - 36);
   g.strokeStyle = C.ink; g.lineWidth = 3; g.beginPath(); g.moveTo(x + 26, GY - 50); g.lineTo(x + 32, GY - 76); g.lineTo(x + 44, GY - 78); g.stroke();
 }
 function suitcase(g, x, y, col){ rect(g, x - 19, y - 32, 38, 32, col || C.brown, 1.8); g.fillStyle = C.ink; g.fillRect(x - 11, y - 32, 3, 32); g.fillRect(x + 8, y - 32, 3, 32); g.strokeStyle = C.ink; g.lineWidth = 3; g.beginPath(); g.arc(x, y - 34, 6, Math.PI, 0); g.stroke(); rect(g, x - 15, y - 26, 10, 7, C.cream, 1); }
@@ -214,7 +214,7 @@ function school(g, x){
     if(!broken){ g.strokeStyle = C.ink; g.lineWidth = 1.6; g.beginPath(); g.moveTo(wx + 15, wy); g.lineTo(wx + 15, wy + 50); g.moveTo(wx, wy + 20); g.lineTo(wx + 30, wy + 20); g.stroke(); }
     else { g.strokeStyle = C.greyL; g.lineWidth = 1.2; g.beginPath(); g.moveTo(wx + 2, wy + 4); g.lineTo(wx + 12, wy + 18); g.lineTo(wx + 6, wy + 30); g.stroke(); } }
   rect(g, x + 328, GY - 96, 54, 96, C.logD, 2); rect(g, x + 316, GY - 104, 78, 10, C.cream, 1.6);
-  rect(g, x + 298, top + 112, 116, 22, C.cin, 1.8); g.fillStyle = C.cream; g.font = '700 11.5px Alegreya, serif'; g.textAlign = 'center'; g.fillText('ЗАВЕТЬЕВСКАЯ ШКОЛА', x + 356, top + 127); g.textAlign = 'left';
+  rect(g, x + 298, top + 112, 116, 22, C.cin, 1.8); g.fillStyle = C.cream; g.font = '700 11.5px "PT Serif", Georgia, serif'; g.textAlign = 'center'; g.fillText('ЗАВЕТЬЕВСКАЯ ШКОЛА', x + 356, top + 127); g.textAlign = 'left';
   rect(g, x + 348, GY - 58, 12, 14, C.gold, 1.4);
 }
 function laundry(g, x0, x1){
@@ -243,7 +243,7 @@ function busStop(g, x, kind){
   rect(g, x, GY - 122, 7, 122, col, 1.6); rect(g, x + 112, GY - 122, 7, 122, col, 1.6);
   shape(g, kind === 'rust' ? '#8a4a2a' : C.cin, () => { g.moveTo(x - 14, GY - 122); g.lineTo(x + 133, GY - 122); g.lineTo(x + 124, GY - 136); g.lineTo(x - 5, GY - 136); g.closePath(); }, 2);
   rect(g, x + 10, GY - 44, 99, 7, C.logL, 1.5); rect(g, x + 16, GY - 37, 5, 37, C.logD, 1.2); rect(g, x + 98, GY - 37, 5, 37, C.logD, 1.2);
-  if(kind !== 'rust'){ rect(g, x + 152, GY - 156, 5, 156, C.grey, 1.4); circ(g, x + 154, GY - 162, 15, kind === 'new' ? C.cin : C.gold, 1.8); g.fillStyle = C.cream; g.font = '700 14px Alegreya, serif'; g.textAlign = 'center'; g.fillText('А', x + 154, GY - 157); g.textAlign = 'left';
+  if(kind !== 'rust'){ rect(g, x + 152, GY - 156, 5, 156, C.grey, 1.4); circ(g, x + 154, GY - 162, 15, kind === 'new' ? C.cin : C.gold, 1.8); g.fillStyle = C.cream; g.font = '700 14px "PT Serif", Georgia, serif'; g.textAlign = 'center'; g.fillText('А', x + 154, GY - 157); g.textAlign = 'left';
     rect(g, x + 140, GY - 136, 28, 32, C.cream, 1.4); g.strokeStyle = C.ink; g.lineWidth = .8; g.beginPath(); for(let i = 0; i < 4; i++){ g.moveTo(x + 144, GY - 128 + i * 6); g.lineTo(x + 164, GY - 128 + i * 6); } g.stroke(); }
 }
 function bus(g, x){
