@@ -431,3 +431,130 @@ function drawTile(g, kind, ph, s, camX, f, oy, cw){
   let off = -((camX * f * s) % t.W); if(off > 0) off -= t.W;
   for(let x = off; x < cw; x += t.W) g.drawImage(t.c, Math.round(x), Math.round(oy));
 }
+
+/* =====================================================================
+   ДУХИ НА ЖИВОПИСИ — Полудница и Леший рисуются прямо в картину, за героями:
+   у них свой свет, и общая подкраска персонажей их не трогает.
+   ===================================================================== */
+function spiritOwn(n){ return (n.id === 'noon' || n.id === 'leshy') && !(typeof spriteFor === 'function' && spriteFor(n.id, 0, false)); }
+const _rnd = i => { const v = Math.sin(i * 127.1 + 311.7) * 43758.5453; return v - Math.floor(v); };
+/* неровный, «косматый» край: каждый отрезок дробится и чуть сдвигается */
+function shagPath(g, pts, amp, seed){
+  g.beginPath();
+  for(let i = 0; i < pts.length; i++){
+    const [x0, y0] = pts[i], [x1, y1] = pts[(i + 1) % pts.length], L = Math.hypot(x1 - x0, y1 - y0), n = Math.max(1, Math.round(L / 4)), nx = -(y1 - y0) / (L || 1), ny = (x1 - x0) / (L || 1);
+    for(let j = 0; j < n; j++){ const t = j / n, a = amp * (_rnd(seed + i * 31 + j) - .35); const x = x0 + (x1 - x0) * t + nx * a, y = y0 + (y1 - y0) * t + ny * a; if(i + j === 0) g.moveTo(x, y); else g.lineTo(x, y); }
+  }
+  g.closePath();
+}
+/* дрожащий от жары воздух: полосы картины чуть ездят вбок */
+function heatHaze(g, x0, y0, w, h, amp){
+  const c = g.canvas, m = g.getTransform(), X = Math.round(m.a * x0 + m.e), Y = Math.round(m.d * y0 + m.f), W = Math.round(m.a * w), H = Math.round(m.d * h);
+  if(W <= 0 || H <= 0) return;
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0);
+  const band = Math.max(2, Math.round(3 * m.a));
+  for(let y = Math.max(0, Y); y < Math.min(c.height, Y + H); y += band){
+    const q = (y - Y) / H, fall = Math.sin(Math.PI * q) * (.4 + .6 * q);   // сильнее у земли, слабее вверху и по краям
+    const dx = Math.sin(y * .045 / m.a + T * 5.2) * amp * m.a * fall + Math.sin(y * .11 / m.a - T * 3.1) * amp * .4 * m.a * fall;
+    g.drawImage(c, X, y, W, band, X + dx, y, W, band);
+  }
+  g.restore();
+}
+/* свой небольшой слой для духа: рисуем чётко, потом растворяем низ и даём свечение */
+const _SPL = {};
+function spiritLayer(g, key, x0, y0, w, h, paint, post){
+  const m = g.getTransform(), sc = m.a, W = Math.ceil(w * sc), H = Math.ceil(h * sc); if(W < 2 || H < 2) return;
+  let c = _SPL[key]; if(!c){ c = _SPL[key] = document.createElement('canvas'); } if(c.width !== W || c.height !== H){ c.width = W; c.height = H; }
+  const L = c.getContext('2d'); L.setTransform(1, 0, 0, 1, 0, 0); L.clearRect(0, 0, W, H); L.setTransform(sc, 0, 0, sc, -x0 * sc, -y0 * sc);
+  paint(L); L.setTransform(sc, 0, 0, sc, -x0 * sc, -y0 * sc); if(post) post(L);
+  g.save(); g.setTransform(1, 0, 0, 1, 0, 0); return { c, X: m.a * x0 + m.e, Y: m.d * y0 + m.f, W, H, done:() => g.restore() };
+}
+function fadeDown(L, x0, w, yA, yB, a){ L.globalCompositeOperation = 'destination-out'; const gr = L.createLinearGradient(0, yA, 0, yB); gr.addColorStop(0, 'rgba(0,0,0,0)'); gr.addColorStop(1, `rgba(0,0,0,${a})`); L.fillStyle = gr; L.fillRect(x0, yA, w, yB - yA + 40); L.globalCompositeOperation = 'source-over'; }
+function drawNoonArt(g, x0){
+  const x = x0 + Math.sin(T * .7) * 4, base = GY - 56, H = 208, br = .9 + Math.sin(T * 2.1) * .05 + Math.sin(T * 5.3) * .02;
+  heatHaze(g, x - 110, base - H - 40, 220, H + 70, 3);
+  g.save(); g.globalCompositeOperation = 'screen';   // жаркий воздух вокруг неё светлее
+  let gr = g.createRadialGradient(x, base - H * .7, 4, x, base - H * .55, 150);
+  gr.addColorStop(0, `rgba(255,244,210,${.32 * br})`); gr.addColorStop(.5, `rgba(255,236,190,${.1 * br})`); gr.addColorStop(1, 'rgba(255,236,190,0)');
+  g.fillStyle = gr; g.fillRect(x - 160, base - H - 110, 320, H + 150); g.restore();
+  const sw = Math.sin(T * 1.3) * 3, sw2 = Math.sin(T * 1.7 + 1) * 2.5, hw = Math.sin(T * .9) * 4;
+  const paint = L => {
+    L.translate(x, base); L.scale(-1, 1);   // смотрит влево, к деревне
+    // волосы распущены до пояса, ветер их чуть ведёт
+    L.fillStyle = 'rgb(236,222,178)'; shagPath(L, [[-3, -H - 2], [-11, -H + 6], [-15, -H + 26], [-17 - hw * .3, -H + 60], [-22 - hw, -H + 104], [-12 - hw * .6, -H + 100], [-8, -H + 64], [-4, -H + 30], [6, -H + 4]], 2.4, 11); L.fill();
+    // рубаха до земли: узкие плечи, поясок, подол колоколом
+    const shirt = [[-5, -H + 22], [-13, -H + 30], [-15, -H + 52], [-13, -H + 84], [-11, -H + 92], [-17, -H + 130], [-25 + sw2, -50], [-32 + sw, 0], [-12, 3], [6, 0], [26 + sw, 2], [22 + sw2, -50], [14, -H + 130], [10, -H + 92], [11, -H + 84], [12, -H + 52], [11, -H + 30], [5, -H + 22]];
+    const fg = L.createLinearGradient(0, -H, 0, 0); fg.addColorStop(0, 'rgb(252,249,238)'); fg.addColorStop(.6, 'rgb(240,232,212)'); fg.addColorStop(1, 'rgb(222,208,176)');
+    L.fillStyle = fg; shagPath(L, shirt, 1.2, 3); L.fill();
+    L.fillStyle = 'rgba(170,150,112,.5)'; shagPath(L, [[-17, -H + 120], [-24 + sw2, -50], [-30 + sw, 0], [-20, 2], [-14, -H + 124]], 1, 7); L.fill();   // тень складок
+    L.strokeStyle = 'rgba(150,128,96,.45)'; L.lineWidth = 1.2;
+    for(const a of [-8, 1, 8]){ L.beginPath(); L.moveTo(a, -H + 96); L.quadraticCurveTo(a * 1.6 + sw * .3, -80, a * 2.2 + sw * .7, -2); L.stroke(); }
+    L.strokeStyle = 'rgb(150,52,40)'; L.lineWidth = 2.2; L.beginPath(); L.moveTo(-11, -H + 90); L.lineTo(10, -H + 89); L.stroke();   // красный поясок
+    L.beginPath(); L.moveTo(8, -H + 90); L.lineTo(10, -H + 108); L.lineWidth = 1.2; L.stroke();
+    // опущенная рука вдоль тела
+    L.strokeStyle = 'rgb(244,236,216)'; L.lineCap = 'round'; L.lineWidth = 6; L.beginPath(); L.moveTo(-10, -H + 30); L.quadraticCurveTo(-15, -H + 70, -13, -H + 104); L.stroke();
+    // голова и шея; лицо не разобрать
+    L.fillStyle = 'rgb(252,246,232)'; L.fillRect(-3, -H + 14, 6, 10); L.beginPath(); L.ellipse(1, -H + 6, 7, 9.5, .1, 0, Math.PI * 2); L.fill();
+    L.strokeStyle = 'rgb(214,190,120)'; L.lineWidth = 2; L.beginPath(); L.arc(1, -H + 4, 8, Math.PI * 1.05, Math.PI * 1.95); L.stroke();   // венок из колосьев
+    // рука на плече и серп: рукоять в кулаке, лезвие полумесяцем впереди головы
+    L.strokeStyle = 'rgb(244,236,216)'; L.lineWidth = 6; L.beginPath(); L.moveTo(9, -H + 30); L.quadraticCurveTo(22, -H + 40, 17, -H + 20); L.stroke();
+    L.strokeStyle = 'rgb(150,120,84)'; L.lineWidth = 2.6; L.beginPath(); L.moveTo(17, -H + 22); L.lineTo(20, -H + 2); L.stroke();
+    const cx = 32, cy = -H + 4, R = 15; L.fillStyle = 'rgb(206,206,198)'; L.beginPath(); L.arc(cx, cy, R, Math.PI, Math.PI * 2.28, false); L.arc(cx + 3, cy + 3, R - 4, Math.PI * 2.24, Math.PI * 1.05, true); L.closePath(); L.fill();
+    L.strokeStyle = 'rgba(255,255,255,.95)'; L.lineWidth = .9; L.beginPath(); L.arc(cx, cy, R - .4, Math.PI * 1.05, Math.PI * 2.2); L.stroke();
+  };
+  const post = L => { L.setTransform(1, 0, 0, 1, 0, 0); L.globalCompositeOperation = 'destination-out'; L.fillStyle = 'rgba(0,0,0,.18)'; L.fillRect(0, 0, L.canvas.width, L.canvas.height); L.globalCompositeOperation = 'source-over';
+    const m = g.getTransform(); L.setTransform(m.a, 0, 0, m.a, -(x - 70) * m.a, -(base - H - 40) * m.a); fadeDown(L, x - 70, 140, base - 70, base + 2, 1); };   // полупрозрачна, а подол тонет в ржи
+  const Lr = spiritLayer(g, 'noon', x - 70, base - H - 40, 140, H + 46, paint, post); if(!Lr) return;
+  g.globalAlpha = .42 * br; g.globalCompositeOperation = 'screen'; g.filter = `blur(${Math.max(4, Lr.W / 30)}px)`; g.drawImage(Lr.c, Lr.X, Lr.Y);   // ореол
+  g.filter = `blur(${Math.max(.6, Lr.W / 260)}px)`; g.globalCompositeOperation = 'source-over'; g.globalAlpha = .86 * br; g.drawImage(Lr.c, Lr.X, Lr.Y); g.filter = 'none'; Lr.done();
+  // на месте лица — слепящее пятно, блик бежит по лезвию
+  g.save(); g.globalCompositeOperation = 'lighter';
+  const fx = x - 1, fy = base - H + 6; gr = g.createRadialGradient(fx, fy, 0, fx, fy, 18); gr.addColorStop(0, `rgba(255,255,250,${.85 * br})`); gr.addColorStop(.4, `rgba(255,248,220,${.3 * br})`); gr.addColorStop(1, 'rgba(255,248,220,0)'); g.fillStyle = gr; g.fillRect(fx - 18, fy - 18, 36, 36);
+  const ga = Math.PI + ((T * .5) % 1.8) * Math.PI * .7; if(ga < Math.PI * 2.28){ const bx = x - (32 + Math.cos(ga) * 15), by = base - H + 4 + Math.sin(ga) * 15;
+    gr = g.createRadialGradient(bx, by, 0, bx, by, 12); gr.addColorStop(0, 'rgba(255,255,255,.95)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(bx - 12, by - 12, 24, 24);
+    g.strokeStyle = 'rgba(255,255,255,.6)'; g.lineWidth = .7; g.beginPath(); g.moveTo(bx - 9, by); g.lineTo(bx + 9, by); g.moveTo(bx, by - 9); g.lineTo(bx, by + 9); g.stroke(); }
+  // пыльца в горячем воздухе
+  for(let i = 0; i < 18; i++){ const t = (T * (.05 + .05 * _rnd(i)) + _rnd(i + 50)) % 1, px = x + (_rnd(i + 9) - .5) * 170 + Math.sin(T + i) * 6, py = base + 10 - t * (H + 50), a = Math.sin(Math.PI * t) * .45;
+    g.fillStyle = `rgba(255,244,205,${a})`; g.beginPath(); g.arc(px, py, .8 + _rnd(i + 3), 0, Math.PI * 2); g.fill(); }
+  g.restore();
+}
+/* Леший сидит на пне у развилки: сгорбленный, косматый, мох и ветки вместо волос. Тени у него нет. */
+function drawLeshyArt(g, x0, ph){
+  const sy = 268, x = x0 + 2, K = .8;      // верх пня — по картине поля
+  const bre = Math.sin(T * 1.1) * 1, rot = Math.sin(T * .45) * .012;
+  const paint = L => {
+    L.translate(x, sy); L.rotate(rot); L.scale(-K, K);   // лицом к тропинке, к Анне
+    const mg = L.createLinearGradient(-20, -130, 30, 90); mg.addColorStop(0, 'rgb(40,44,32)'); mg.addColorStop(.4, 'rgb(23,26,19)'); mg.addColorStop(1, 'rgb(12,14,10)');
+    L.fillStyle = 'rgb(16,19,13)';   // ноги в онучах, лапти
+    shagPath(L, [[34, 8], [50, 4], [52, 40], [54, 74], [66, 80], [66, 86], [40, 86], [42, 70], [40, 30]], 2.5, 21); L.fill();
+    shagPath(L, [[22, 10], [36, 12], [34, 44], [32, 78], [40, 84], [18, 86], [22, 72], [24, 40]], 2.5, 27); L.fill();
+    // посох прислонён к плечу
+    L.strokeStyle = 'rgb(34,29,20)'; L.lineWidth = 4; L.lineCap = 'round'; L.beginPath(); L.moveTo(70, 86); L.lineTo(64, 20); L.lineTo(58, -40); L.lineTo(50, -112); L.lineTo(56, -122); L.stroke();
+    // тулуп: горб, широкая спина, полы лежат на коленях
+    L.fillStyle = mg; shagPath(L, [[-12, -98 + bre], [-26, -84], [-33, -56], [-34, -22], [-31, 2], [-36, 16], [-6, 20], [24, 16], [52, 10], [54, -4], [44, -12], [22, -18], [16, -42], [16, -68], [10, -88 + bre]], 4.5, 5); L.fill();
+    L.strokeStyle = 'rgba(70,64,46,.6)'; L.lineWidth = 1.4; L.beginPath(); L.moveTo(8, -84); L.quadraticCurveTo(-2, -40, 6, 16); L.stroke();   // запах на левую сторону
+    // голова свешена вперёд, ниже плеч
+    L.fillStyle = 'rgb(22,26,18)'; shagPath(L, [[8, -92 + bre], [6, -104 + bre], [14, -114 + bre], [26, -112 + bre], [32, -102 + bre], [30, -90 + bre], [20, -84 + bre]], 3, 41); L.fill();
+    L.fillStyle = 'rgb(36,40,28)'; shagPath(L, [[16, -94 + bre], [32, -94 + bre], [33, -76], [28, -52], [24, -64], [19, -48], [16, -70]], 4, 61); L.fill();   // борода мочалом
+    // рука лежит на колене
+    L.strokeStyle = 'rgb(22,26,17)'; L.lineWidth = 10; L.beginPath(); L.moveTo(-2, -78); L.quadraticCurveTo(14, -40, 46, -8); L.stroke();
+    L.fillStyle = 'rgb(58,50,36)'; L.beginPath(); L.ellipse(48, -7, 5, 4, 0, 0, Math.PI * 2); L.fill();
+    // ветки и мох вместо шапки
+    L.lineWidth = 1.5; L.strokeStyle = 'rgb(28,31,21)';
+    const twig = (x, y, a, l, d) => { if(d > 3 || l < 4) return; const ex = x + Math.cos(a) * l, ey = y + Math.sin(a) * l; L.beginPath(); L.moveTo(x, y); L.lineTo(ex, ey); L.stroke(); twig(ex, ey, a - .45 - _rnd(d + l) * .2, l * .62, d + 1); twig(ex, ey, a + .4 + _rnd(d * 7 + l) * .2, l * .55, d + 1); };
+    twig(12, -110 + bre, -Math.PI / 2 - .7, 18, 0); twig(20, -114 + bre, -Math.PI / 2 - .05, 16, 0); twig(27, -110 + bre, -Math.PI / 2 + .55, 13, 1);
+    L.filter = 'blur(1.5px)'; L.fillStyle = 'rgba(88,104,58,.22)'; for(const [mx, my, rx, ry] of [[-14, -86, 14, 5], [2, -94, 9, 4], [-28, -40, 5, 12], [40, -8, 10, 4]]){ L.beginPath(); L.ellipse(mx, my, rx, ry, -.3, 0, Math.PI * 2); L.fill(); }
+  };
+  const post = L => { L.filter = 'none'; L.globalCompositeOperation = 'source-atop'; L.lineWidth = .9;   // свалявшаяся шерсть и мох
+      for(let i = 0; i < 260; i++){ const px = x - 60 + _rnd(i) * 120, py = sy - 110 + _rnd(i + 400) * 190, a = (_rnd(i + 900) - .5) * .9 + Math.PI / 2, l = 2 + _rnd(i + 77) * 3;
+        L.strokeStyle = i % 3 ? 'rgba(4,5,3,.35)' : 'rgba(78,84,58,.22)'; L.beginPath(); L.moveTo(px, py); L.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); L.stroke(); }
+      L.globalCompositeOperation = 'source-over'; fadeDown(L, x - 80, 160, sy + 14, sy + 60, .9); };   // ноги уходят в туман
+  const Lr = spiritLayer(g, 'leshy', x - 80, sy - 130, 160, 210, paint, post); if(!Lr) return;
+  g.filter = `blur(${Math.max(.5, Lr.W / 300)}px)`; g.globalAlpha = .96; g.drawImage(Lr.c, Lr.X, Lr.Y); g.filter = 'none'; g.globalAlpha = 1; Lr.done();
+  // бледно-зелёные глаза из-под бровей, моргают
+  if((T % 5.7) < 5.5){ g.save(); g.globalCompositeOperation = 'lighter';
+    for(const ex of [21, 28]){ const ex2 = x - ex * K, ey = sy + (-101 + bre) * K, gr = g.createRadialGradient(ex2, ey, 0, ex2, ey, 6); gr.addColorStop(0, 'rgba(210,250,150,.9)'); gr.addColorStop(.35, 'rgba(160,220,100,.35)'); gr.addColorStop(1, 'rgba(160,220,100,0)'); g.fillStyle = gr; g.fillRect(ex2 - 6, ey - 6, 12, 12);
+      g.fillStyle = 'rgba(232,255,190,1)'; g.beginPath(); g.ellipse(ex2, ey, 1.3, .9, 0, 0, Math.PI * 2); g.fill(); }
+    g.restore(); }
+}
+function drawSpirits(g, list, ph){ for(const n of list){ if(n.id === 'noon') drawNoonArt(g, n.x); else if(n.id === 'leshy') drawLeshyArt(g, n.x, ph); } }

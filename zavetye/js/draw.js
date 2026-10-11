@@ -294,6 +294,9 @@ function drawArtFrame(v, camX, anna, P, ph){
   // дальний туман — за героями, ближний — полупрозрачно поверх, чтобы фигуры не тонули
   if(!a.bright){ g.setTransform(1, 0, 0, 1, 0, 0); drawFog(g, ph, camX, fogK, 'back'); }
   g.setTransform(s, 0, 0, s, -camX * s, oy);
+  // духи — часть картины: стоят глубже героев и светятся своим светом
+  const spirits = npcsFor(v).filter(spiritOwn).map(n => ({ ...n, x:rx(n.x) }));
+  if(spirits.length){ drawSpirits(g, spirits, ph); g.setTransform(s, 0, 0, s, -camX * s, oy); }
   // герои рисуются на отдельный слой и подкрашиваются светом сцены (огонь, туман, закат)
   const tint = LOWQ.off ? null : charTint(v.strip, ph), lc = tint ? charLayer(cw, ch) : null;
   if(anna && tint) sampleScene(g, (rx(anna.x) - camX) * s, oy + (GY - 124 * k) * s, 124 * k * s, v.strip + ph);
@@ -302,7 +305,7 @@ function drawArtFrame(v, camX, anna, P, ph){
   try{
     drawFx(g);
     const at = x => { g.setTransform(s * k, 0, 0, s * k, (x - camX) * s - x * s * k, oy + GY * s * (1 - k)); };
-    for(const n of npcsFor(v)){ const m = { ...n, x:rx(n.x) }; at(m.x); if(n.id === 'young' && v.strip === 'forestroad' && artParts('forestroad', 0)){ g.translate(m.x, GY); g.scale(.8, .8); g.translate(-m.x, -GY - 100); } if(n.id === 'varya' && !IMG.s_varya){ figure(g, m.x, LOOKS.varya, { face:1 }); continue; } drawNpc(g, m); }
+    for(const n of npcsFor(v)){ if(spiritOwn(n)) continue; const m = { ...n, x:rx(n.x) }; at(m.x); if(n.id === 'young' && v.strip === 'forestroad' && artParts('forestroad', 0)){ g.translate(m.x, GY); g.scale(.8, .8); g.translate(-m.x, -GY - 100); } if(n.id === 'varya' && !IMG.s_varya){ figure(g, m.x, LOOKS.varya, { face:1 }); continue; } drawNpc(g, m); }
     if(v.strip === 'road'){ const sx = rx(spot('road', 'Бетонная плита', 1150)) - 60;
       if(v.flags.busstop){ at(sx); busStop(g, sx + 6, 'new'); } else if(v.flags.rustystop){ at(sx); busStop(g, sx + 6, 'rust'); } }
     if(anna){ at(rx(anna.x)); annaDraw(g, rx(anna.x), anna.dir, anna.move, anna.ph); }
@@ -324,7 +327,7 @@ function drawArtFrame(v, camX, anna, P, ph){
   };
   if(lc){
     // работаем только в полосе, где стоят герои: так в разы быстрее
-    const xs = []; if(anna) xs.push(rx(anna.x)); for(const n of npcsFor(v)) xs.push(rx(n.x)); if(v.bus) xs.push(rx(v.bus.x) + 190);
+    const xs = []; if(anna) xs.push(rx(anna.x)); for(const n of npcsFor(v)) if(!spiritOwn(n)) xs.push(rx(n.x)); if(v.bus) xs.push(rx(v.bus.x) + 190);
     const lo = xs.length ? Math.min(...xs) : camX, hi = xs.length ? Math.max(...xs) : camX;
     const X0 = Math.max(0, Math.floor((lo - 220 - camX) * s)), X1 = Math.min(cw, Math.ceil((hi + 220 - camX) * s));
     const Y0 = Math.max(0, Math.floor(oy + (GY - 300 * Math.max(1, k)) * s)), Y1 = Math.min(ch, Math.ceil(oy + (GY + 30) * s));

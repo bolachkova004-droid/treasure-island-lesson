@@ -235,6 +235,22 @@ painterly digital illustration, semi-realistic, northern Russian village, Slavic
 **31. `bg_stop_wet`** — мокрая остановка на старой дороге.
 > Side view of an empty rural bus stop by an old broken asphalt road in the rain: a rusty metal shelter, a bench with peeling paint, a faded timetable, puddles, a grey forest behind. Ordinary and lonely. Cold grey light, steady drizzle.
 
+### Этап 6. Духи: Полудница и Леший
+
+Сейчас в игре они нарисованы кодом прямо в картину: Полудница — светящаяся фигура в дрожащем от жары воздухе, Леший — тёмный силуэт на пне у ельника с зелёными глазами. Если сделать для них картинки, игра возьмёт их вместо этого. Фон — **ровный нейтральный серый, без теней и пола**: так их легко вырезать.
+
+**32. `s_noon`** — Полудница в полный рост.
+> Full-body side view, facing right, of Poludnitsa, the noon spirit of Slavic folklore: a very tall thin woman in a long white linen shirt down to the ground with a thin red woven belt, long pale wheat-coloured hair loose to the waist, a small wreath of rye ears. Her right hand rests on her shoulder holding an old sickle, the curved blade above her shoulder catching a spark of sunlight. Her face is lost in a soft blinding glow, no features visible. The hem of the shirt fades into heat haze. Painted in the same muted realistic painterly style as the backgrounds, warm noon light from above. Plain flat neutral grey background, no floor, no shadow, nothing else in the frame.
+
+**33. `p_noon_neutral`** — Полудница, портрет по пояс.
+> Waist-up portrait of the same Poludnitsa, three-quarter view: white linen shirt with faded red embroidery at the collar, pale loose hair, the sickle on her shoulder. Where her face should be there is only bright overexposed light, as if looking at the sun; you can barely sense the eyes. Heat shimmer around her outline. Holy and frightening at once. Muted painterly realism. Plain flat neutral grey background.
+
+**34. `s_leshy`** — Леший сидит на пне.
+> Full-body side view, facing right, of Leshy, the forest spirit of Slavic folklore, sitting hunched on a low mossy stump: an old gaunt man in a worn dark sheepskin coat buttoned on the wrong (left) side, one arm resting on his knee, a crooked walking stick leaning on his shoulder, bast shoes. His long beard is like dry grey lichen, small bare twigs and moss grow out of his hair instead of a hat, faint pale green eyes. Dark, earthy, desaturated colours — he almost merges with a spruce forest. He casts no shadow. Muted realistic painterly style, cold morning light. Plain flat neutral grey background, the stump included, no ground, nothing else.
+
+**35. `p_leshy_neutral`** — Леший, портрет по пояс.
+> Waist-up portrait of the same Leshy, three-quarter view, head slightly lowered, looking up from under heavy brows: weathered face like old bark, lichen beard, twigs and moss in the hair, faintly glowing pale green eyes, the sheepskin collar buttoned on the wrong side. Calm, ancient, indifferent. Muted painterly realism, cold forest light. Plain flat neutral grey background.
+
 ---
 
 Когда всё будет готово, напомни мне скачать все картинки и отправить их в Claude вместе с именами файлов.
