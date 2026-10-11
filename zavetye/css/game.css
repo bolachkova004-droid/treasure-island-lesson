@@ -171,6 +171,10 @@ body.f-nb .hud{opacity:0;pointer-events:none}
 .trb:hover{color:var(--milk)}
 .note .trb,.nb .trb{color:var(--graphite)}
 
+/* иллюстрация видения — на весь экран под диалогом */
+.illus{position:fixed;inset:0;z-index:18;opacity:0;pointer-events:none;transition:opacity .9s ease;background:#0b0a09}
+.illus.on{opacity:1}
+.illus img{width:100%;height:100%;object-fit:cover;display:block}
 /* ---------- портреты: не выше ~70% экрана ---------- */
 .portrait{position:fixed;bottom:0;left:max(2vw,8px);z-index:19;height:min(70vh,720px);pointer-events:none;opacity:0;transform:translateX(-24px);transform-origin:50% 100%;transition:opacity .45s ease,transform .45s ease,filter .4s ease}
 .portrait.right{left:auto;right:max(2vw,8px);transform:translateX(24px)}

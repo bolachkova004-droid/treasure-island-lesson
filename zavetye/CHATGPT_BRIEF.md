@@ -255,6 +255,34 @@ painterly digital illustration, semi-realistic, northern Russian village, Slavic
 **34. `s_domovoi`** — Домовой.
 > Use the attached image only as a style reference: same muted, realistic painterly style, same soft light and colour palette. Paint Domovoi, the house spirit of Slavic folklore, full body, standing, three-quarter view turned to the right. A tiny hunched old man, the height of a cat, completely overgrown with shaggy grey-brown hair, a long tangled beard, a faded linen shirt with a rope belt, tiny bast shoes, big rough hands. Two small amber eyes glowing softly from under bushy brows. Grumpy but kind, a little funny. Warm stove light from one side. Plain flat neutral grey background, no floor, no shadow, nothing else in the picture. Vertical image.
 
+### Этап 7. Чего ещё не хватает (по важности)
+
+Для видений и остановки место в игре уже подготовлено. Присылайте картинки с именем файла — я вырежу фон где нужно и подключу.
+
+**Сначала — сюжетно важные**
+
+**36. `p_aglaya_photo`** — фотография Аглаи. Её Анна находит в школе («у Аглаи мамин подбородок»), сейчас в этой сцене портрета нет.
+> An old faded colour photograph from 2004, slightly damaged, film grain: a strict village English teacher around forty in a dark plain dress, hair pulled back, standing in front of a wooden school wall, looking straight at the camera, a sad intelligent face. Muted colours like an old print. Portrait orientation, waist up.
+
+**37. `il_vision`** — видение Полудницы: утро 12 июня 2004 года. Показывается на весь экран, пока идёт видение.
+> Wide cinematic painting, same muted realistic painterly style as the attached image. Early foggy morning in a Russian village yard in 2004: a straight new wooden fence, a shiny new red Java motorcycle, a small log banya. A young woman in a headscarf, seen from behind, slides a heavy iron bolt on the outside of the banya door, her hands trembling. At the gate, half hidden in fog, a second small dark figure of an old woman. Cold blue-grey light, silence, a feeling of something wrong. Horizontal 16:9.
+
+**38. `il_izba`** — изба на порогах в ночном лесу. Тоже на весь экран.
+> Wide cinematic painting, same muted realistic painterly style as the attached image. Night in a dense spruce forest: between the trunks stands an old log house that rests not on chicken legs but on dozens of wooden thresholds stacked one above another like a crooked staircase, each leading to its own small door. Only one window is lit with warm light, and a woman with her hair pulled back stands in it, raising one hand. Grey-blue darkness, fog between the trees. Horizontal 16:9.
+
+**39. `s_stop_new`** и **40. `s_stop_rust`** — остановка на старой дороге (появляется в концовках). Сейчас она нарисована кодом и выглядит как картинка из другой игры.
+> Side view of a small rural Soviet-style bus stop: a tin roof on two metal posts, a narrow wooden bench, a sign «Заветье» and a small timetable on the post. Painted fresh and neat, as if it was put up yesterday. Same muted realistic painterly style as the attached image. Plain flat neutral grey background, no ground, no shadow, nothing else.
+
+Для `s_stop_rust` — тот же промт, но: *«completely rusted, no sign, no timetable, the bench is broken, abandoned for twenty years»*.
+
+**Потом — эмоции**
+
+**41. `p_varya_sad`** — Варя расстроенная (после правды о папе). Тот же лист персонажа, что и `p_varya_neutral`: *«the same girl, waist up, looking down, holding the book to her chest, trying not to cry»*.
+
+**42. `p_young_relief`** — Гриша в 18 лет в момент, когда понимает, что не проспал. Тот же лист, что и `p_young_neutral`: *«the same young man, waist up, exhaling with relief and confusion, eyes wet, headphones around his neck»*.
+
+**И ещё из этапа 5** (если будут силы): `bg_aglaya_house_day` — дом Аглаи днём без луны в окне (24), ночные версии улицы, школы, реки и лесной остановки (25–28).
+
 ---
 
 Когда всё будет готово, напомни мне скачать все картинки и отправить их в Claude вместе с именами файлов.

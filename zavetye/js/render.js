@@ -239,6 +239,7 @@ function appleTree(g, x, swingA){
   return [ex, ey];
 }
 function busStop(g, x, kind){
+  { const im = IMG[kind === 'new' ? 's_stop_new' : 's_stop_rust']; if(im){ const h = 190, w = im.width / im.height * h; g.drawImage(im, x + 80 - w / 2, GY + 6 - h, w, h); return; } }   // картинка остановки, если она уже есть
   const col = kind === 'rust' ? '#9a5a36' : C.blue;
   rect(g, x, GY - 122, 7, 122, col, 1.6); rect(g, x + 112, GY - 122, 7, 122, col, 1.6);
   shape(g, kind === 'rust' ? '#8a4a2a' : C.cin, () => { g.moveTo(x - 14, GY - 122); g.lineTo(x + 133, GY - 122); g.lineTo(x + 124, GY - 136); g.lineTo(x - 5, GY - 136); g.closePath(); }, 2);

@@ -20,6 +20,10 @@ function openScene(id){
   if(id === 'morning' && !ui.cardShown){ ui.cardShown = true; dayCard(() => { ui.cardShown = false; showScene(id); }); return; }
   showScene(id);
 }
+/* иллюстрации на весь экран для видений: показываются, только если картинка уже есть */
+const ILLUS = { noon_vision:'il_vision', forest_night:'il_izba' };
+function showIllus(id){ const k = ILLUS[id], el = $('illus'); if(!el) return; const im = k && IMG[k];
+  if(im){ el.querySelector('img').src = im.src; el.classList.add('on'); } else el.classList.remove('on'); }
 function showScene(id){
   if(id === 'p_bus') st.bus = { x:1300, mode:'park' };
   if(id === 'morning') st.wake = null;
@@ -33,7 +37,7 @@ function showScene(id){
   ui.dlg = true; $('dlg').classList.remove('chsheet'); hideHint(); $('area').classList.remove('on');
   trackOnce('first_dialogue');
   if(!st.tut.dlg){ st.tut.dlg = 1; setTimeout(() => caption(coarse() ? 'Нажмите на текст, чтобы читать дальше.' : 'Щелчок или пробел — читать дальше.', 4200), 600); }
-  showPortrait(id); renderDlg(); updateHud(); focusSync(); save();
+  showIllus(id); showPortrait(id); renderDlg(); updateHud(); focusSync(); save();
 }
 function resumeDlg(){ const id = st.scene; const sc = S[id](); curChoices = sc.choices || []; if(!st.view || st.view.id !== id) st.view = { id, title: sc.title || '', cap: !!sc.cap, away: !!sc.away, pages: sc.text.filter(Boolean).map(wrapP) }; DLG = { i: st.view.pages.length - 1 }; ui.dlg = true; showPortrait(id); renderDlg(); focusSync(); }
 const coarse = () => matchMedia('(pointer:coarse)').matches;
@@ -70,7 +74,7 @@ function choose(i){
 }
 function hideDlg(){ $('dlg').hidden = true; ui.dlg = false; hidePortrait(); focusSync(); }
 function closeDlg(){
-  hideDlg(); st.scene = null; st.view = null; DLG = null; curChoices = [];
+  showIllus(null); hideDlg(); st.scene = null; st.view = null; DLG = null; curChoices = [];
   if(ui.end) return save();
   if(st.pend){ const p = st.pend; st.pend = null; teleport(p, closeDlg); return; }
   if(st.day >= 5 && !F('busDone')){ busArrive(); return; }
