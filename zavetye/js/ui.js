@@ -235,6 +235,13 @@ function restartGame(){ wipeSave(); st = null; $('endScr').hidden = true; ui.end
 $('menu').addEventListener('input', e => { const r = e.target.closest('[data-vol]'); if(!r) return; SET[r.dataset.vol] = +r.value; saveSet(); applyVolumes(); renderMenu(); });
 
 /* ---------- финал: дело Анны ---------- */
+/* итог по английскому для дела Анны */
+function enStats(){
+  if(typeof formsSeen !== 'function') return '';
+  const E = st.en || { gaps:{}, docs:{}, quiz:{ right:0, total:0 } }, f = formsSeen().size, g = GAPS.filter(x => E.gaps[x.id] && E.gaps[x.id].done).length;
+  const d = Object.values(E.docs || {}).filter(x => x.first === true).length, nd = Object.keys(E.docs || {}).length;
+  return `<p>Конструкций встретилось: ${f} из ${Object.keys(FORMS).length}. Стёртых строк восстановлено: ${g} из ${GAPS.length}. Документов понято с первого раза: ${d} из ${nd}.${E.quiz && E.quiz.total ? ` Самопроверка: ${E.quiz.right} из ${E.quiz.total}.` : ''}</p>`;
+}
 function showEnd(kind){
   const o = st.outcome, a = st.flags.answer;
   const title = kind === 'leave' && !o ? 'Лес подождёт' : ({ truth:'Остановка на старой дороге', half:'Ржавый навес', convenient:'Заросшая дорога', erase:'Чистые страницы', loop:'Шесть тридцать восемь' }[o] || 'Заветье');
@@ -260,7 +267,7 @@ function showEnd(kind){
       <section class="cf-sec"><h3>Что случилось на самом деле</h3><p>${truthTold ? happened : 'Анна узнает это, если вернётся к делу. Подсказка: всё, что пересказывают, могли переписать. Домашние задания не пересказывает никто.'}</p></section>
       <section class="cf-sec"><h3>Три главные улики</h3><ul>${top.length ? top.map(id => `<li>${CLUES[id].t}</li>`).join('') : '<li>Улик не собрано.</li>'}</ul></section>
       <section class="cf-sec"><h3>Что оказалось ложью</h3><ul>${lies.length ? lies.map(x => `<li class="lie">${x}</li>`).join('') : '<li>Анна не успела услышать неправду. Или не заметила её.</li>'}</ul></section>
-      <section class="cf-sec wide"><h3>Какой английский помог</h3><ul>${enLine}</ul></section>
+      <section class="cf-sec wide"><h3>Какой английский помог</h3><ul>${enLine}</ul>${enStats()}</section>
       <section class="cf-sec wide"><h3>Что осталось необъяснённым</h3><ul>${open.map(x => `<li>${x}</li>`).join('')}</ul>${a ? `<p>Грише Анна сказала: ${{ leave:'«Уезжай».', stay:'«Оставайся».', choice:'«Решай сам».', silence:'ничего.' }[a]}</p>` : ''}</section>
     </div>
     <div class="teaser">Утром Анна замечает в доме Аглаи дверь. Вчера её не было.<b>ДЕЛО II — СКОРО</b></div>

@@ -20,7 +20,7 @@ function closeBook(){ ui.nb = false; $('nbw').hidden = true; if(typeof focusSync
 function tabCount(k){
   if(!st) return 0;
   return { case: st.order.filter(id => CLUES[id].kind !== 'en').length, people: st.people.length, world: st.changes.length + st.lore.length,
-    notes: st.notes.length, en: st.order.filter(id => CLUES[id].kind === 'en').length }[k] || 0;
+    notes: st.notes.length, en: st.order.filter(id => CLUES[id].kind === 'en').length + Object.keys((st.en && st.en.docs) || {}).length }[k] || 0;
 }
 function renderBook(){
   if(!st) return;
@@ -197,7 +197,14 @@ function enUI(){
   }
   // перенос навыка: один раз, когда прочитаны две-три записи
   if(ids.filter(id => st.clues[id].lens).length >= 2) h += '<p class="transfer">Вы сейчас различили мечту, твёрдый план и то, чему помешали. Это тот же навык, что нужен в обычной речи: <i>I want to</i>, <i>I’m going to</i>, <i>I would have</i> говорят о разном.</p>';
-  h += '<h3>Заметки Аглаи</h3><div class="agl"><p><u>want to</u>, <u>will</u> — хочу, уеду когда-нибудь. Мечта.</p><p><u>am going to</u>, <u>have bought</u>, <u>have packed</u> — решено и сделано. План.</p><p><u>would have left</u> — уехал бы. Значит, помешали.</p><p class="sig">Для дела это разные вещи. — А. К.</p></div>';
+  h += gapsUI() + docsUI() + quizUI() + formsUI() + wordsUI();
+  const fs = formsSeen();
+  h += '<h3>Заметки Аглаи</h3><div class="agl"><p><u>want to</u>, <u>will</u> — хочу, уеду когда-нибудь. Мечта.</p><p><u>am going to</u>, <u>have bought</u>, <u>have packed</u> — решено и сделано. План.</p><p><u>would have left</u> — уехал бы. Значит, помешали.</p>'
+    + (fs.has('past') || fs.has('pres') ? '<p><u>packs</u> — всегда так. <u>packed</u> — один раз, вчера.</p>' : '')
+    + (fs.has('cond1') ? '<p><u>if you pass</u>, <u>I will write</u> — если сделаешь, будет.</p>' : '')
+    + (fs.has('used') ? '<p><u>used to swim</u> — раньше купалась. Теперь — нет.</p>' : '')
+    + (fs.has('musth') ? '<p><u>must have</u> — наверняка. <u>can’t have</u> — не может быть.</p>' : '')
+    + '<p class="sig">Для дела это разные вещи. — А. К.</p></div>';
   return h;
 }
 

@@ -16,10 +16,10 @@ function fresh(diff){
   return { v:3, diff, day:0, phase:2, strip:'flat', x:720, dir:-1, scene:null, view:null, wake:null, bus:null,
     flags:{}, clues:{}, order:[], notes:[], changes:[], people:[], rel:{grisha:0,grunya:0,varya:0,nina:0},
     signal:3, unseen:0, morningDue:false, ver:{ s:null, att:[] }, outcome:null,
-    seen:[], press:{}, tut:{}, lore:[] };
+    seen:[], press:{}, tut:{}, lore:[], en:{ docs:{}, gaps:{}, quiz:{ right:0, total:0, cur:null } } };
 }
 /* старые сохранения дополняются новыми полями */
-function upgrade(s){ if(!s) return s; s.seen = s.seen || []; s.press = s.press || {}; s.tut = s.tut || {}; s.lore = s.lore || []; return s; }
+function upgrade(s){ if(!s) return s; s.seen = s.seen || []; s.press = s.press || {}; s.tut = s.tut || {}; s.lore = s.lore || []; s.en = s.en || { docs:{}, gaps:{}, quiz:{ right:0, total:0, cur:null } }; return s; }
 const dayName = d => WEEK[(1 + d) % 7];
 const F = k => !!(st && st.flags[k]);
 const setF = (k, v = true) => { st.flags[k] = v; };
@@ -57,7 +57,7 @@ function sleep(){ st.day++; st.phase = 0; st.morningDue = true; st.wake = 'bed';
 const enMark = s => s.replace(/\[([^\]]+)\]/g, '<u>$1</u>');
 const enPlain = s => s.replace(/[\[\]]/g, '');
 function en(s, ru){
-  const e = `<span class="en" lang="en">${enMark(s)}</span>`;
+  const e = `<span class="en" lang="en">${enMark(s)}</span>` + (typeof listenBtn === 'function' ? listenBtn(s) : '');
   // перевод не висит постоянно: его подсматривают по «?» (в режиме поддержки он ещё и открывается после первой попытки)
   if(!st || st.diff === 'easy' || st.diff === 'normal') return `<span class="enw">${e}<button type="button" class="trb" data-tr="${esc(ru)}" aria-label="Подсмотреть перевод" title="Подсмотреть перевод">?</button></span>`;
   return e;
