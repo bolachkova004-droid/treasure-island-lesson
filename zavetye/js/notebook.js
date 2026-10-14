@@ -19,7 +19,7 @@ function openBook(tab){
 function closeBook(){ ui.nb = false; $('nbw').hidden = true; if(typeof focusSync === 'function') focusSync(); }
 function tabCount(k){
   if(!st) return 0;
-  return { case: st.order.filter(id => CLUES[id].kind !== 'en').length, people: st.people.length, world: st.changes.length + st.lore.length,
+  return { case: st.order.filter(id => CLUES[id].kind !== 'en').length, people: st.people.length, world: st.changes.length + st.lore.length + (st.songs || []).length,
     notes: st.notes.length, en: st.order.filter(id => CLUES[id].kind === 'en').length + Object.keys((st.en && st.en.docs) || {}).length }[k] || 0;
 }
 function renderBook(){
@@ -72,6 +72,7 @@ function leads(){
   if(c('c_varya') && !c('c_banya')) L.push('Баня Лаптевых. Засов снаружи.');
   if(!F('noonDone')) L.push((c('c_timetable') || c('e3')) ? 'В полдень в поле кто-то ходит. Теперь известна точная дата.' : 'В полдень в поле спрашивают, который час. Нужна точная дата.');
   if((c('c_timetable') || c('e3')) && !F('foundRoad')) L.push('Леший на опушке ведёт туда, куда хочешь на самом деле. Теперь ясно, кого ищешь.');
+  if((st.day === 2 || st.day === 3) && !F('rusalDone')) L.push('Ночью у реки провожают русалок. Груня звала стоять с ними.');
   if(easy && F('heardTune') && !c('c_lullaby')) L.push('Колыбельную из видения кто-то поёт в деревне. Может, за ужином у Груни?');
   if(F('foundRoad') && !st.outcome) L.push('Выбрать версию, приколоть три улики и рассказать её парню на лесной остановке.');
   if(st.outcome) L.push('Дело закрыто. В воскресенье утром на старую дорогу придёт автобус.');
@@ -158,7 +159,13 @@ function worldUI(){
   let h = '<div class="case-h">Заветье</div><div class="case-q">Что здесь меняется, когда кто-то говорит достаточно крепко.</div>';
   h += '<h3>Вчера и сегодня</h3>' + (st.changes.length ? st.changes.map(vsUI).join('') : '<p class="empty">Пока всё как было. Или так только кажется.</p>');
   h += '<h3>Дом Аглаи</h3><p>' + (F('greeted') ? 'Анна поздоровалась с домом. Домовой принимает её как гостью: тепло и вежливо, но хозяйское только одалживает.' : F('silentEntry') ? 'Анна промолчала, как велела Аглая. Домовой зовёт её хозяйкой. Кто-то в углу с этим не согласен.' : 'Анна ещё не дошла до дома.') + '</p>';
-  return h + loreUI();
+  return h + songsUI() + loreUI();
+}
+function songsUI(){
+  const S = (st.songs || []).filter(k => SONGS[k]), n = Object.keys(SONGS).length;
+  let h = `<h3>Песни без конца · ${S.length} из ${n}</h3>`;
+  if(!S.length) return h + '<p class="empty">В Заветье поют — у печи, на реке, в поле. Слушайте.</p>';
+  return h + '<p class="pencil">Ни одна не допета. Груня говорит, последнюю строчку оставляют лесу.</p><div class="songs">' + S.map(k => { const s0 = SONGS[k]; return `<article class="song nb-song"><span class="song-k">${s0.t} · ${s0.src}</span>${s0.lines.join('<br>')}<span class="song-miss">…</span></article>`; }).join('') + '</div>';
 }
 const CHILD_SVG = '<svg viewBox="0 0 70 60" aria-hidden="true"><g fill="none" stroke="#3c5a8a" stroke-width="2" stroke-linecap="round"><path d="M10 50h50M18 50V30l12-10 12 10v20"/><path d="M26 50V38h8v12"/><circle cx="54" cy="12" r="6" stroke="#c98a2a"/></g></svg>';
 function loreUI(){

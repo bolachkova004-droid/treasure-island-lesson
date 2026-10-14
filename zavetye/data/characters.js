@@ -31,6 +31,8 @@ function speakerOf(id){
   if(/^fr/.test(id) || id === 'res_forest') return ['young','neutral'];
   if(/^noon/.test(id) && id !== 'noon_fail') return ['noon','neutral'];
   if(/^leshy/.test(id)) return ['leshy','neutral'];
+  if(id === 'river_rite_close' || id === 'river_rite_run') return ['grunya', IMG.p_grunya_rite ? 'rite' : 'warm'];   // в праздничном, если есть картинка
+  if(id === 'river_rite_look' || id === 'river_rite_watch') return ['anna','afraid'];
   if(/^dom/.test(id)) return ['domovoi','neutral'];
   if(id === 'school_desk' || id === 'school_in') return ['aglaya','photo'];
   if(['p_house_in','p_silent','p_greet','forest_night'].includes(id)) return ['anna','afraid'];

@@ -21,7 +21,7 @@ function openScene(id){
   showScene(id);
 }
 /* иллюстрации на весь экран для видений: показываются, только если картинка уже есть */
-const ILLUS = { noon_vision:'il_vision', forest_night:'il_izba' };
+const ILLUS = { noon_vision:'il_vision', forest_night:'il_izba', river_rite:'il_rusal' };
 function showIllus(id){ const k = ILLUS[id], el = $('illus'); if(!el) return; const im = k && IMG[k];
   if(im){ el.querySelector('img').src = im.src; el.classList.add('on'); } else el.classList.remove('on'); }
 function showScene(id){
@@ -30,10 +30,11 @@ function showScene(id){
   st.scene = id;
   const sc = S[id]();
   loreHook(id, sc);
+  if(SONG_PEND){ sc.text.push(addLore(SONG_PEND)); SONG_PEND = null; }
   st.view = { id, title: sc.title || '', cap: !!sc.cap, away: !!sc.away, pages: sc.text.filter(Boolean).map(wrapP) };
   DLG = { i:0 }; curChoices = sc.choices || [];
   { const sp = speakerOf(id); if(sp && !PORTRAIT_KEYS(sp[0]).every(k => IMG[k])) ensure(PORTRAIT_KEYS(sp[0]), 0).then(() => { if(st && st.view && st.view.id === id) portraitPage(); }); }
-  if(['noon_vision','varya_song'].includes(id) || (id === 'gr_dinner' && F('heardTune') && has('c_lullaby'))){ lullaby(); caption('♪ Кто-то тихо напевает колыбельную. Мелодия обрывается на последней строке.', 6000); }
+  if(['noon_vision','varya_song'].includes(id)){ lullaby(); caption('♪ Кто-то тихо напевает колыбельную. Мелодия обрывается на последней строке.', 6000); }
   ui.dlg = true; $('dlg').classList.remove('chsheet'); hideHint(); $('area').classList.remove('on');
   trackOnce('first_dialogue');
   if(!st.tut.dlg){ st.tut.dlg = 1; setTimeout(() => caption(coarse() ? 'Нажмите на текст, чтобы читать дальше.' : 'Щелчок или пробел — читать дальше.', 4200), 600); }

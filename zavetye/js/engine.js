@@ -16,10 +16,10 @@ function fresh(diff){
   return { v:3, diff, day:0, phase:2, strip:'flat', x:720, dir:-1, scene:null, view:null, wake:null, bus:null,
     flags:{}, clues:{}, order:[], notes:[], changes:[], people:[], rel:{grisha:0,grunya:0,varya:0,nina:0},
     signal:3, unseen:0, morningDue:false, ver:{ s:null, att:[] }, outcome:null,
-    seen:[], press:{}, tut:{}, lore:[], en:{ docs:{}, gaps:{}, quiz:{ right:0, total:0, cur:null } } };
+    seen:[], press:{}, tut:{}, lore:[], songs:[], en:{ docs:{}, gaps:{}, quiz:{ right:0, total:0, cur:null } } };
 }
 /* старые сохранения дополняются новыми полями */
-function upgrade(s){ if(!s) return s; s.seen = s.seen || []; s.press = s.press || {}; s.tut = s.tut || {}; s.lore = s.lore || []; s.en = s.en || { docs:{}, gaps:{}, quiz:{ right:0, total:0, cur:null } }; return s; }
+function upgrade(s){ if(!s) return s; s.seen = s.seen || []; s.press = s.press || {}; s.tut = s.tut || {}; s.lore = s.lore || []; s.songs = s.songs || []; s.en = s.en || { docs:{}, gaps:{}, quiz:{ right:0, total:0, cur:null } }; return s; }
 const dayName = d => WEEK[(1 + d) % 7];
 const F = k => !!(st && st.flags[k]);
 const setF = (k, v = true) => { st.flags[k] = v; };

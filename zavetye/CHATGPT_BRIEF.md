@@ -283,6 +283,19 @@ painterly digital illustration, semi-realistic, northern Russian village, Slavic
 
 **И ещё из этапа 5** (если будут силы): `bg_aglaya_house_day` — дом Аглаи днём без луны в окне (24), ночные версии улицы, школы, реки и лесной остановки (25–28).
 
+### Этап 8. Обряды и праздничные наряды
+
+В Заветье теперь есть обряды: проводы русалок ночью на реке, родительская суббота, залом во ржи, заговоры. На проводах русалок женщины в праздничном — это главное место, где костюмы могут быть яркими. Для иллюстрации место в игре уже подготовлено.
+
+**43. `il_rusal`** — проводы русалок. Показывается на весь экран во время обряда.
+> Wide cinematic painting, same realistic painterly style as the attached image, but with rich festive colour. Night by a quiet northern river, torches and small fires on the bank. A procession of village women of different ages in festive Russian folk costume: bright red checked ponevas, white linen shirts with dense red and black embroidery on the sleeves (roosters, rhombs, bird-goddesses), red and saffron headscarves with fringes, amber and rowan-berry necklaces, wreaths of cornflowers and wormwood. Two girls carry a straw doll dressed in a white shirt toward the water. An old woman in a red fringed headscarf leads them, singing. The colours glow warm against the blue-black night and mist on the water. Mysterious, beautiful and slightly frightening. Horizontal 16:9.
+
+**44. `p_grunya_rite`** — Груня в праздничном (для разговора на берегу). Тот же лист персонажа, что и у других портретов Груни.
+> The same old village woman Grunya, waist up, now in festive folk dress for a night ritual: a bright red headscarf with long fringes, a white shirt with dense red embroidery, a heavy amber necklace, a wreath of wormwood in her hands. Warm firelight from below, night behind her. Plain flat neutral grey background.
+
+**45. `p_varya_rite`** — Варя в венке (по желанию).
+> The same 12-year-old girl Varya, waist up, in a white embroidered folk shirt with a red woven belt, a crooked wreath of cornflowers on her braids, very serious face, firelight. Plain flat neutral grey background.
+
 ---
 
 Когда всё будет готово, напомни мне скачать все картинки и отправить их в Claude вместе с именами файлов.

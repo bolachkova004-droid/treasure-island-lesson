@@ -125,6 +125,9 @@ function lullaby0(){
   const N = [ [329.6, .5], [440, .5], [440, .5], [493.9, .5], [523.3, 1], [493.9, .5], [440, 1], [392, .5], [440, .5], [493.9, .5], [329.6, 1.2] ];
   let t = .3; for(const [f, d] of N){ env(f, d * 1.6, .05, 'triangle', t); t += d * .72; }
 }
+/* обрядовая песня: два голоса без слов, второй — на кварту ниже и тише, как хор у реки */
+function hum(k){ if(!AU.ctx) return; onBus(AU.music, () => { if(k === 'lull') return lullaby0(); const N = SONG_MEL[k]; if(!N) return;
+  let t = .3; for(const [f, d] of N){ env(f, d * 1.7, .045, 'triangle', t); env(f * .75, d * 1.7, .022, 'sine', t + .03); t += d * .78; } }); }
 function audioTick(dt){ if(!AU.ctx) return; onBus(AU.amb, () => audioTick0(dt)); }
 function audioTick0(dt){ const c = AU.ctx, t = c.currentTime;
   const v = st, out = v && !STRIPS[v.strip].indoor, ph = v ? phaseOf(v) : 3;
