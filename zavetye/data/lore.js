@@ -114,6 +114,6 @@ function song(id){
     setTimeout(() => { toast('В тетрадь: ' + (S0.mel ? 'песня' : 'заговор') + ' «' + S0.t + '»'); }, 700);
     if(st.songs.length === 1) SONG_PEND = 'pesni';   // поверье о песнях — отдельной страницей в конце сцены
   }
-  if(S0.mel && typeof hum === 'function') setTimeout(() => hum(S0.mel), 300);
+  if(S0.mel && typeof hum === 'function' && !window.CUT_QUIET) setTimeout(() => hum(S0.mel), 300);
   return `<div class="song"><span class="song-k">${S0.src}</span>${S0.lines.join('<br>')}<span class="song-miss">${S0.mel ? 'Песня обрывается.' : 'Дальше не написано.'}</span></div>` + extra;
 }

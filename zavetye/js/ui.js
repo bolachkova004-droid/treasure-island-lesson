@@ -18,6 +18,8 @@ function openScene(id){
   if(p && !atPlace(p)){ hideDlg(); teleport(PLACES[p], () => openScene(id)); return; }
   // новый день начинается с карточки дня — переход между днями отмечен орнаментом
   if(id === 'morning' && !ui.cardShown){ ui.cardShown = true; dayCard(() => { ui.cardShown = false; showScene(id); }); return; }
+  // обряд в первый раз — 3D кат-сцена, потом разговор
+  { const c = typeof cutFor === 'function' && cutFor(id); if(c){ playCut(id, () => { window.CUT_QUIET = true; showScene(id); setTimeout(() => { window.CUT_QUIET = false; }, 1500); }); return; } }
   showScene(id);
 }
 /* иллюстрации на весь экран для видений: показываются, только если картинка уже есть */
