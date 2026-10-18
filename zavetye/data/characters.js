@@ -35,7 +35,7 @@ function speakerOf(id){
   if(id === 'river_rite_look' || id === 'river_rite_watch') return ['anna','afraid'];
   if(/^dom/.test(id)) return ['domovoi','neutral'];
   if(id === 'school_desk' || id === 'school_in') return ['aglaya','photo'];
-  if(['p_house_in','p_silent','p_greet','forest_night'].includes(id)) return ['anna','afraid'];
+  if(['p_house_in','p_silent','p_greet','forest_night','forest_lost'].includes(id)) return ['anna','afraid'];
   if(['p_call','after_case','stay_open','bus_sunday'].includes(id)) return ['anna','sad'];
   if(/^p_/.test(id)) return ['anna','neutral'];
   return null;

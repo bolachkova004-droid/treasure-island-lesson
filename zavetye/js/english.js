@@ -92,6 +92,7 @@ const WORDS = {
   stove:['stove','печь'], feed:['feed','кормить'], greet:['greet','здороваться'], retell:['retell','пересказывать'], homework:['homework','домашнее задание'],
   porch:['porch','крыльцо'], exam:['exam','экзамен'], pass:['pass (an exam)','сдать (экзамен)'], uncle:['uncle','дядя'], plan:['plan','план'],
   river:['river','река'], swim:['swim','плавать'], grandmother:['grandmother','бабушка'], afraid:['be afraid of','бояться'],
+  birch:['birch','берёза'], rowan:['rowan','рябина'], owl:['owl','сова'], ribbon:['ribbon','лента'], towards:['towards','к, по направлению к'], follow:['follow','идти за кем-то'], lead:['lead','вести, выводить'], past:['go past','пройти мимо'],
   oversleep:['oversleep','проспать'], late:['be late','опаздывать'], stop:['stop','остановить'], someone:['someone','кто-то'],
 };
 const CLUE_WORDS = { e1:['leave','repair'], e2:['leave'], e3:['leave','ticket','suitcase','pack'], e4:['promise','come back'], e5:['bus stop','leave'] };
@@ -120,6 +121,7 @@ function wordsSeen(){
   for(const id of st.order) for(const w of CLUE_WORDS[id] || []) s.add(w);
   for(const id of st.notes) for(const w of NOTE_WORDS[id] || []) s.add(w);
   const E = st.en || {}; for(const id of Object.keys(E.docs || {})) for(const w of DOCS[id].words) s.add(w);
+  if(F('forestRead')) for(const w of ['birch','rowan','owl','ribbon','towards','follow','lead','past']) s.add(w);   // ночной лес по запискам Аглаи
   return [...s].filter(w => WORDS[w]);
 }
 

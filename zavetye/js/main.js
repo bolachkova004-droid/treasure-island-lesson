@@ -29,7 +29,7 @@ function interact(h){
   if(!h) return; target = null; targetHot = null;
   const r = h.act(); if(!r) return;
   trackOnce('first_interaction'); hideHint();
-  if(typeof r === 'object'){ if(r.cost){ pass(r.cost); updateHud(); } openScene(r.scene); }
+  if(typeof r === 'object'){ if(r.cost){ pass(r.cost); updateHud(); } if(r.play) runPlay(r); else openScene(r.scene); }
   else openScene(r);
 }
 function nearestHot(){

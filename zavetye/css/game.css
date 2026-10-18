@@ -569,3 +569,38 @@ body.f-nb .saved,body.f-nb .toast{opacity:0!important}
 .cut-skip:hover{opacity:1;border-bottom-color:var(--milk-2)}
 .cut-fade{position:absolute;inset:0;z-index:5;background:#000;pointer-events:none;opacity:1}
 @media (max-width:760px){ .cut-bar{height:5vh} .cut-sub{bottom:calc(5vh + 54px);font-size:calc(18px * var(--fs) * var(--vs))} .cut-skip{bottom:calc(5vh + 12px)} .cut-title{top:calc(5vh + 14px)} }
+
+/* ---------- действия (js/acts.js) ---------- */
+.acts{position:fixed;inset:0;z-index:60;background:#05060a;display:none;user-select:none;-webkit-user-select:none;touch-action:none}
+.acts.on{display:block}
+.act-cv{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+.acts-search .act-cv{cursor:none}
+.act-top{position:absolute;left:0;right:0;top:calc(14px + env(safe-area-inset-top,0px));z-index:2;text-align:center;pointer-events:none;padding:0 16px}
+.act-title{margin:0;font:400 clamp(20px,2.4vw,30px)/1.1 var(--display);letter-spacing:.05em;text-transform:uppercase;color:var(--milk);text-shadow:0 2px 14px rgba(0,0,0,.9)}
+.act-hint{margin:6px auto 0;max-width:640px;font:400 calc(15px * var(--fs) * var(--vs))/1.4 var(--body);color:var(--milk-2);text-shadow:0 1px 3px rgba(0,0,0,.95)}
+.act-count{margin:4px 0 0;font:400 calc(13px * var(--fs) * var(--vs))/1.3 var(--mono);color:var(--milk-3);text-shadow:0 1px 3px rgba(0,0,0,.95);min-height:1em}
+.act-sub{position:absolute;left:50%;bottom:calc(34px + env(safe-area-inset-bottom,0px));z-index:3;transform:translateX(-50%);width:max-content;max-width:min(720px,calc(100% - 32px));margin:0;text-align:center;font:italic 400 calc(20px * var(--fs) * var(--vs))/1.4 var(--body);color:#f1e6cf;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 22px rgba(0,0,0,.85);opacity:0;transition:opacity .5s ease;pointer-events:none}
+.act-sub.on{opacity:1}
+.acts-noon .act-title{color:#2a1e12;text-shadow:0 0 18px rgba(255,250,235,.9)}
+.acts-noon .act-hint,.acts-noon .act-count{color:#4a3a26;text-shadow:0 0 10px rgba(255,250,235,.9)}
+.act-card{position:absolute;left:50%;top:calc(104px + env(safe-area-inset-top,0px));z-index:3;transform:translateX(-50%);width:min(560px,calc(100% - 32px));padding:12px 18px 12px;background:var(--old);color:var(--ink);box-shadow:0 12px 40px rgba(0,0,0,.6);text-align:center}
+.act-card[hidden]{display:none}
+.act-from{display:block;font:400 calc(12.5px * var(--fs) * var(--vs))/1.2 var(--body);color:var(--graphite);margin-bottom:4px}
+.act-en{font:400 calc(25px * var(--fs) * var(--vs))/1.25 var(--note);color:#1f2c55}
+.act-en u{text-decoration:none;border-bottom:2px solid var(--thread)}
+.act-card .trb{color:var(--graphite)}
+.act-ru{display:block;margin-top:6px;font:italic 400 calc(15px * var(--fs) * var(--vs))/1.35 var(--body);color:var(--graphite)}
+.act-ru[hidden]{display:none}
+.act-alt{position:absolute;right:16px;bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:3;padding:6px 2px;font:400 calc(15.5px * var(--fs) * var(--vs))/1.2 var(--body);color:var(--milk);border-bottom:1px solid var(--milk-2)}
+.act-alt[hidden]{display:none}
+.act-panel{position:absolute;inset:0;z-index:6;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;background:rgba(4,5,8,.72)}
+.act-panel[hidden]{display:none}
+.act-msg{margin:0;max-width:560px;text-align:center;font:italic 400 calc(21px * var(--fs) * var(--vs))/1.45 var(--body);color:var(--milk)}
+.act-btns{display:flex;gap:26px;flex-wrap:wrap;justify-content:center}
+.act-b{padding:6px 2px;font:400 calc(17px * var(--fs) * var(--vs))/1.2 var(--body);color:var(--milk-2);border-bottom:1px solid transparent}
+.act-b.main{color:var(--milk);border-bottom-color:var(--milk-2)}
+.act-b:hover{color:var(--milk);border-bottom-color:var(--milk)}
+.act-fade{position:absolute;inset:0;z-index:7;background:#000;pointer-events:none;opacity:1;transition:opacity .4s ease}
+.ch .cost.play{color:var(--milk-2)}
+@media (max-width:760px){ .act-card{top:calc(118px + env(safe-area-inset-top,0px))} .act-en{font-size:calc(21px * var(--fs) * var(--vs))} .act-sub{font-size:calc(17px * var(--fs) * var(--vs));bottom:calc(40px + env(safe-area-inset-bottom,0px))} .act-alt{left:16px;right:16px;text-align:center} }
+.acts-noon .act-top{padding:6px 16px 26px;background:radial-gradient(ellipse at 50% 0,rgba(255,250,236,.7),rgba(255,250,236,0) 70%)}

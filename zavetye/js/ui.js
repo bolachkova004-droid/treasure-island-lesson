@@ -57,7 +57,7 @@ function renderDlg(){
   $('dlgMore').hidden = last;
   const hasCh = last && curChoices.length > 0, key = KEY_SCENES.includes(v.id);
   el.classList.toggle('has-ch', hasCh);
-  $('dlgCh').innerHTML = last ? curChoices.map((c, i) => `<button type="button" class="ch ${c.say ? 'say' : 'act'}${key && !/^(Отойти|Уйти|Попрощаться|Не сейчас|Ещё подумать)/.test(c.t) ? ' key' : ''}" data-i="${i}"${c.dis ? ' disabled' : ''} style="animation-delay:${i * 40}ms"><span class="n">${i + 1}</span><span class="tx">${c.say ? sayText(c.t) : c.t}${c.sub ? `<span class="sub">${c.sub}</span>` : ''}</span>${c.cost ? '<span class="cost">· время</span>' : ''}</button>`).join('') : '';
+  $('dlgCh').innerHTML = last ? curChoices.map((c, i) => `<button type="button" class="ch ${c.say ? 'say' : 'act'}${key && !/^(Отойти|Уйти|Попрощаться|Не сейчас|Ещё подумать)/.test(c.t) ? ' key' : ''}" data-i="${i}"${c.dis ? ' disabled' : ''} style="animation-delay:${i * 40}ms"><span class="n">${i + 1}</span><span class="tx">${c.say ? sayText(c.t) : c.t}${c.sub ? `<span class="sub">${c.sub}</span>` : ''}</span>${c.play ? '<span class="cost play">· действие</span>' : ''}${c.cost ? '<span class="cost">· время</span>' : ''}</button>`).join('') : '';
   $('dlgBody').scrollTop = 0;
   if(last && curChoices.length && !coarse()){ const f = $('dlgCh').querySelector('.ch:not([disabled])'); if(f) f.focus({ preventScroll:true }); }
 }
@@ -73,7 +73,14 @@ function choose(i){
   let next = c.go || 'walk';
   if(c.fn){ const r = c.fn(); if(typeof r === 'string') next = r; }
   if(c.cost){ pass(c.cost); updateHud(); }
+  if(c.play) return runPlay(c);
   if(next === 'loc' || next === 'walk') closeDlg(); else openScene(next);
+}
+/* выбор, который ведёт в действие (js/acts.js): исход действия решает, какая сцена дальше */
+function runPlay(c){
+  hideDlg(); st.scene = null; st.view = null; DLG = null; curChoices = [];
+  playAct(c.play, win => { const f = win ? c.winFn : c.loseFn; if(f) f(); updateHud();
+    const nx = win ? c.win : c.lose; if(!nx || nx === 'loc' || nx === 'walk') closeDlg(); else openScene(nx); });
 }
 function hideDlg(){ $('dlg').hidden = true; ui.dlg = false; hidePortrait(); focusSync(); }
 function closeDlg(){

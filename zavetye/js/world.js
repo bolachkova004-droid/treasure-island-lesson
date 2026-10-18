@@ -63,7 +63,7 @@ function hotsFor(){
       h(160, 'Осмотреть', 'Прялка', () => 'h_corner');
       h(330, st.phase === 3 ? 'Позвать' : 'Осмотреть', st.phase === 3 ? 'Того, кто за печью' : 'Печь', () => (st.phase === 3 ? 'dom' : 'h_stove'));
       h(560, 'Осмотреть', 'Стол', () => 'h_table');
-      h(760, 'Осмотреть', 'Полка с тетрадями', () => ((!F('searchedHouse') && st.phase <= 2) ? { scene:'h_search', cost:1 } : 'h_shelf'));
+      h(760, 'Осмотреть', 'Полка с тетрадями', () => ((!F('searchedHouse') && st.phase <= 2) ? { play:'search', win:'h_search', lose:'h_search', loseFn:() => { setF('searchLate'); pass(1); }, cost:1 } : 'h_shelf'));
       h(900, st.phase >= 2 ? 'Лечь' : 'Присесть', 'Лавка', () => 'h_bed');
       break;
     case 'grunya':
