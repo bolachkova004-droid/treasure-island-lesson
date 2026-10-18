@@ -18,7 +18,8 @@ function openScene(id){
   if(p && !atPlace(p)){ hideDlg(); teleport(PLACES[p], () => openScene(id)); return; }
   // новый день начинается с карточки дня — переход между днями отмечен орнаментом
   if(id === 'morning' && !ui.cardShown){ ui.cardShown = true; dayCard(() => { ui.cardShown = false; showScene(id); }); return; }
-  // обряд в первый раз — 3D кат-сцена, потом разговор
+  // ролик из Kling, если он есть, иначе обряд в первый раз — 3D кат-сцена; потом разговор
+  { const v = typeof vcutFor === 'function' && vcutFor(id); if(v){ playVCut(id, () => showScene(id)); return; } }
   { const c = typeof cutFor === 'function' && cutFor(id); if(c){ playCut(id, () => { window.CUT_QUIET = true; showScene(id); setTimeout(() => { window.CUT_QUIET = false; }, 1500); }); return; } }
   showScene(id);
 }
@@ -107,7 +108,7 @@ const PSLOT = { L:{ key:null }, R:{ key:null } };
 const slotEl = s => $(s === 'L' ? 'portL' : 'portR');
 function setSlot(s, who, mood){
   const el = slotEl(s), P = PSLOT[s], im = who ? portraitFor(who, mood) : null;
-  if(!im){ el.classList.remove('on'); P.key = null; return false; }
+  if(!im){ el.classList.remove('on'); P.key = null; if(typeof slotVideo === 'function') slotVideo(el, null); return false; }
   if(P.key !== im.src){
     const [a, b] = el.querySelectorAll('img'), cur = a.classList.contains('cur') ? a : b, nxt = cur === a ? b : a;
     if(P.key && el.classList.contains('on')){
@@ -116,7 +117,7 @@ function setSlot(s, who, mood){
     } else cur.src = im.src;
     P.key = im.src;
   }
-  el.classList.add('on'); return true;
+  el.classList.add('on'); if(typeof slotVideo === 'function') slotVideo(el, im); return true;
 }
 /* расставляет портреты по текущей странице и возвращает, кто сейчас говорит (или null — рассказ) */
 function portraitPage(){
@@ -145,7 +146,7 @@ function portraitPage(){
   return who;
 }
 function showPortrait(){ portraitPage(); }
-function hidePortrait(){ for(const s of ['L', 'R']){ slotEl(s).classList.remove('on', 'listen', 'away'); PSLOT[s].key = null; } }
+function hidePortrait(){ for(const s of ['L', 'R']){ slotEl(s).classList.remove('on', 'listen', 'away'); PSLOT[s].key = null; } if(typeof stopPortraitVideos === 'function') stopPortraitVideos(); }
 
 /* ---------- HUD: день и время, мысль Анны, тетрадь ---------- */
 const GLYPH = [
