@@ -11,6 +11,7 @@
    Нет ролика — всё работает, как раньше.
    ===================================================================== */
 const VIDEOS = {
+  p_grunya_warm: 'video/p_grunya_warm',
 };
 const VCUTS = {
   p_road:       { key:'v_arrive', title:'Заветье', clips:['c_arrive_1', 'c_arrive_2'] },
