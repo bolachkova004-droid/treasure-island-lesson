@@ -213,10 +213,39 @@ function formsUI(){
   return '<h3>Что вы уже различаете</h3><ul class="forms">' + Object.entries(FORMS).filter(([k]) => seen.has(k)).map(([k, f]) => `<li><b lang="en">${f.t}</b> <span class="lv">${f.lv}</span> — ${f.ru}</li>`).join('') + '</ul>';
 }
 
+/* ---------- записка дня: утром под чашкой — вопрос по пройденному ----------
+   Повторение с интервалом: сначала то, на чём ошибались, потом то, что давно не спрашивали.
+   Верный ответ — приписка Аглаи с подсказкой, куда идти дальше: английский помогает делу. */
+function dailyNote(){
+  const E = enState(), seen = formsSeen();
+  const pool = QUIZ.map((q, i) => i).filter(i => seen.has(QUIZ[i].f)); if(!pool.length) return '';
+  E.daily = E.daily || {}; E.dq = E.dq || {};   // dq[i] = { n: сколько раз спрашивали, last: день, miss: ошибался }
+  let D = E.daily[st.day];
+  if(!D){ const score = i => { const r = E.dq[i] || { n:0, last:-9, miss:0 }; return (r.miss ? -10 : 0) + r.n * 3 - (st.day - r.last); };
+    const i = pool.slice().sort((a, b) => score(a) - score(b))[0];
+    D = E.daily[st.day] = { i, ord:[0, 1, 2].sort(() => Math.random() - .5), pick:null }; }
+  const q = QUIZ[D.i];
+  return `<div class="daily" data-dday="${st.day}"><p class="daily-h">Под чашкой снова лежал листок, тем же круглым почерком. По-английски, и сбоку вопрос: <i>Which one says it?</i></p>`
+    + `<p class="daily-q">${q.ru}</p><div class="daily-o">${D.ord.map(k => `<button type="button" class="dopt" data-dq="${k}" lang="en">${q.opts[k]}</button>`).join('')}</div><p class="daily-r" aria-live="polite"></p></div>`;
+}
+function dailyAnswer(btn){
+  const box = btn.closest('.daily'), day = +box.dataset.dday, E = enState(), D = E.daily && E.daily[day]; if(!D || D.pick !== null) return;
+  const k = +btn.dataset.dq, q = QUIZ[D.i], ok = k === q.a; D.pick = k;
+  const r = E.dq[D.i] || (E.dq[D.i] = { n:0, last:-9, miss:0 }); r.n++; r.last = day; r.miss = ok ? 0 : 1;
+  E.quiz.total++; if(ok) E.quiz.right++;
+  box.querySelectorAll('.dopt').forEach(b => { b.disabled = true; const kk = +b.dataset.dq; if(kk === q.a) b.classList.add('right'); else if(kk === k) b.classList.add('wrong'); });
+  const f = FORMS[q.f], L = typeof leads === 'function' ? leads() : [], tip = L.length ? L[0] : '';
+  box.querySelector('.daily-r').innerHTML = ok
+    ? `<b>Верно.</b> <span lang="en">${f.t}</span> — ${f.ru}.${tip ? ` Внизу приписка красными чернилами: «${tip}»` : ''}`
+    : `<b>Не то.</b> Здесь нужно <span lang="en">${f.t}</span> — ${f.ru}. Завтра Аглая спросит об этом ещё раз.`;
+  if(typeof haptic === 'function') haptic(ok ? 14 : 30); sfx(ok ? 'clue' : 'page'); track('english_daily', { ok }); save();
+}
+
 /* клики в английском разделе */
 document.addEventListener('click', e => {
   const t = e.target;
   const ls = t.closest('.lsn'); if(ls){ e.stopPropagation(); speak(ls.dataset.say); return; }
+  const dq = t.closest('[data-dq]'); if(dq){ e.stopPropagation(); dailyAnswer(dq); return; }
   if(!ui.nb) return;
   const go = t.closest('[data-gapo]'); if(go){ gapAnswer(go.dataset.gapo, go.dataset.v); return; }
   const gk = t.closest('[data-gapok]'); if(gk){ const inp = document.querySelector(`.gap-in[data-gap="${gk.dataset.gapok}"]`); if(inp && inp.value.trim()) gapAnswer(gk.dataset.gapok, inp.value); return; }

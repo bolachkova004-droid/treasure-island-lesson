@@ -96,7 +96,7 @@ function gain(id, silent){
   st.clues[id] = { lens:null, doubt:false, blank:false };
   st.order.push(id);
   st.unseen++;
-  toast('В тетрадь: ' + c.t); sfx('clue');
+  if(typeof clueFly === 'function') clueFly(c); else toast('В тетрадь: ' + c.t); sfx('clue');
   trackOnce('first_clue'); if(c.kind === 'en') trackOnce('first_english_clue'); track('evidence_added');
   return `<span class="gain">${c.t}</span>`;
 }

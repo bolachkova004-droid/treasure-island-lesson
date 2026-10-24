@@ -613,3 +613,51 @@ body.f-nb .saved,body.f-nb .toast{opacity:0!important}
 .cut.vmode .cut-vid{display:block}
 .cut.vmode .cut-cv{display:none}
 @media (orientation:portrait){ .cut-vid{object-fit:contain} }
+
+/* ---------- плёнка: зерно чуть дрожит, как на проекторе ---------- */
+@media (prefers-reduced-motion:no-preference){ .grain{animation:grainShift .9s steps(9) infinite} }
+@keyframes grainShift{0%{background-position:0 0}11%{background-position:-37px 21px}22%{background-position:54px -12px}33%{background-position:-18px -49px}44%{background-position:71px 33px}55%{background-position:-60px 8px}66%{background-position:12px 66px}77%{background-position:-44px -30px}88%{background-position:29px -61px}100%{background-position:0 0}}
+
+/* ---------- фирменные взаимодействия (js/feel.js, js/lux.js) ---------- */
+/* у предмета — узелок на красной нитке: нитка протягивается, узел затягивается */
+.prompt .knotI{width:26px;height:14px;flex:none;overflow:visible;filter:drop-shadow(0 0 4px rgba(0,0,0,.85))}
+.prompt .knotI .th{fill:none;stroke:var(--thread-2);stroke-width:1.7;stroke-linecap:round;stroke-dasharray:1;stroke-dashoffset:0}
+.prompt .knotI circle{fill:var(--thread-2);stroke:var(--milk);stroke-width:1;transform-origin:13px 7px}
+.prompt:hover .knotI circle{fill:var(--milk)}
+@media (prefers-reduced-motion:no-preference){
+  .prompt .knotI .th{animation:knotThread .55s cubic-bezier(.3,.6,.2,1) both}
+  .prompt .knotI circle{animation:knotTie .45s .4s cubic-bezier(.3,1.6,.5,1) both}
+}
+@keyframes knotThread{from{stroke-dashoffset:1}}
+@keyframes knotTie{from{transform:scale(0)}}
+/* переход между местами: темнота смыкается кругом вокруг Анны */
+.fade.iris{opacity:1;transition:none;-webkit-mask-image:radial-gradient(circle at var(--ix,50%) var(--iy,60%),transparent var(--r,0px),#000 calc(var(--r,0px) + 70px));mask-image:radial-gradient(circle at var(--ix,50%) var(--iy,60%),transparent var(--r,0px),#000 calc(var(--r,0px) + 70px))}
+/* разговор: мир за спиной собеседников уходит в мягкий расфокус */
+#cv{transition:filter .7s ease,transform 1.2s cubic-bezier(.2,.7,.2,1);transform-origin:50% 74%}
+body.talk #cv{filter:brightness(.8) saturate(.9);transform:scale(1.03)}
+@media (pointer:fine) and (min-width:900px){ body.talk #cv{filter:brightness(.8) saturate(.9) blur(1.4px)} }
+@media (prefers-reduced-motion:reduce){ body.talk #cv{transform:none} }
+/* улика: карточка показывается и улетает в тетрадь */
+.flyc{position:fixed;left:50%;top:calc(80px + env(safe-area-inset-top,0px));z-index:41;transform:translateX(-50%);display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:12px;align-items:center;max-width:min(360px,calc(100% - 32px));padding:10px 16px 11px 12px;background:var(--paper);color:var(--ink);box-shadow:0 18px 40px rgba(0,0,0,.55),0 2px 0 rgba(0,0,0,.2);border-left:3px solid var(--thread);pointer-events:none}
+.flyc img{grid-row:1/3;width:58px;height:58px;object-fit:cover;filter:saturate(.85) contrast(1.05);box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.flyc .k{font:400 calc(11.5px * var(--fs) * var(--vs))/1.2 var(--body);letter-spacing:.05em;text-transform:uppercase;color:var(--graphite)}
+.flyc b{font:700 calc(16.5px * var(--fs) * var(--vs))/1.25 var(--body)}
+.flyc:not(:has(img)){grid-template-columns:minmax(0,1fr)}
+.flyc.gone{opacity:0;transition:opacity .4s}
+.hb .knot.pulse{animation:knotPulse .8s cubic-bezier(.3,1.6,.5,1)}
+@keyframes knotPulse{0%{transform:scale(1)}35%{transform:scale(1.9);box-shadow:0 0 0 2px rgba(19,17,15,.7),0 0 14px rgba(176,55,44,.9)}100%{transform:scale(1)}}
+/* доска версии: новая нить протягивается от тезиса к улике */
+@media (prefers-reduced-motion:no-preference){ .board svg.threads path.fresh{stroke-dasharray:1;stroke-dashoffset:1;animation:threadIn .9s .1s cubic-bezier(.4,.1,.2,1) forwards} }
+@keyframes threadIn{to{stroke-dashoffset:0}}
+/* записка дня: утреннее повторение английского в разговоре */
+.daily{margin:.2em 0 .4em;max-width:60ch}
+.daily-h{margin:0 0 .5em}
+.daily-q{margin:0 0 .5em;padding-left:12px;border-left:1.5px solid var(--brass);font-style:italic;color:var(--milk)}
+.daily-o{display:flex;flex-direction:column;gap:2px}
+.dopt{text-align:left;padding:5px 10px 5px 12px;font:400 calc(17px * var(--fs) * var(--vs))/1.35 var(--body);color:var(--milk-2);border-left:1.5px solid transparent;transition:border-color .2s,padding .2s,color .2s}
+.dopt:hover:not(:disabled),.dopt:focus-visible{border-left-color:var(--milk-2);padding-left:16px;color:var(--milk);outline:none}
+.dopt:disabled{cursor:default}
+.dopt.right{color:var(--milk);border-left-color:var(--brass)}
+.dopt.wrong{color:var(--milk-3);text-decoration:line-through;text-decoration-color:var(--thread-2)}
+.daily-r{margin:.5em 0 0;min-height:1.2em;color:var(--milk-2)}
+.daily-r b{color:var(--brass-2)}

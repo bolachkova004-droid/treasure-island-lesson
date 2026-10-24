@@ -38,7 +38,7 @@ function showScene(id){
   DLG = { i:0 }; curChoices = sc.choices || [];
   { const sp = speakerOf(id); if(sp && !PORTRAIT_KEYS(sp[0]).every(k => IMG[k])) ensure(PORTRAIT_KEYS(sp[0]), 0).then(() => { if(st && st.view && st.view.id === id) portraitPage(); }); }
   if(['noon_vision','varya_song'].includes(id)){ lullaby(); caption('♪ Кто-то тихо напевает колыбельную. Мелодия обрывается на последней строке.', 6000); }
-  ui.dlg = true; $('dlg').classList.remove('chsheet'); hideHint(); $('area').classList.remove('on');
+  ui.dlg = true; document.body.classList.add('talk'); $('dlg').classList.remove('chsheet'); hideHint(); $('area').classList.remove('on');
   trackOnce('first_dialogue');
   if(!st.tut.dlg){ st.tut.dlg = 1; setTimeout(() => caption(coarse() ? 'Нажмите на текст, чтобы читать дальше.' : 'Щелчок или пробел — читать дальше.', 4200), 600); }
   showIllus(id); showPortrait(id); renderDlg(); updateHud(); focusSync(); save();
@@ -83,7 +83,7 @@ function runPlay(c){
   playAct(c.play, win => { const f = win ? c.winFn : c.loseFn; if(f) f(); updateHud();
     const nx = win ? c.win : c.lose; if(!nx || nx === 'loc' || nx === 'walk') closeDlg(); else openScene(nx); });
 }
-function hideDlg(){ $('dlg').hidden = true; ui.dlg = false; hidePortrait(); focusSync(); }
+function hideDlg(){ $('dlg').hidden = true; ui.dlg = false; document.body.classList.remove('talk'); hidePortrait(); focusSync(); }
 function closeDlg(){
   showIllus(null); hideDlg(); st.scene = null; st.view = null; DLG = null; curChoices = [];
   if(ui.end) return save();

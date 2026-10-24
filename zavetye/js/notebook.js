@@ -116,8 +116,9 @@ function drawThreads(){
   const R0 = b.getBoundingClientRect(), t = th.getBoundingClientRect();
   const x1 = t.left + t.width / 2 - R0.left, y1 = t.bottom - R0.top - 6;
   svg.setAttribute('viewBox', `0 0 ${R0.width} ${R0.height}`);
-  svg.innerHTML = pins.map(p => { const r = p.getBoundingClientRect(), x2 = r.left + r.width / 2 - R0.left, y2 = r.top - R0.top; const sag = 26 + Math.abs(x2 - x1) * .08;
-    return `<path d="M${x1} ${y1} C ${x1} ${y1 + sag}, ${x2} ${y2 - sag * .3 + sag}, ${x2} ${y2}"/>`; }).join('');
+  const was = drawThreads.seen || (drawThreads.seen = new Set()), key = th.dataset.stmt || '';
+  svg.innerHTML = pins.map(p => { const r = p.getBoundingClientRect(), x2 = r.left + r.width / 2 - R0.left, y2 = r.top - R0.top; const sag = 26 + Math.abs(x2 - x1) * .08, k = key + ':' + p.dataset.pinned, fresh = !was.has(k); was.add(k);
+    return `<path${fresh ? ' class="fresh" pathLength="1"' : ''} d="M${x1} ${y1} C ${x1} ${y1 + sag}, ${x2} ${y2 - sag * .3 + sag}, ${x2} ${y2}"/>`; }).join('');
 }
 addEventListener('resize', () => { if(ui.nb) drawThreads(); });
 

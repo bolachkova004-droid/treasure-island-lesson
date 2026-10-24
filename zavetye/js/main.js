@@ -10,12 +10,13 @@ const wrapP = s => (s.startsWith('<') ? s : `<p>${s}</p>`).replace(/^<p>— /, '
 
 /* ---------- переходы ---------- */
 function teleport(dest, then){
-  ui.fading = true; $('fade').classList.add('on'); sfx('door');
-  Promise.all([new Promise(r => setTimeout(r, 460)), ensure(STRIP_KEYS(dest[0]), 8000)]).then(() => {
+  ui.fading = true; sfx('door');
+  const shut = new Promise(r => (typeof iris === 'function' ? iris(true, r) : ($('fade').classList.add('on'), setTimeout(r, 460))));
+  Promise.all([shut, ensure(STRIP_KEYS(dest[0]), 8000)]).then(() => {
     const [strip, x] = dest, changed = st.strip !== strip;
     st.strip = strip; st.x = x; st.dir = x > STRIPS[strip].w / 2 ? -1 : 1; target = null; targetHot = null;
     snapCam(); PARTS.length = 0; annaHist.length = 0; FX.length = 0; ANNA_ANIM.face = ANNA_ANIM.dirPrev = st.dir; ANNA_ANIM.th = ANNA_ANIM.thTo = st.dir > 0 ? 0 : Math.PI; ANNA_ANIM.look = ANNA_ANIM.idle = 0;
-    $('fade').classList.remove('on');
+    if(typeof iris === 'function') iris(false); else $('fade').classList.remove('on');
     setTimeout(() => { ui.fading = false; if(changed) showArea(); saveMark(); if(st.strip === 'village' && F('arrived')) trackOnce('reached_zavetye'); if(then) then(); }, 300);
     preloadNear(strip);
   });
@@ -116,7 +117,7 @@ addEventListener('keydown', e => {
   if(ui.nb || ui.title || ui.end || !$('menu').hidden) return;
   if(ui.dlg){
     if(/^Digit[1-9]$/.test(e.code)){ choose(+e.code.slice(5) - 1); e.preventDefault(); return; }
-    if(['Space','Enter','KeyE'].includes(e.code)){ if(document.activeElement && document.activeElement.classList.contains('ch') && DLG && DLG.i >= st.view.pages.length - 1) return; e.preventDefault(); advance(); }
+    if(['Space','Enter','KeyE'].includes(e.code)){ if(document.activeElement && document.activeElement.classList.contains('ch') && DLG && DLG.i >= st.view.pages.length - 1) return; if(document.activeElement && document.activeElement.classList.contains('dopt')) return; e.preventDefault(); advance(); }
     return;
   }
   if(['KeyE','Space','Enter','ArrowUp','KeyW'].includes(e.code) && curHot && !blocked()){ e.preventDefault(); interact(curHot); }

@@ -289,7 +289,7 @@ function drawArtFrame(v, camX, anna, P, ph){
   drawArtStrip(g, P, camX, v.strip);
   if(oy + VH * s < ch){ g.fillStyle = '#101014'; g.fillRect(0, oy + VH * s - 1, cw, ch); }
   WX = weatherOf(v);
-  const fogK = (strip.indoor ? .12 : ph === 0 ? .55 : .9) * (strip.indoor ? 1 : WX.fog);
+  const fogK = (strip.indoor ? .12 : ph === 0 ? .42 : ph === 1 ? .7 : .9) * (strip.indoor ? 1 : WX.fog);
   // дальний туман — за героями, ближний — полупрозрачно поверх, чтобы фигуры не тонули
   if(!a.bright){ g.setTransform(1, 0, 0, 1, 0, 0); drawFog(g, ph, camX, fogK, 'back'); }
   g.setTransform(s, 0, 0, s, -camX * s, oy);
@@ -374,9 +374,10 @@ function drawArtFrame(v, camX, anna, P, ph){
   else drawChars(g);
   drawParticles(g, v);
   g.setTransform(1, 0, 0, 1, 0, 0);
-  if(!a.bright) drawFog(g, ph, camX, fogK * .45, 'front');
+  if(!a.bright) drawFog(g, ph, camX, fogK * (ph <= 1 ? .3 : .45), 'front');
   { const now = performance.now(), dt = Math.min(.05, (now - (lastDraw || now)) / 1000); lastDraw = now; if(WX.rain && !strip.indoor) drawRain(g, WX.rain, dt); }
   gradeArt(g, ph, P.nightArt, a.bright, strip.indoor, WX);
   if(ph >= 2 && !P.nightArt) drawArtLights(g, camX, v.strip, ph === 3 ? .95 : .4);
   if(GLOWS.length){ g.globalCompositeOperation = 'lighter'; for(const L of GLOWS){ const x = (L.x - camX) * s, y = oy + L.y * s, r = L.r * s; if(r <= 0) continue; const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, `rgba(${L.col},${.3 * L.a})`); gr.addColorStop(1, `rgba(${L.col},0)`); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); } g.globalCompositeOperation = 'source-over'; }
+  if(typeof luxLight === 'function') luxLight(g, v, camX, anna, ph, strip.indoor);
 }
