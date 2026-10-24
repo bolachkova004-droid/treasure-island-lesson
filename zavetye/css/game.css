@@ -661,3 +661,47 @@ body.talk #cv{filter:brightness(.8) saturate(.9);transform:scale(1.03)}
 .dopt.wrong{color:var(--milk-3);text-decoration:line-through;text-decoration-color:var(--thread-2)}
 .daily-r{margin:.5em 0 0;min-height:1.2em;color:var(--milk-2)}
 .daily-r b{color:var(--brass-2)}
+
+/* ---------- тетрадь-разворот: на большом экране — книга на две страницы ---------- */
+.book.spread{width:min(calc(1180px * var(--vs)),calc(100% - 46px));height:min(calc(800px * var(--vs)),100%);perspective:2600px}
+.book.spread .page{column-count:2;column-gap:132px;column-fill:auto;overflow:hidden;padding:36px 66px 66px;
+  background-image:
+    linear-gradient(90deg,transparent 46px,rgba(122,42,38,.4) 46px,rgba(122,42,38,.4) 47.5px,transparent 47.5px),
+    linear-gradient(90deg,transparent calc(50% + 46px),rgba(122,42,38,.4) calc(50% + 46px),rgba(122,42,38,.4) calc(50% + 47.5px),transparent calc(50% + 47.5px)),
+    linear-gradient(90deg,transparent calc(50% - 46px),rgba(40,28,18,.07) calc(50% - 14px),rgba(40,28,18,.3) 50%,rgba(40,28,18,.07) calc(50% + 14px),transparent calc(50% + 46px)),
+    repeating-linear-gradient(180deg,transparent 0 31px,rgba(60,70,90,.1) 31px 32px);
+  box-shadow:inset 8px 0 18px -10px rgba(0,0,0,.3),inset -8px 0 18px -10px rgba(0,0,0,.25)}
+.book.spread .page .obj,.book.spread .page .person,.book.spread .page .board,.book.spread .page .vs,.book.spread .page .nt,.book.spread .page article,.book.spread .page li,.book.spread .page .quiz,.book.spread .page .gaps,.book.spread .page .song,.book.spread .page figure{break-inside:avoid}
+.book.spread .page h3,.book.spread .page .case-h,.book.spread .page .case-q{break-after:avoid}
+.book.spread .board{margin-bottom:10px}
+/* «Люди» на развороте — досье: крупный снимок слева, текст справа */
+.book.spread .people{display:flex;flex-direction:column;gap:22px}
+.book.spread .person{width:100%;display:grid;grid-template-columns:min(190px,44%) minmax(0,1fr);column-gap:18px;align-items:start}
+.book.spread .person .ph{grid-row:1/span 6}
+.book.spread .person p{margin-top:0}
+/* номера страниц и перелистывание */
+.bk-foot{position:absolute;left:66px;right:66px;bottom:14px;z-index:3;display:flex;justify-content:space-between;pointer-events:none}
+.bk-foot[hidden]{display:none}
+.bk-foot button{pointer-events:auto;padding:4px 6px;font:400 calc(14px * var(--fs) * var(--vs))/1 var(--mono);color:var(--graphite)}
+.bk-foot button span{font:400 calc(20px * var(--fs) * var(--vs))/1 var(--body);vertical-align:-1px}
+.bk-foot button:hover:not(:disabled){color:var(--thread)}
+.bk-foot button:disabled{cursor:default}
+.bk-foot button:disabled span{visibility:hidden}
+.bk-foot.single span{display:none}
+/* лист, который переворачивается: лицевая сторона — старая страница, оборот — новая */
+.leaf,.leaf-under{position:absolute;z-index:4;overflow:hidden;pointer-events:none}
+.leaf{overflow:visible;transform-style:preserve-3d}
+.leaf.fwd{transform-origin:0 50%}
+.leaf.back{transform-origin:100% 50%}
+.leaf .face{position:absolute;inset:0;overflow:hidden;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:var(--paper)}
+.leaf .face.back{transform:rotateY(180deg)}
+.leaf .face::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(40,28,18,.18),rgba(40,28,18,0) 30%,rgba(255,255,255,.08) 70%,rgba(40,28,18,.12))}
+.leaf.fwd{box-shadow:-18px 0 40px -20px rgba(0,0,0,.6)}
+.pclone{position:absolute;top:0;overflow:hidden!important}
+/* улики на развороте — плотнее: снимок или рисунок слева, подпись и текст справа */
+.book.spread .objs{display:block}
+.book.spread .obj{display:inline-block;vertical-align:top;width:100%;margin:0 0 24px}   /* цельный блок: не рвётся между страницами */
+.book.spread .obj:has(> .photo,> .drawing){display:inline-grid;grid-template-columns:150px minmax(0,1fr);column-gap:16px;align-items:start}
+.book.spread .obj:has(> .photo,> .drawing) > .photo,.book.spread .obj:has(> .photo,> .drawing) > .drawing{grid-column:1;grid-row:1/span 5}
+.book.spread .obj:has(> .photo,> .drawing) > :not(.photo):not(.drawing){grid-column:2}
+.book.spread .obj .photo + .txt{margin-top:0}

@@ -83,6 +83,26 @@ const QUIZ = [
   { f:'musth', ru:'На столе тёплая чашка. Наверняка здесь кто-то только что пил чай.', opts:['Someone must have drunk tea here.','Someone can’t have drunk tea here.','Someone drinks tea here every year.'], a:0 },
   { f:'musth', ru:'Гриша не мог проспать — он всегда встаёт в пять.', opts:['Grisha can’t have overslept.','Grisha must oversleep.','Grisha has overslept every day.'], a:0 },
   { f:'going', ru:'Варя уже решила: завтра она идёт в старую школу.', opts:['Varya is going to go to the old school tomorrow.','Varya wants to go to the old school one day.','Varya went to the old school yesterday.'], a:0 },
+  /* ещё ситуации для записки дня: по две-три на каждую конструкцию, чтобы за пять дней вопросы не повторялись */
+  { f:'want', ru:'Гриша мечтает перебраться в город, но никаких планов у него нет.', opts:['Grisha wants to move to the city.','Grisha is moving to the city on Friday.','Grisha has moved to the city.'], a:0 },
+  { f:'want', ru:'Анне хочется узнать, кем была Аглая.', opts:['Anna wants to find out who Aglaya was.','Anna has found out who Aglaya was.','Anna found out who Aglaya was last week.'], a:0 },
+  { f:'will', ru:'Когда-нибудь Варя уедет учиться в город.', opts:['One day Varya will go to study in the city.','Varya went to study in the city last year.','Varya has gone to study in the city.'], a:0 },
+  { f:'will', ru:'Груня обещает Анне: «Я тебя накормлю».', opts:['“I will feed you,” says Grunya.','“I fed you,” says Grunya.','“I have fed you,” says Grunya.'], a:0 },
+  { f:'going', ru:'Нина Петровна уже купила муку: в субботу она печёт блины.', opts:['Nina is going to make pancakes on Saturday.','Nina made pancakes last Saturday.','Nina wants to make pancakes one day.'], a:0 },
+  { f:'pp', ru:'Анна только что нашла записку — вот она, у неё в руке.', opts:['Anna has found a note.','Anna finds a note every day.','Anna will find a note.'], a:0 },
+  { f:'pp', ru:'Чемодан уже собран и стоит у двери.', opts:['Grisha has packed his suitcase.','Grisha will pack his suitcase.','Grisha is going to pack his suitcase.'], a:0 },
+  { f:'past', ru:'В 2004 году Гриша купил билет на автобус.', opts:['Grisha bought a bus ticket in 2004.','Grisha has bought a bus ticket in 2004.','Grisha buys a bus ticket in 2004.'], a:0 },
+  { f:'past', ru:'Вчера Анна разговаривала с Лешим.', opts:['Anna talked to the Leshy yesterday.','Anna has talked to the Leshy yesterday.','Anna talks to the Leshy yesterday.'], a:0 },
+  { f:'pres', ru:'Каждую пятницу Гриша собирает чемодан.', opts:['Grisha packs his suitcase every Friday.','Grisha is packing his suitcase right now.','Grisha packed his suitcase last Friday.'], a:0 },
+  { f:'pres', ru:'Груня всегда поёт, когда моет посуду.', opts:['Grunya always sings when she washes the dishes.','Grunya is singing right now.','Grunya sang yesterday.'], a:0 },
+  { f:'cond1', ru:'Если Анна поздоровается с домом, домовой примет её как гостью.', opts:['If Anna greets the house, the domovoi will treat her as a guest.','If Anna will greet the house, the domovoi treats her as a guest.','If Anna greeted the house, the domovoi has treated her as a guest.'], a:0 },
+  { f:'cond1', ru:'Если ночью пойдёшь в лес, заблудишься.', opts:['If you go into the forest at night, you will get lost.','If you will go into the forest at night, you get lost.','If you went into the forest at night, you have got lost.'], a:0 },
+  { f:'used', ru:'Раньше Аглая учила детей английскому. Теперь школа пустая.', opts:['Aglaya used to teach the children English.','Aglaya teaches the children English every day.','Aglaya is going to teach the children English.'], a:0 },
+  { f:'used', ru:'Когда-то по субботам на остановке было людно. Теперь там никого.', opts:['The bus stop used to be busy on Saturdays.','The bus stop is busy every Saturday.','The bus stop will be busy on Saturday.'], a:0 },
+  { f:'wouldh', ru:'Гриша уехал бы в Тверь, но его заперли.', opts:['Grisha would have left for Tver, but someone locked him in.','Grisha will leave for Tver tomorrow.','Grisha has left for Tver.'], a:0 },
+  { f:'wouldh', ru:'Анна приехала бы раньше, но не знала адреса.', opts:['Anna would have come earlier, but she didn’t know the address.','Anna came earlier because she knew the address.','Anna will come earlier.'], a:0 },
+  { f:'musth', ru:'Засов ходит легко и бесшумно. Наверняка его недавно смазывали.', opts:['Someone must have oiled the bolt recently.','Someone can’t have oiled the bolt.','Someone oils the bolt every year.'], a:0 },
+  { f:'musth', ru:'Аглая не могла уехать: все её вещи остались дома.', opts:['Aglaya can’t have left: all her things are still at home.','Aglaya must have left: all her things are still at home.','Aglaya leaves every summer.'], a:0 },
 ];
 
 /* слова дела: встречаются в записях и документах */

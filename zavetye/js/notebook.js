@@ -28,10 +28,71 @@ function renderBook(){
   $('nbSide').innerHTML = TABS.map(([k, l]) => { const n = tabCount(k); return `<button type="button" class="mark${k === 'en' ? ' en-mark' : ''}" role="tab" data-tab="${k}" aria-selected="${k === bookTab}">${l}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
   $('nbMob').innerHTML = MTABS.map(([k, l]) => { const n = k === 'world' ? tabCount('world') + tabCount('notes') : tabCount(k); return `<button type="button" role="tab" data-tab="${k}" aria-selected="${k === bookTab}">${l}${n ? `<span class="n">${n}</span>` : ''}</button>`; }).join('');
   const main = $('nbMain');
+  const keep = BK.tab === bookTab; if(!keep){ BK.tab = bookTab; BK.p = 0; }
+  const sl = main.scrollTop;
   main.innerHTML = ({ case:caseUI, people:peopleUI, world: () => worldUI() + (mobile() ? '<h3>Записи</h3>' + notesUI(true) : ''), notes:notesUI, en:enUI })[bookTab]();
-  main.scrollTop = 0;
+  main.scrollTop = keep ? sl : 0;
+  spreadLayout();
   requestAnimationFrame(drawThreads);
 }
+
+/* ---------- разворот: на большом экране тетрадь — книга на две страницы ----------
+   Текст сам перетекает со страницы на страницу (колонки), разворот листается:
+   правая страница поднимается вместе с текстом и ложится налево. */
+const BK = { tab:null, p:0, n:1, step:0, busy:false };
+const spreadOK = () => innerWidth >= 1000 && innerHeight >= 640;
+function spreadLayout(){
+  const m = $('nbMain'), b = m.closest('.book'), on = spreadOK();
+  b.classList.toggle('spread', on); bookFoot(on);
+  if(!on){ BK.n = 1; return; }
+  const cs = getComputedStyle(m), pl = parseFloat(cs.paddingLeft), pr = parseFloat(cs.paddingRight), gap = parseFloat(cs.columnGap) || 0;
+  const cw = m.clientWidth - pl - pr, colW = (cw - gap) / 2; BK.step = cw + gap;
+  m.scrollLeft = 0; const cols = Math.max(1, Math.round((m.scrollWidth - pl - pr + gap) / (colW + gap)));
+  BK.n = Math.max(1, Math.ceil(cols / 2)); BK.p = Math.min(BK.p, BK.n - 1);
+  m.scrollLeft = BK.p * BK.step; bookFoot(true);
+}
+function bookFoot(on){
+  const b = $('nbMain').closest('.book'); let f = b.querySelector('.bk-foot');
+  if(!f){ f = document.createElement('div'); f.className = 'bk-foot'; f.innerHTML = '<button type="button" class="bk-prev" aria-label="Предыдущий разворот"><span aria-hidden="true">‹</span> <i></i></button><button type="button" class="bk-next" aria-label="Следующий разворот"><i></i> <span aria-hidden="true">›</span></button>'; b.appendChild(f);
+    f.querySelector('.bk-prev').onclick = () => turnPage(-1); f.querySelector('.bk-next').onclick = () => turnPage(1); }
+  f.hidden = !on; if(!on) return;
+  const [pv, nx] = f.querySelectorAll('button');
+  pv.querySelector('i').textContent = BK.p * 2 + 1; nx.querySelector('i').textContent = BK.p * 2 + 2;
+  pv.disabled = BK.p <= 0; nx.disabled = BK.p >= BK.n - 1; f.classList.toggle('single', BK.n <= 1);
+}
+/* копия страницы для перелистывания: без id, прокручена на нужный разворот */
+function pageClone(m, scroll){ const c = m.cloneNode(true); c.removeAttribute('id'); c.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); c.classList.add('pclone'); c.setAttribute('aria-hidden', 'true'); c.style.width = m.clientWidth + 'px'; c.style.height = m.clientHeight + 'px'; c._sl = scroll; return c; }
+function turnPage(d){
+  if(BK.busy || !spreadOK()) return; const np = BK.p + d; if(np < 0 || np >= BK.n) return;
+  const m = $('nbMain'), b = m.closest('.book'), W = m.clientWidth, H = m.clientHeight, half = W / 2, old = BK.p * BK.step, nw = np * BK.step;
+  sfx('page'); BK.busy = true;
+  const done = () => { BK.p = np; m.scrollLeft = nw; bookFoot(true); requestAnimationFrame(drawThreads); BK.busy = false; };
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches || !Element.prototype.animate){ done(); return; }
+  try{
+    const box = (x, cls) => { const e = document.createElement('div'); e.className = cls; e.style.left = (m.offsetLeft + x) + 'px'; e.style.top = m.offsetTop + 'px'; e.style.width = half + 'px'; e.style.height = H + 'px'; return e; };
+    const fill = (face, scroll, showRight) => { const c = pageClone(m, scroll); c.style.left = showRight ? -half + 'px' : '0px'; face.appendChild(c); return c; };
+    // под листом: та половина старого разворота, которую лист ещё не накрыл
+    const under = box(d > 0 ? 0 : half, 'leaf-under'); fill(under, old, d < 0);
+    const leaf = box(d > 0 ? half : 0, 'leaf ' + (d > 0 ? 'fwd' : 'back'));
+    const front = document.createElement('div'), back = document.createElement('div'); front.className = 'face front'; back.className = 'face back';
+    fill(front, old, d > 0); fill(back, nw, d < 0); leaf.append(front, back);
+    b.append(under, leaf);
+    for(const c of [...under.children, ...front.children, ...back.children]) c.scrollLeft = c._sl;
+    m.scrollLeft = nw;   // под поднимающимся листом уже новый разворот
+    const a = leaf.animate([{ transform:'rotateY(0deg)' }, { transform:`rotateY(${d > 0 ? -180 : 180}deg)` }], { duration:680, easing:'cubic-bezier(.45,.05,.25,1)' });
+    setTimeout(() => under.remove(), 340);
+    a.onfinish = () => { leaf.remove(); under.remove(); done(); };
+  }catch(e){ document.querySelectorAll('.leaf,.leaf-under').forEach(x => x.remove()); done(); }
+}
+addEventListener('keydown', e => { if(!ui.nb || !spreadOK() || (e.target.closest && e.target.closest('input,textarea'))) return;
+  const d = { ArrowRight:1, PageDown:1, KeyD:1, ArrowLeft:-1, PageUp:-1, KeyA:-1 }[e.code]; if(!d) return;
+  e.preventDefault(); e.stopImmediatePropagation(); turnPage(d); }, true);
+/* фокус с клавиатуры может увести на соседний разворот — выравниваем, чтобы страницы не съезжали */
+$('nbMain').addEventListener('scroll', () => { const m = $('nbMain'); if(BK.busy || !spreadOK() || !BK.step) return;
+  const p = Math.max(0, Math.min(BK.n - 1, Math.round(m.scrollLeft / BK.step))); if(Math.abs(m.scrollLeft - p * BK.step) > 1) m.scrollLeft = p * BK.step; if(p !== BK.p){ BK.p = p; bookFoot(true); requestAnimationFrame(drawThreads); } });
+let wheelT = 0;
+document.addEventListener('wheel', e => { if(!ui.nb || !spreadOK() || !e.target.closest('#nbMain')) return; e.preventDefault();
+  const now = performance.now(); if(now - wheelT < 500 || Math.abs(e.deltaY) + Math.abs(e.deltaX) < 12) return; wheelT = now; turnPage((e.deltaY || e.deltaX) > 0 ? 1 : -1); }, { passive:false });
 
 /* ---------- Дело: мысль Анны, доска версии, улики-предметы, куда сходить ---------- */
 function caseUI(){
@@ -120,7 +181,7 @@ function drawThreads(){
   svg.innerHTML = pins.map(p => { const r = p.getBoundingClientRect(), x2 = r.left + r.width / 2 - R0.left, y2 = r.top - R0.top; const sag = 26 + Math.abs(x2 - x1) * .08, k = key + ':' + p.dataset.pinned, fresh = !was.has(k); was.add(k);
     return `<path${fresh ? ' class="fresh" pathLength="1"' : ''} d="M${x1} ${y1} C ${x1} ${y1 + sag}, ${x2} ${y2 - sag * .3 + sag}, ${x2} ${y2}"/>`; }).join('');
 }
-addEventListener('resize', () => { if(ui.nb) drawThreads(); });
+addEventListener('resize', () => { if(ui.nb){ spreadLayout(); drawThreads(); } });
 
 /* ---------- Люди ---------- */
 const PEOPLE_PIC = { grunya:'p_grunya_warm', grisha:'p_grisha_cheerful', varya:'p_varya_neutral', nina:'p_nina_stern', young:'p_young_neutral' };
