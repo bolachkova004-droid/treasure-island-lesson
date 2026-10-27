@@ -69,6 +69,29 @@ function speak(text, rate, voiceOverride){
   return true;
 }
 
+/* Длинный текст читаем по предложениям: Chrome обрывает одну длинную фразу
+   примерно через 15 секунд. onEach(i) вызывается в начале каждого предложения. */
+let queueId = 0;
+function speakQueue(list, rate, onEach, onDone){
+  if(!synth){ notice('В этом браузере нет озвучки. Попробуйте Chrome, Edge или Safari.'); return false; }
+  const v = current(), id = ++queueId;
+  if(!v && !warned){ warned = true; notice('На устройстве нет английского голоса — нажмите «🔊 Голос», там инструкция.'); }
+  synth.cancel();
+  const r = Number(rate) || .9;
+  const us = list.map((text, i) => {
+    const u = new SpeechSynthesisUtterance(String(text));
+    if(v){ u.voice = v; u.lang = v.lang; } else u.lang = 'en-GB';
+    u.rate = Math.min(1.05, Math.max(.72, r < .75 ? .72 : r + .08)); u.pitch = 1;
+    u.onstart = () => { if(id === queueId && onEach) onEach(i); };
+    if(i === list.length - 1) u.onend = () => { if(id === queueId && onDone) onDone(); };
+    return u;
+  });
+  window.__ttsUtterance = us;
+  setTimeout(() => us.forEach(u => synth.speak(u)), 50);
+  return true;
+}
+function stop(){ queueId++; if(synth) synth.cancel(); }
+
 /* ---------- окно выбора голоса ---------- */
 let box = null;
 function css(){
@@ -141,5 +164,5 @@ function openPicker(){
   refreshPicker();
 }
 
-window.TTS = { speak, openPicker, current, available: () => !!synth };
+window.TTS = { speak, speakQueue, stop, openPicker, current, available: () => !!synth };
 })();
