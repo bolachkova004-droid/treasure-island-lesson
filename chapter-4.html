@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#9fdcff">
+<meta name="format-detection" content="telephone=no">
+<title>The Sea-Chest · Treasure Island IV</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chapter-kit.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="speech.js"></script>
+<script>
+/* Глава IV · The Sea-Chest — тексты и ответы. Движок: chapter-kit.js */
+const PASTCONT = /\b(was|were) [a-z]+ing\b/;
+window.CHAPTER = {
+  key:'benbow-ch4-v1', num:'IV',
+  title:'The Sea-Chest', titleRu:'Сундук капитана',
+  intro:'Капитан мёртв, до десяти вечера пираты вернутся. Джим и его мама остаются одни с сундуком, в котором лежат их деньги — и что-то ещё. Девять заданий на урок — от прогноза до дневника Джима — и домашнее задание.',
+  art:`<svg viewBox="0 0 230 170" role="img" aria-label="Открытый морской сундук с золотом и свёртком бумаг при свече">
+      <ellipse cx="115" cy="152" rx="100" ry="10" fill="#0c1d30" opacity=".5"/>
+      <circle cx="196" cy="42" r="30" fill="#ffd36b" opacity=".18"/>
+      <rect x="190" y="52" width="12" height="40" rx="3" fill="#f6ead0"/>
+      <path d="M196 30 q8 12 0 22 q-8 -10 0 -22z" fill="#ffb020"/>
+      <path d="M38 60 L42 28 Q115 2 188 28 L192 60 Z" fill="#7a4b26" stroke="#3d2412" stroke-width="3" transform="rotate(-8 115 60)"/>
+      <rect x="34" y="70" width="162" height="78" rx="8" fill="#8b5a2b" stroke="#3d2412" stroke-width="3"/>
+      <rect x="34" y="62" width="162" height="16" rx="5" fill="#5e3a1b" stroke="#3d2412" stroke-width="3"/>
+      <g fill="#ffcf3f" stroke="#c98a12" stroke-width="2">
+        <circle cx="70" cy="66" r="9"/><circle cx="88" cy="60" r="9"/><circle cx="106" cy="64" r="9"/><circle cx="124" cy="58" r="9"/><circle cx="142" cy="64" r="9"/><circle cx="160" cy="60" r="9"/>
+      </g>
+      <rect x="100" y="38" width="44" height="28" rx="4" fill="#d9c79c" stroke="#7a6640" stroke-width="2" transform="rotate(-10 122 52)"/>
+      <path d="M104 46 h34 M104 53 h28" stroke="#7a6640" stroke-width="2" transform="rotate(-10 122 52)"/>
+      <rect x="104" y="96" width="22" height="26" rx="4" fill="#ffcf3f" stroke="#c98a12" stroke-width="2"/>
+      <circle cx="115" cy="107" r="4" fill="#3d2412"/>
+      <path d="M56 78 v70 M174 78 v70" stroke="#3d2412" stroke-width="3"/>
+      <text x="115" y="140" text-anchor="middle" font-family="Georgia,serif" font-size="16" font-style="italic" fill="#f6ead0">B</text>
+    </svg>`,
+  steps:[
+    { short:'Прогноз',    kicker:'до чтения',       title:'Before the chest opens', min:'5 минут' },
+    { short:'Слова',      kicker:'лексика',         title:'Words to take with you', min:'10 минут' },
+    { short:'Цепь',       kicker:'после чтения',    title:'Rebuild the night',      min:'7 минут' },
+    { short:'Правда?',    kicker:'понимание',       title:'True or false?',         min:'6 минут' },
+    { short:'Сундук',     kicker:'детали',          title:'What was in the chest?', min:'5 минут' },
+    { short:'Грамматика', kicker:'Past Continuous', title:'Counting when…',         min:'10 минут' },
+    { short:'Разговор',   kicker:'говорение',       title:'Mother’s choice',        min:'10 минут' },
+    { short:'Дневник',    kicker:'письмо',          title:'Jim’s diary',            min:'12 минут' },
+    { short:'Финал',      kicker:'проверка',        title:'Close the chest',        min:'5 минут' },
+    { short:'Домашка',    kicker:'домашнее задание', title:'Homework: after ten o’clock', min:'30–40 минут' }
+  ],
+  recap:{
+    pickN:3,
+    html:'<b>Что было в главе III.</b> Недавно умер отец Джима, и мама с сыном остались одни. В холодный вечер к трактиру приходит слепой нищий <b>Pew</b>. Он хватает Джима за руку, заставляет отвести его к капитану и вручает Билли Бонсу <b>the black spot</b> — «чёрную метку», пиратское предупреждение. На ней написано: <i>“You have till ten tonight.”</i> Капитан вскакивает, шатается и падает замертво.',
+    task:'Пираты вернутся к десяти вечера. А в комнате стоит сундук капитана, и капитан был должен трактиру деньги. <b>Что, по-твоему, лежит в сундуке?</b> Выбери три предмета. После чтения сравнишь с правдой в задании 5.',
+    doneText:'Прогноз записан. Теперь читай главу IV и проверь себя в задании 5.',
+    frame:'“I think there is/are … in the chest, because the captain …” / “I don’t think there is … because …”',
+    teach:'Не подтверждайте и не опровергайте прогноз до чтения. Вопрос «What would make you change your mind?» удерживает интерес к тексту. Главу лучше читать дома или вслух по абзацам, а задания 3–5 делать сразу после чтения.'
+  },
+  words:{ items:[
+  { id:'tell',   en:'tell somebody everything', ru:'рассказать кому-то всё',               ex:'Jim told his mother everything he knew.' },
+  { id:'help',   en:'ask for help',             ru:'попросить о помощи',                   ex:'They ran to the village to ask for help.' },
+  { id:'afraid', en:'be too afraid to do',      ru:'слишком бояться, чтобы что-то сделать', ex:'The men were too afraid to come back to the inn.' },
+  { id:'dare',   en:'dare to do',               ru:'осмелиться, решиться',                 ex:'“If you don’t dare, Jim and I dare,” said his mother.' },
+  { id:'lock',   en:'lock the door',            ru:'запереть дверь',                       ex:'They went back home and locked the door.' },
+  { id:'owe',    en:'owe somebody money',       ru:'быть должным кому-то',                 ex:'The captain owed them a lot of money.' },
+  { id:'hurry',  en:'in a hurry',               ru:'в спешке, второпях',                   ex:'They left the inn in a hurry.' },
+  { id:'faint',  en:'faint',                    ru:'упасть в обморок',                     ex:'Near the bridge, Jim’s mother fainted.' }
+],
+    ballast:'hamlet — деревушка · quadrant — квадрант, морской прибор · oilskin packet — свёрток в промасленной ткани · guineas, doubloons, louis d’ors, pieces of eight — старинные монеты · latch — щеколда · tarry string — просмолённая верёвка.' },
+  events:[
+  'Jim tells his mother everything he knows about the captain.',
+  'They run to the nearby village to ask for help.',
+  'The men are too afraid of Captain Flint’s name to come with them.',
+  'Jim and his mother go back to the inn alone and lock the door.',
+  'Jim finds the key on a string around the dead captain’s neck.',
+  'They open the chest and find a bag of gold and a packet of papers.',
+  'His mother starts counting only the money the captain owed her.',
+  'They hear the blind man’s stick and a whistle, so they run away with the packet.'
+],
+  order0:[3,0,5,1,7,2,6,4],
+  chainHint:'Подсказка: сначала просьба о помощи, потом ключ, потом сундук; звуки снаружи — в самом конце.',
+  truth:[
+  { t:'The men from the village agreed to defend the inn with Jim and his mother.', a:false, why:'Защищать трактир не согласился никто. Согласились только послать одного парня верхом к доктору Ливси.' },
+  { t:'Someone from the village rode to Dr Livesey’s house for help.', a:true, why:'Да: один парень поскакал к доктору за вооружённой помощью.' },
+  { t:'Jim found the key in the captain’s pocket.', a:false, why:'В карманах были монетки, напёрсток, нитки, табак и нож. Ключ висел на просмолённой верёвке на шее капитана.' },
+  { t:'Under an old sea-cloak there was a bag of gold.', a:true, why:'Да: под старым морским плащом лежали свёрток в промасленной ткани и холщовый мешочек с золотом.' },
+  { t:'All the coins in the bag were English guineas.', a:false, why:'Монеты были из разных стран: дублоны, луидоры, гинеи, пиастры. Мама умела считать только гинеи, поэтому дело шло медленно.' },
+  { t:'Jim’s mother wanted to take all the money in the bag.', a:false, why:'Нет: только то, что капитан был им должен, — и ни пенни больше. Она хотела показать, что она честная женщина.' },
+  { t:'The blind man tried to open the door of the inn.', a:true, why:'Да: он стучал палкой и дёргал ручку, но дверь была заперта.' },
+  { t:'Jim took the gold, and his mother took the packet.', a:false, why:'Наоборот: мама взяла деньги, которые успела отсчитать, а Джим — свёрток в промасленной ткани.' }
+],
+  pick:{
+    task:'Нажми на всё, что <b>действительно лежало</b> в сундуке капитана. Четыре предмета здесь лишние. Потом проверь — и сравни со своим прогнозом из задания 1.',
+    checkLabel:'Открыть сундук',
+    items:[
+  { id:'clothes', icon:'🧥', en:'a suit of good clothes', ru:'хороший костюм', in:true },
+  { id:'pistols', icon:'🔫', en:'two pairs of pistols',   ru:'две пары пистолетов', in:true },
+  { id:'silver',  icon:'🪙', en:'a bar of silver',        ru:'слиток серебра', in:true },
+  { id:'watch',   icon:'⌚', en:'an old Spanish watch',   ru:'старые испанские часы', in:true },
+  { id:'parrot',  icon:'🦜', en:'a parrot in a cage',     ru:'попугай в клетке', in:false },
+  { id:'shells',  icon:'🐚', en:'five or six sea shells', ru:'пять-шесть морских ракушек', in:true },
+  { id:'tobacco', icon:'🍂', en:'some tobacco',           ru:'табак', in:true },
+  { id:'crown',   icon:'👑', en:'a diamond crown',        ru:'алмазная корона', in:false },
+  { id:'gold',    icon:'💰', en:'a bag of gold',          ru:'мешочек с золотом', in:true },
+  { id:'leg',     icon:'🦵', en:'a wooden leg',           ru:'деревянная нога', in:false },
+  { id:'packet',  icon:'📜', en:'a packet of papers',     ru:'свёрток с бумагами', in:true },
+  { id:'rum',     icon:'🍾', en:'a bottle of rum',        ru:'бутылка рома', in:false }
+],
+    extra:'Лишними были попугай (он у Джона Сильвера — встретишь позже), корона, деревянная нога и ром.',
+    frame:'“There was a … and some … in the chest, but there wasn’t a …” / “I was right / wrong about …”',
+    teach:'Задание тренирует there was / there were и some / any. Попросите описать сундук по памяти, закрыв экран.'
+  },
+  gram:{
+    rules:'<div class="rule-pair"><div class="rule"><h3>Длинное действие — фон</h3><span class="form">was / were + -ing</span>' +
+    '<p>Mother <b>was counting</b> the coins…</p><p class="note" style="padding:8px 10px;margin:0">Что происходило в тот момент. Действие уже шло и не закончилось.</p></div>' +
+    '<div class="rule evt"><h3>Короткое действие — удар</h3><span class="form">Past Simple</span>' +
+    '<p>…when they <b>heard</b> a whistle.</p><p class="note" style="padding:8px 10px;margin:0">Что случилось и прервало фон. Слова-сигналы: <b>when</b> (короткое), <b>while</b> (длинное).</p></div></div>' +
+    '<svg class="timeline" viewBox="0 0 560 90" role="img" aria-label="Схема: длинная полоса was counting прерывается моментом heard a whistle">' +
+    '<rect x="30" y="34" width="420" height="22" rx="11" fill="#bfe3ff"/><text x="200" y="27" text-anchor="middle" font-family="Rubik,sans-serif" font-size="14" font-weight="700" fill="#1f6fb0">was counting the coins</text>' +
+    '<path d="M330 18 L340 45 L330 72" stroke="#e5533d" stroke-width="4" fill="none"/><circle cx="336" cy="45" r="8" fill="#e5533d"/>' +
+    '<text x="350" y="86" font-family="Rubik,sans-serif" font-size="14" font-weight="700" fill="#e5533d">heard a whistle!</text>' +
+    '<path d="M460 45 h70" stroke="#98a6b8" stroke-width="3" stroke-dasharray="6 6"/><text x="495" y="70" text-anchor="middle" font-family="Nunito,sans-serif" font-size="12" fill="#5d6f88">время</text></svg>',
+    items:[
+  { pre:'Mother', opts:['was counting','counted'], post:'the coins when they heard a stick on the road.', a:0, why:'Долгое действие (считала) прервано коротким (услышали) — was counting.' },
+  { pre:'They were counting the money when somebody', opts:['turned','was turning'], post:'the door handle.', a:0, why:'Короткое действие, которое прервало длинное, — Past Simple.' },
+  { pre:'Jim', opts:['searched','was searching'], post:'the captain’s pockets when he noticed a string round his neck.', a:1, why:'Он был в процессе поиска, когда заметил верёвку, — was searching.' },
+  { pre:'When they opened the chest, they', opts:['noticed','were noticing'], post:'a smell of tobacco and tar.', a:0, why:'Два коротких действия одно за другим — оба в Past Simple.' },
+  { pre:'While they', opts:['ran','were running'], post:'to the bridge, Jim’s mother felt weak.', a:1, why:'После while обычно идёт длительное действие — were running.' },
+  { pre:'The blind man', opts:['knocked','was knocking'], post:'on the door, and then he went away.', a:0, why:'Цепочка коротких событий (постучал, потом ушёл) — Past Simple.' }
+],
+    writeTask:'Два предложения с <b>was/were + -ing</b> и <b>when</b> или <b>while</b>: одно о главе, одно о себе.',
+    writes:[
+      { label:'О главе: “Jim’s mother was … when …”', model:'Jim was searching the captain’s pockets when he saw the string.', minWords:6, checks:[{ re:PASTCONT, miss:'нет was/were + -ing' }, { re:/\b(when|while)\b/, miss:'нет when или while' }] },
+      { label:'О себе: “Yesterday I was … when …”', model:'Yesterday I was cooking dinner when my friend called me.', minWords:6, checks:[{ re:PASTCONT, miss:'нет was/were + -ing' }, { re:/\b(when|while)\b/, miss:'нет when или while' }] }
+    ],
+    teach:'Цель узкая: прерванное действие в рассказе. Не уходите во все значения Past Continuous. Хороший мост к говорению: “What were you doing yesterday at 8 p.m. when…?”'
+  },
+  talk:{ ...{
+  qs:[
+    'Is Jim’s mother honest, brave or foolish? Prove it with one detail from the chapter.',
+    'Why were the men in the village too afraid to help? Would you help?',
+    'Why does Jim take the packet and not the gold? What could be inside?',
+    'What would you take from the chest, and why?',
+    'Who is the real hero of this chapter: Jim or his mother?'
+  ],
+  tw:['Ответь за 30 секунд.','Используй три выражения из задания 2.','Говори от лица мамы Джима.','Поспорь со своим первым ответом.','Добавь одно предложение в Past Continuous.'],
+  frame:'<b>A2:</b> “I think she is … because she …” · <b>B1:</b> “Although she was in danger, she …, which shows that …”'
+},
+    intro:'Пираты вот-вот вернутся, а мама Джима <b>отказывается брать больше, чем им должны</b>, и медленно считает незнакомые монеты. Твоё решение?',
+    votes:[
+  ['honest','Она права', 'берёт только своё — это честно'],
+  ['foolish','Смело, но глупо', 'опасность рядом, надо бежать сразу'],
+  ['all','Надо брать всё', 'пираты сами воры']
+],
+    checks:['решение названо прямо','деталь из главы','три выражения из задания 2','одно предложение в Past Continuous'],
+    teach:'Сначала монолог без вмешательства, потом один комментарий по содержанию и один по языку. Сильный вопрос для спора: “Is honesty still a virtue when your life is in danger?”' },
+  diary:{
+    task:'Ты — Джим. Ночью, спрятавшись под мостом, ты пишешь в дневник. <b>50–90 слов</b>, минимум <b>четыре выражения</b> из задания 2 и <b>одно предложение в Past Continuous</b>. Подсветка ниже загорается сама.',
+    placeholder:'Dear diary, what a night! I told my mother everything…',
+    targets:[
+  { id:'tell',   label:'told … everything', re:/\b(told|tell)\b[^.!?]*\beverything\b/ },
+  { id:'help',   label:'ask for help',      re:/\bask(ed)?\b[^.!?]*\bfor help\b/ },
+  { id:'afraid', label:'too afraid to',     re:/\btoo (afraid|scared|frightened) to\b/ },
+  { id:'dare',   label:'dare',              re:/\bdare(d|s)?\b/ },
+  { id:'lock',   label:'locked the door',   re:/\block(ed)?\b[^.!?]*\bdoor\b/ },
+  { id:'owe',    label:'owed',              re:/\bowe(d|s)?\b/ },
+  { id:'hurry',  label:'in a hurry',        re:/\bin a hurry\b/ },
+  { id:'faint',  label:'fainted',           re:/\bfaint(ed|s)?\b/ }
+],
+    hits:4, min:50, max:90,
+    extra:{ re:PASTCONT, label:'Past Continuous', miss:'нет предложения с was/were + -ing' },
+    model:'Dear diary, what a terrible night! I told my mother everything about the captain. We ran to the village to ask for help, but the men were too afraid to come with us. So we went back alone and locked the door. The captain owed us money, so we opened his chest. My mother was counting the coins when we heard the blind man’s stick. Then somebody whistled on the hill. We left in a hurry, and near the bridge my mother fainted. I still have the packet.',
+    teach:'Устное обсуждение (задание 7) лучше провести до письма, иначе текст станет заученным монологом. При проверке смотрите на связность: first / then / suddenly / in the end.'
+  },
+  exit:{
+    gaps:[
+  { pre:'Jim ', post:' his mother everything he knew.', ok:['told'] },
+  { pre:'The men were too ', post:' to come back to the inn.', ok:['afraid','scared','frightened'] },
+  { pre:'They went back home and ', post:' the door.', ok:['locked'] },
+  { pre:'The captain ', post:' them a lot of money.', ok:['owed'] },
+  { pre:'Mother ', post:' counting the coins when they heard a whistle.', ok:['was'] },
+  { pre:'They left the inn in a ', post:'.', ok:['hurry'] },
+  { pre:'Near the bridge, his mother ', post:'.', ok:['fainted'] }
+],
+    button:'Закрыть сундук', idle:'Сундук ещё открыт', passText:'Сундук закрыт — глава IV пройдена!',
+    cando:['Я могу пересказать главу IV по порядку.', 'Я могу объяснить, почему мама Джима взяла не все деньги.', 'Я могу рассказать о прерванном действии: was …ing when …'],
+    teach:'5 из 7 и выше — тема закрыта, можно переходить к главе V. Меньше — повторите задание 2 через сутки и снова сделайте этот лист.'
+  },
+  home:{
+    tr:[
+  { ru:'Джим рассказал маме всё о капитане.', must:[/\btold\b/, /\beverything\b/], tip:'tell somebody everything', model:'Jim told his mother everything about the captain.' },
+  { ru:'Они побежали в деревню, чтобы попросить о помощи.', must:[/\bask(ed)? for help\b/], tip:'ask for help', model:'They ran to the village to ask for help.' },
+  { ru:'Мужчины слишком боялись, чтобы пойти с ними.', must:[/\btoo (afraid|scared|frightened) to\b/], tip:'too afraid to + глагол', model:'The men were too afraid to go with them.' },
+  { ru:'Капитан был должен им много денег.', must:[/\bowed\b/], tip:'owe somebody money → owed', model:'The captain owed them a lot of money.' },
+  { ru:'Они вернулись домой и заперли дверь.', must:[/\blocked\b/, /\bdoor\b/], tip:'lock the door → locked', model:'They went back home and locked the door.' },
+  { ru:'Они покинули трактир в спешке.', must:[/\bin a hurry\b/], tip:'in a hurry', model:'They left the inn in a hurry.' }
+],
+    brTitle:'Раскрой скобки',
+    brNote:'Past Continuous (was/were + -ing) или Past Simple? Впиши только глагол в нужной форме.',
+    br:[
+  { pre:'Jim’s mother', verb:'count', post:'the money when they heard a whistle.', ok:['was counting'] },
+  { pre:'They were walking to the village when they', verb:'see', post:'a light in a window.', ok:['saw'] },
+  { pre:'I', verb:'watch', post:'TV when my phone rang.', ok:['was watching'] },
+  { pre:'We', verb:'have', post:'dinner when the lights went out.', ok:['were having'] },
+  { pre:'When the blind man knocked, Jim', verb:'stop', post:'breathing for a second.', ok:['stopped'] },
+  { pre:'While she', verb:'read', post:'the letter, she started to cry.', ok:['was reading'] }
+].map(b => ({ ...b, why: /ing$/.test(b.ok[0]) ? 'действие шло в тот момент' : 'короткое действие' })),
+    dict:[
+  'Nobody in the village wanted to help them.',
+  'The key was on a string around his neck.',
+  'She took only the money that he owed her.',
+  'They were running to the bridge when she fainted.'
+],
+    prompt:{ title:'Что будет в десять часов?',
+      html:'Пираты обещали вернуться к десяти. Напиши прогноз к главе V: что они сделают, что будет с Джимом, мамой и свёртком.',
+      frames:'I think the pirates will probably… · Jim will… because… · I don’t think his mother will… · The packet is probably…',
+      placeholder:'I think the pirates will probably come back at ten o’clock…' },
+    checklist:['Прочитать главу V «The Last of the Blind Man» и проверить свой прогноз из части D. <a href="chapter-5.html">задания к главе V →</a>',
+       'Пройти тренажёр слов: «Набор 2 → Найди ошибку» (хотя бы на две звезды). <a href="a2-words.html">открыть тренажёр →</a>',
+       'Рассказать вслух за одну минуту, что случилось в главе IV, не глядя в текст.']
+  }
+};
+</script>
+<script src="chapter-kit.js"></script>
+</body>
+</html>

@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#9fdcff">
+<meta name="format-detection" content="telephone=no">
+<title>The Last of the Blind Man · Treasure Island V</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chapter-kit.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="speech.js"></script>
+<script>
+/* Глава V · The Last of the Blind Man — тексты и ответы. Движок: chapter-kit.js */
+const PASTPERF = /\bhad (already |just |never |not )?([a-z]+ed|been|gone|done|seen|taken|left|run|hidden|found|come|become|got|gotten|put|lost|told|said|heard|known|eaten|written|given|stolen|broken|fallen|thrown|caught|brought|bought|thought|felt|kept|slept|sat|stood|won|begun|drunk|forgotten|ridden|driven|woken|worn|flown|grown|shown|made|had|read|met|held|sent|spent|built|lent|meant|led|fled|hit|cut|shut|set|let)\b/;
+window.CHAPTER = {
+  key:'benbow-ch5-v1', num:'V',
+  title:'The Last of the Blind Man', titleRu:'Конец слепого',
+  intro:'Десять часов. Мама без сил лежит под мостом, у Джима за пазухой свёрток капитана, а к трактиру бегут пираты. Девять заданий на урок — от прогноза до рассказа Джима доктору — и домашнее задание.',
+  art:`<svg viewBox="0 0 230 170" role="img" aria-label="Каменный мост над ручьём ночью, луна и фонарь">
+      <circle cx="184" cy="40" r="24" fill="#f6ead0" opacity=".9"/>
+      <circle cx="176" cy="34" r="24" fill="#23476e" opacity=".85"/>
+      <path d="M0 132 q60 -10 115 0 t115 0 V170 H0z" fill="#16324f"/>
+      <path d="M10 140 q30 -6 60 0 M120 146 q30 -6 60 0" stroke="#7fa8a0" stroke-width="2" fill="none" opacity=".6"/>
+      <path d="M14 132 V96 H216 V132 H176 Q176 104 115 104 Q54 104 54 132 Z" fill="#8a8f98" stroke="#3d4450" stroke-width="3"/>
+      <path d="M14 96 H216" stroke="#3d4450" stroke-width="5"/>
+      <path d="M40 96 v-8 M80 96 v-8 M120 96 v-8 M160 96 v-8 M200 96 v-8" stroke="#3d4450" stroke-width="3"/>
+      <g transform="translate(150 62)">
+        <path d="M0 0 h14 v20 h-14z" fill="#ffd36b" stroke="#6b4423" stroke-width="2"/>
+        <path d="M-2 0 h18 M7 -6 v6" stroke="#6b4423" stroke-width="2"/>
+        <circle cx="7" cy="10" r="16" fill="#ffd36b" opacity=".2"/>
+      </g>
+      <path d="M44 86 l6 -16 l6 16 M47 78 h6" stroke="#f6ead0" stroke-width="2" fill="none" opacity=".7"/>
+    </svg>`,
+  steps:[
+    { short:'Прогноз',    kicker:'до чтения',        title:'Who will come tonight?',  min:'5 минут' },
+    { short:'Слова',      kicker:'лексика',          title:'Words to take with you',  min:'10 минут' },
+    { short:'Цепь',       kicker:'после чтения',     title:'Rebuild the attack',      min:'7 минут' },
+    { short:'Правда?',    kicker:'понимание',        title:'True or false?',          min:'6 минут' },
+    { short:'Кто был?',   kicker:'детали',           title:'Who was on the road?',    min:'5 минут' },
+    { short:'Грамматика', kicker:'Past Perfect',     title:'The packet had gone',     min:'10 минут' },
+    { short:'Разговор',   kicker:'говорение',        title:'Who is to blame?',        min:'10 минут' },
+    { short:'Рассказ',    kicker:'письмо',           title:'Jim’s report',            min:'12 минут' },
+    { short:'Финал',      kicker:'проверка',         title:'Close the case',          min:'5 минут' },
+    { short:'Домашка',    kicker:'домашнее задание', title:'Homework: the packet',    min:'30–40 минут' }
+  ],
+  recap:{
+    pickN:3,
+    html:'<b>Что было в главе IV.</b> Джим и мама вернулись в трактир, открыли сундук капитана и стали отсчитывать то, что он им был должен. Услышав палку слепого у двери и свист на холме, они убежали: мама унесла часть денег, Джим — свёрток в промасленной ткани. У моста маме стало плохо, и Джим спрятал её под мостом.',
+    task:'Сейчас около десяти вечера. <b>Кто появится на дороге этой ночью?</b> Выбери троих. После чтения проверишь себя в задании 5.',
+    doneText:'Прогноз записан. Теперь читай главу V и проверь себя в задании 5.',
+    frame:'“I think … will come because …” / “I don’t think … will come because …”',
+    teach:'Прогноз держит интерес к тексту. Спросите: “What would you do if you were Jim: stay under the bridge or go and watch?” — и вернитесь к этому вопросу после чтения.'
+  },
+  words:{
+    items:[
+      { id:'curious', en:'be curious',              ru:'быть любопытным',             ex:'Jim was too curious to stay under the bridge.' },
+      { id:'hide',    en:'hide behind',             ru:'прятаться за',                ex:'He hid behind a bush near the road.' },
+      { id:'door',    en:'break down the door',     ru:'выломать дверь',              ex:'“Break down the door!” shouted the blind man.' },
+      { id:'search',  en:'search for',              ru:'искать, обыскивать',          ex:'The pirates searched the house for the papers.' },
+      { id:'upside',  en:'turn something upside down', ru:'перевернуть вверх дном',  ex:'They turned the whole inn upside down.' },
+      { id:'behind',  en:'leave somebody behind',   ru:'бросить, оставить кого-то',   ex:'His friends ran away and left the blind man behind.' },
+      { id:'knock',   en:'be knocked down',         ru:'быть сбитым с ног',           ex:'The blind man was knocked down by a horse.' },
+      { id:'time',    en:'just in time',            ru:'как раз вовремя',             ex:'The officers arrived just in time.' }
+    ],
+    ballast:'lugger — люггер, небольшое парусное судно · revenue officers — таможенники · supervisor — начальник · bank — склон, берег ручья · lookout — дозорный · hoofs — копыта · gallop — скакать галопом.'
+  },
+  events:[
+    'Jim leaves his mother under the bridge and hides behind a bush to watch.',
+    'Seven or eight men run towards the inn, and the blind man is with them.',
+    'They find the door open and the captain dead on the floor.',
+    'They search the chest, but the packet of papers is gone.',
+    'The blind man shouts at them to find Jim and his mother.',
+    'They hear a whistle and the sound of horses, and the pirates run away.',
+    'The pirates leave the blind man behind, and a horse knocks him down.',
+    'Mr Dance and his officers arrive, and Jim decides to take the packet to Dr Livesey.'
+  ],
+  order0:[4,0,6,2,7,1,5,3],
+  chainHint:'Подсказка: сначала Джим прячется, потом пираты в доме; лошади и гибель слепого — в самом конце, а Джим уезжает к доктору последним.',
+  truth:[
+    { t:'Jim stayed under the bridge with his mother all the time.', a:false, why:'Любопытство победило страх: Джим выбрался и спрятался за кустом, чтобы видеть трактир.' },
+    { t:'The blind man came to the inn with the other pirates.', a:true, why:'Да: он бежал вместе с ними и командовал.' },
+    { t:'The pirates found the money in the captain’s chest.', a:true, why:'Да: деньги были на месте, но пиратам нужны были не они.' },
+    { t:'The pirates were really looking for the packet of papers.', a:true, why:'Да: слепой был в ярости, когда понял, что свёртка нет.' },
+    { t:'The other pirates stayed to protect the blind man.', a:false, why:'Нет: услышав лошадей, они разбежались и бросили его.' },
+    { t:'The blind man was knocked down by a horse.', a:true, why:'Да: в панике он выбежал прямо под копыта.' },
+    { t:'The officers caught the pirates’ ship.', a:false, why:'Нет: судно пиратов ушло в море.' },
+    { t:'Jim decided to give the packet to Mr Dance.', a:false, why:'Нет: Джим решил отвезти свёрток доктору Ливси, и мистер Данс взялся его проводить.' }
+  ],
+  pick:{
+    task:'Кто <b>действительно был</b> у трактира и на дороге в эту ночь? Нажми на всех. Четверо здесь лишние.',
+    checkLabel:'Проверить',
+    items:[
+      { id:'pew',     icon:'🦯', en:'the blind man',          ru:'слепой нищий',               in:true },
+      { id:'jim',     icon:'🧒', en:'Jim',                    ru:'Джим',                       in:true },
+      { id:'livesey', icon:'👨‍⚕️', en:'Dr Livesey',            ru:'доктор Ливси',               in:false },
+      { id:'pirates', icon:'🏴‍☠️', en:'seven or eight pirates', ru:'семь-восемь пиратов',       in:true },
+      { id:'mother',  icon:'👩', en:'Jim’s mother',           ru:'мама Джима',                 in:true },
+      { id:'silver',  icon:'🦜', en:'Long John Silver',       ru:'Долговязый Джон Сильвер',    in:false },
+      { id:'dance',   icon:'🎖️', en:'Mr Dance',               ru:'мистер Данс, начальник таможенников', in:true },
+      { id:'squire',  icon:'🎩', en:'Squire Trelawney',       ru:'сквайр Трелони',             in:false },
+      { id:'riders',  icon:'🐎', en:'officers on horses',     ru:'таможенники верхом',         in:true },
+      { id:'captain', icon:'⚓', en:'the captain, alive',     ru:'капитан — живой',            in:false }
+    ],
+    extra:'Доктор Ливси и сквайр Трелони появятся в главе VI, Сильвер — ещё позже. А капитан, увы, лежал мёртвым на полу.',
+    frame:'“There was / were … on the road, but there wasn’t …” / “I was right / wrong about …”',
+    teach:'Задание повторяет there was / there were. Попросите перечислить героев по памяти и сказать, что каждый делал в ту ночь: “Jim was hiding behind a bush…”'
+  },
+  gram:{
+    rules:'<div class="rule-pair"><div class="rule"><h3>Что случилось раньше</h3><span class="form">had + третья форма</span>' +
+      '<p>When the pirates opened the chest, Jim <b>had</b> already <b>taken</b> the packet.</p></div>' +
+      '<div class="rule evt"><h3>Что случилось потом</h3><span class="form">Past Simple</span>' +
+      '<p>The pirates <b>opened</b> the chest and <b>shouted</b> with anger.</p></div></div>' +
+      '<p class="note" style="margin-bottom:18px">Past Perfect нужен, когда мы рассказываем о прошлом и «отматываем назад»: <b>had + третья форма</b>. Если события идут по порядку (сначала… потом…) — хватает Past Simple. Сигналы: <b>by the time, already, before, after</b>.</p>',
+    items:[
+      { pre:'When the pirates opened the chest, Jim', opts:['had already taken','already took'], post:'the packet.', a:0, why:'Джим взял свёрток раньше, чем пираты открыли сундук, — had taken.' },
+      { pre:'Mr Dance arrived after the pirates', opts:['ran away','had run away'], post:'.', a:1, why:'Сначала пираты убежали, потом приехал Данс — had run away.' },
+      { pre:'The pirates', opts:['searched','had searched'], post:'the house, and then they heard the horses.', a:0, why:'События по порядку (and then) — Past Simple.' },
+      { pre:'The blind man didn’t understand that his friends', opts:['had left','left'], post:'him alone on the road.', a:0, why:'Они ушли раньше, чем он это понял, — had left.' },
+      { pre:'By the time the officers reached the sea, the ship', opts:['sailed','had sailed'], post:'away.', a:1, why:'By the time — сигнал Past Perfect: корабль ушёл раньше.' },
+      { pre:'Jim', opts:['hid','had hidden'], post:'behind a bush and watched the men.', a:0, why:'Цепочка действий по порядку — Past Simple.' }
+    ],
+    writeTask:'Два предложения с <b>had + третья форма</b>: одно о главе, одно о себе.',
+    writes:[
+      { label:'Соедини: “Jim took the packet. Later the pirates opened the chest.” → When the pirates opened the chest, …', model:'When the pirates opened the chest, Jim had already taken the packet.', minWords:6,
+        checks:[{ re:/\bhad (already |just )?taken\b/, miss:'нужно had taken' }, { re:/\bwhen\b/, miss:'нет when' }] },
+      { label:'О себе: “When I got home yesterday, … had …”', model:'When I got home yesterday, my sister had already eaten all the cake.', minWords:6,
+        checks:[{ re:PASTPERF, miss:'нет had + третья форма' }, { re:/\b(when|by the time|before|after)\b/, miss:'нет when / by the time / before / after' }] }
+    ],
+    teach:'Цель узкая: «отмотать назад» в рассказе. Нарисуйте на доске линию времени ночи: Джим берёт свёрток → пираты открывают сундук. Устно: “What had happened before the officers arrived?”'
+  },
+  talk:{
+    intro:'Пираты бросили слепого на дороге, и он погиб под копытами. <b>Кто виноват?</b>',
+    votes:[['pew','Сам слепой','он был жестоким и сам выбежал на дорогу'],['crew','Другие пираты','они бросили товарища'],['nobody','Никто','это несчастный случай']],
+    qs:[
+      'Was Jim brave or foolish to come back and watch the pirates?',
+      'Did the blind man deserve what happened to him? Why or why not?',
+      'Why did the pirates run away instead of fighting the officers?',
+      'Why does Jim want to give the packet to Dr Livesey and not to Mr Dance?',
+      'What do you think is inside the packet, and why is it so important?'
+    ],
+    tw:['Ответь за 30 секунд.','Используй три выражения из задания 2.','Говори от лица слепого.','Добавь одно предложение в Past Perfect.','Поспорь со своим первым ответом.'],
+    frame:'<b>A2:</b> “I think … is to blame because …” · <b>B1:</b> “By the time the officers arrived, the pirates had …, so …”',
+    checks:['вывод назван прямо','деталь из главы','три выражения из задания 2','одно предложение в Past Perfect'],
+    teach:'Тема вины даёт повод для спора. Для сильного B1 можно ввести “They shouldn’t have left him”. Сначала беглость, потом один комментарий по содержанию и один по языку.'
+  },
+  diary:{
+    task:'Ты — Джим. Ночью ты приезжаешь к доктору Ливси и рассказываешь, что случилось. Напиши этот рассказ: <b>50–90 слов</b>, минимум <b>четыре выражения</b> из задания 2 и <b>одно предложение в Past Perfect</b> (had + третья форма). Подсветка ниже загорается сама.',
+    placeholder:'Doctor, you won’t believe what happened tonight…',
+    targets:[
+      { id:'curious', label:'curious',             re:/\bcurious\b/ },
+      { id:'hide',    label:'hid behind',          re:/\b(hid|hide|hides|hiding|hidden) behind\b/ },
+      { id:'door',    label:'break down the door', re:/\b(break|broke|broken|breaking) down the door\b|\bdown with the door\b/ },
+      { id:'search',  label:'searched',            re:/\bsearch(ed|es|ing)?\b/ },
+      { id:'upside',  label:'upside down',         re:/\bupside down\b/ },
+      { id:'behind',  label:'left … behind',       re:/\b(leave|left|leaves|leaving)\b[^.!?]*\bbehind\b/ },
+      { id:'knock',   label:'knocked down',        re:/\bknock(ed|s)? (him |her |them )?down\b/ },
+      { id:'time',    label:'just in time',        re:/\bjust in time\b/ }
+    ],
+    hits:4, min:50, max:90,
+    extra:{ re:PASTPERF, label:'Past Perfect', miss:'нет предложения с had + третья форма' },
+    model:'Doctor, you won’t believe what happened tonight! I was too curious to stay under the bridge, so I hid behind a bush and watched the inn. The pirates searched the house and turned it upside down. When they opened the chest, I had already taken the packet. Then they heard horses, ran away and left the blind man behind. He was knocked down by a horse. Mr Dance and his officers arrived just in time. Here is the packet.',
+    teach:'Устное обсуждение (задание 7) лучше провести до письма. Хорошее упражнение после: прочитать рассказ вслух «как доктору» — быстро, взволнованно, но понятно.'
+  },
+  exit:{
+    gaps:[
+      { pre:'Jim was too ', post:' to stay under the bridge.', ok:['curious'] },
+      { pre:'He hid ', post:' a bush near the road.', ok:['behind'] },
+      { pre:'The pirates searched the house ', post:' the papers.', ok:['for'] },
+      { pre:'They turned the whole inn upside ', post:'.', ok:['down'] },
+      { pre:'His friends ran away and left the blind man ', post:'.', ok:['behind'] },
+      { pre:'The blind man was knocked ', post:' by a horse.', ok:['down'] },
+      { pre:'The officers arrived just in ', post:'.', ok:['time'] }
+    ],
+    button:'Закрыть дело', idle:'Дело ещё открыто', passText:'Глава V пройдена — пора к доктору Ливси!',
+    cando:['Я могу пересказать главу V по порядку.','Я могу объяснить, кто виноват в гибели слепого, и поспорить.','Я могу рассказать, что случилось раньше: had + третья форма.'],
+    teach:'5 из 7 и выше — тема закрыта, можно переходить к главе VI. Меньше — повторите задание 2 через сутки и снова сделайте этот лист.'
+  },
+  home:{
+    tr:[
+      { ru:'Джиму было слишком любопытно, чтобы оставаться под мостом.', must:[/\bcurious\b/], tip:'too curious to …', model:'Jim was too curious to stay under the bridge.' },
+      { ru:'Он спрятался за кустом.', must:[/\bhid behind\b/], tip:'hide → hid behind', model:'He hid behind a bush.' },
+      { ru:'Пираты обыскали весь дом.', must:[/\bsearched\b/], tip:'search → searched', model:'The pirates searched the whole house.' },
+      { ru:'Они перевернули трактир вверх дном.', must:[/\bupside down\b/], tip:'turn something upside down', model:'They turned the inn upside down.' },
+      { ru:'Друзья бросили слепого.', must:[/\bleft\b/, /\bbehind\b/], tip:'leave somebody behind → left … behind', model:'His friends left the blind man behind.' },
+      { ru:'Таможенники приехали как раз вовремя.', must:[/\bjust in time\b/], tip:'just in time', model:'The officers arrived just in time.' }
+    ],
+    brTitle:'Past Perfect или Past Simple',
+    brNote:'Впиши глагол в нужной форме. Что случилось <b>раньше</b> — had + третья форма; события по порядку — Past Simple.',
+    br:[
+      { pre:'When the pirates opened the chest, the packet', verb:'already / disappear', post:'.', ok:['had already disappeared'], why:'это случилось раньше' },
+      { pre:'The officers arrived after the pirates', verb:'run', post:'away.', ok:['had run'], why:'сначала убежали — had run' },
+      { pre:'Jim', verb:'hide', post:'behind a bush and watched.', ok:['hid'], why:'события по порядку' },
+      { pre:'By the time I got to the station, the train', verb:'leave', post:'.', ok:['had left'], why:'by the time → had left' },
+      { pre:'She', verb:'never / see', post:'the sea before that holiday.', ok:['had never seen'], why:'опыт до момента в прошлом' },
+      { pre:'We', verb:'finish', post:'dinner and then watched a film.', ok:['finished'], why:'события по порядку' }
+    ],
+    dict:[
+      'Jim was too curious to stay under the bridge.',
+      'The pirates turned the whole inn upside down.',
+      'His friends ran away and left the blind man behind.',
+      'The officers arrived just in time.'
+    ],
+    prompt:{ title:'Что в свёртке?',
+      html:'Джим везёт свёрток доктору Ливси. Напиши прогноз к главе VI: что лежит в свёртке и что с ним сделает доктор.',
+      frames:'I think the packet might be… · It must be important because… · Dr Livesey will probably… · I don’t think…',
+      placeholder:'I think the packet might be…' },
+    checklist:['Прочитать главу VI «The Captain’s Papers» и проверить свой прогноз из части D.',
+      'Пройти тренажёр слов: «Набор 2 → Пропуски» хотя бы на две звезды. <a href="a2-words.html">открыть тренажёр →</a>',
+      'Рассказать вслух за одну минуту, что случилось в главе V, не глядя в текст.']
+  }
+};
+</script>
+<script src="chapter-kit.js"></script>
+</body>
+</html>

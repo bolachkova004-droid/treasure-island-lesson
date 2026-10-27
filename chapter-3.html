@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#9fdcff">
+<meta name="format-detection" content="telephone=no">
+<title>The Black Spot · Treasure Island III</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@500;700;800&family=Nunito:ital,wght@0,600;0,700;0,800;1,600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chapter-kit.css">
+</head>
+<body>
+<div id="app"></div>
+<script src="speech.js"></script>
+<script>
+/* Глава III · The Black Spot — тексты и ответы. Движок: chapter-kit.js */
+const REPORTED = /\b(asked|told|ordered|begged)\s+(me|him|her|us|them|jim|bill|the \w+|my \w+|his \w+)\s+(not\s+)?to\s+[a-z]+/;
+window.CHAPTER = {
+  key:'benbow-ch3-v1', num:'III',
+  title:'The Black Spot', titleRu:'Чёрная метка',
+  intro:'Капитан болен и боится: старая команда Флинта охотится за его сундуком. А по замёрзшей дороге к трактиру уже стучит палка слепого. Девять заданий на урок — от прогноза до дневника Джима — и домашнее задание.',
+  art:`<svg viewBox="0 0 230 170" role="img" aria-label="Клочок бумаги с чёрной меткой, палка слепого и часы, показывающие десять">
+      <ellipse cx="115" cy="154" rx="100" ry="10" fill="#0c1d30" opacity=".5"/>
+      <circle cx="186" cy="48" r="34" fill="#f6ead0" opacity=".12"/>
+      <circle cx="186" cy="48" r="26" fill="#f6ead0" stroke="#7a6640" stroke-width="3"/>
+      <path d="M186 48 L186 30 M186 48 L172 40" stroke="#16324f" stroke-width="3.5" stroke-linecap="round"/>
+      <circle cx="186" cy="48" r="3" fill="#16324f"/>
+      <path d="M40 150 L150 20" stroke="#6b4423" stroke-width="7" stroke-linecap="round"/>
+      <path d="M146 24 q10 -10 18 -2" stroke="#6b4423" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <g transform="rotate(-9 92 104)">
+        <path d="M44 70 h96 l-4 10 l4 10 l-4 10 l4 10 l-4 10 l4 10 h-96 l4 -10 l-4 -10 l4 -10 l-4 -10 l4 -10z" fill="#e8dcbe" stroke="#7a6640" stroke-width="2"/>
+        <circle cx="92" cy="98" r="18" fill="#111"/>
+        <path d="M60 128 h64" stroke="#7a6640" stroke-width="2" stroke-dasharray="4 4"/>
+      </g>
+    </svg>`,
+  steps:[
+    { short:'Прогноз',    kicker:'до чтения',        title:'Who is coming?',          min:'5 минут' },
+    { short:'Слова',      kicker:'лексика',          title:'Words to take with you',  min:'10 минут' },
+    { short:'Цепь',       kicker:'после чтения',     title:'Rebuild the day',         min:'7 минут' },
+    { short:'Правда?',    kicker:'понимание',        title:'True or false?',          min:'6 минут' },
+    { short:'Портрет',    kicker:'детали',           title:'Paint the blind man',     min:'5 минут' },
+    { short:'Грамматика', kicker:'косвенная речь',   title:'He told me to…',          min:'10 минут' },
+    { short:'Разговор',   kicker:'говорение',        title:'Rum or no rum?',          min:'10 минут' },
+    { short:'Дневник',    kicker:'письмо',           title:'Jim’s diary',             min:'12 минут' },
+    { short:'Финал',      kicker:'проверка',         title:'Remove the black spot',   min:'5 минут' },
+    { short:'Домашка',    kicker:'домашнее задание', title:'Homework: six hours left', min:'30–40 минут' }
+  ],
+  recap:{
+    pickN:3,
+    html:'<b>Что было в главах I–II.</b> В трактир «Адмирал Бенбоу» приехал старый моряк Билли Бонс — со шрамом от сабли и тяжёлым сундуком. Он платил Джиму, чтобы тот высматривал одноногого моряка. Во второй главе пришёл пират по прозвищу Чёрный Пёс; капитан подрался с ним и прогнал его, а потом рухнул на пол — с ним случился удар. Доктор Ливси предупредил: ещё немного рома — и капитан умрёт.',
+    task:'Сегодня к трактиру придёт новый страшный гость — <b>слепой нищий</b>. Как он выглядит? Выбери три детали, которые, по-твоему, будут в описании. После чтения проверишь себя в задании 5.',
+    doneText:'Прогноз записан. Теперь читай главу III и проверь себя в задании 5.',
+    frame:'“I think he has … / he wears … because …” / “I don’t think he has … because …”',
+    teach:'Не подтверждайте прогноз до чтения. Вопрос перед чтением: “Why can a blind man be scary?” — пусть студент выскажет две гипотезы и проверит их по тексту.'
+  },
+  words:{
+    items:[
+      { id:'beg',    en:'beg somebody for something', ru:'умолять кого-то о чём-то',     ex:'The sick captain begged Jim for a glass of rum.' },
+      { id:'refuse', en:'refuse to do',               ru:'отказываться что-то делать',   ex:'At first Jim refused to bring him any rum.' },
+      { id:'after',  en:'be after something',         ru:'охотиться за чем-то',          ex:'“It’s my old sea-chest they’re after,” said the captain.' },
+      { id:'die',    en:'die suddenly',               ru:'внезапно умереть',             ex:'That evening Jim’s father died suddenly.' },
+      { id:'lead',   en:'lead somebody to',           ru:'отвести кого-то к',            ex:'Jim had to lead the blind man to the captain.' },
+      { id:'grip',   en:'grip',                       ru:'крепко схватить',              ex:'The blind man gripped Jim’s hand like a vice.' },
+      { id:'letgo',  en:'let go of',                  ru:'отпустить',                    ex:'He didn’t let go of Jim’s hand.' },
+      { id:'tears',  en:'burst into tears',           ru:'расплакаться',                 ex:'When the captain fell dead, Jim burst into tears.' }
+    ],
+    ballast:'the black spot — чёрная метка, пиратский вызов · first mate — старший помощник · green shade — зелёный козырёк на глазах · sea-cloak — морской плащ · hood — капюшон · vice — тиски («схватил как тисками») · apoplexy — удар, апоплексия.'
+  },
+  events:[
+    'The captain lies in bed after his stroke and begs Jim for rum.',
+    'Jim brings him one glass of rum but refuses to take his money.',
+    'The captain explains that Flint’s old crew is after his sea-chest.',
+    'That evening, Jim’s father dies suddenly.',
+    'On a cold afternoon, a blind man comes along the road, tapping with his stick.',
+    'The blind man grips Jim’s hand and makes him lead him to the captain.',
+    'He puts the black spot into the captain’s hand and quickly leaves.',
+    'The captain reads “Ten o’clock”, jumps up and falls down dead.'
+  ],
+  order0:[2,0,6,3,1,7,4,5],
+  chainHint:'Подсказка: сначала разговор капитана с Джимом, потом горе в семье Джима; слепой приходит только после этого.',
+  truth:[
+    { t:'The doctor said the captain could drink as much rum as he wanted.', a:false, why:'Наоборот: доктор предупредил, что ром его убьёт.' },
+    { t:'Jim took the captain’s gold coin for the rum.', a:false, why:'Джим отказался от денег: ему нужно только то, что капитан должен его отцу.' },
+    { t:'The captain had been Flint’s first mate.', a:true, why:'Да: он был старшим помощником Флинта и единственный знал, где спрятано сокровище.' },
+    { t:'If he got the black spot, the captain wanted Jim to go for the doctor.', a:true, why:'Да: Джим должен был скакать к доктору Ливси, чтобы тот поднял судей.' },
+    { t:'Jim’s father died a few days after the blind man’s visit.', a:false, why:'Нет: отец умер раньше, слепой пришёл уже после похорон.' },
+    { t:'The blind man spoke very politely at first.', a:true, why:'Да: сначала он вежливо спросил дорогу, а потом схватил Джима за руку как тисками.' },
+    { t:'The blind man stayed at the inn and drank with the captain.', a:false, why:'Нет: он отдал метку и сразу ушёл, постукивая палкой.' },
+    { t:'After reading the black spot, the captain said: “Ten o’clock!”', a:true, why:'Да: пираты дали ему срок до десяти вечера.' }
+  ],
+  pick:{
+    task:'Каким был слепой нищий? Нажми на все детали, которые <b>действительно есть</b> в описании из главы III. Четыре детали здесь лишние.',
+    checkLabel:'Проверить портрет',
+    items:[
+      { id:'stick',  icon:'🦯', en:'a stick that he tapped',     ru:'палка, которой он постукивал', in:true },
+      { id:'shade',  icon:'🟩', en:'a green shade over his eyes', ru:'зелёный козырёк на глазах',    in:true },
+      { id:'cloak',  icon:'🧥', en:'an old sea-cloak with a hood', ru:'старый плащ с капюшоном',    in:true },
+      { id:'leg',    icon:'🦵', en:'a wooden leg',               ru:'деревянная нога',              in:false },
+      { id:'back',   icon:'🧓', en:'a bent back',                ru:'сгорбленная спина',            in:true },
+      { id:'parrot', icon:'🦜', en:'a parrot on his shoulder',   ru:'попугай на плече',             in:false },
+      { id:'grip',   icon:'✊', en:'a very strong grip',         ru:'очень сильная хватка',         in:true },
+      { id:'scar',   icon:'⚔️', en:'a sabre scar on his cheek',  ru:'шрам от сабли на щеке',        in:false },
+      { id:'voice',  icon:'🎵', en:'a strange sing-song voice',  ru:'странный певучий голос',       in:true },
+      { id:'coat',   icon:'🎩', en:'a fine new coat and hat',    ru:'новый нарядный камзол и шляпа', in:false }
+    ],
+    extra:'Лишние детали: деревянная нога (это одноногий моряк, которого боится капитан), попугай, шрам от сабли (он у самого капитана) и нарядная одежда — на слепом были лохмотья.',
+    frame:'“He had a … and he wore …” / “He didn’t have a …”',
+    teach:'Портрет тренирует had / wore / was + прилагательное. Попросите описать слепого по памяти, закрыв экран, а потом — описать героя любого фильма так, чтобы его угадали.'
+  },
+  gram:{
+    rules:'<div class="rule-pair"><div class="rule"><h3>Просьба</h3><span class="form">ask somebody to do</span>' +
+      '<p>“Bring me some rum, Jim.” → The captain <b>asked Jim to bring</b> him some rum.</p></div>' +
+      '<div class="rule evt"><h3>Приказ или запрет</h3><span class="form">tell somebody (not) to do</span>' +
+      '<p>“Don’t drink!” → The doctor <b>told him not to drink</b>.</p></div></div>' +
+      '<p class="note" style="margin-bottom:18px">⚠️ Без <b>that</b> и без <b>-ing</b>: told him <b>to go</b>, а не told him that he go / told him going. Отрицание — <b>not</b> перед to.</p>',
+    items:[
+      { pre:'The captain asked Jim', opts:['to bring','bring'], post:'him a glass of rum.', a:0, why:'ask somebody + to + глагол.' },
+      { pre:'The doctor told the captain', opts:['don’t drink','not to drink'], post:'any more rum.', a:1, why:'Запрет в косвенной речи: tell somebody NOT to do.' },
+      { pre:'The blind man told Jim', opts:['to take','taking'], post:'him to the captain.', a:0, why:'tell somebody + to + глагол, без -ing.' },
+      { pre:'Jim asked the blind man', opts:['let go','to let go'], post:'of his hand.', a:1, why:'После ask somebody нужен to: to let go.' },
+      { pre:'The captain told Jim', opts:['not to tell','to not telling'], post:'anyone about the chest.', a:0, why:'not стоит перед to: not to tell.' },
+      { pre:'“Hold out your left hand,” said the blind man. → He told Bill', opts:['that he holds out','to hold out'], post:'his left hand.', a:1, why:'Приказ: told + кого + to + глагол.' }
+    ],
+    writeTask:'Перескажи прямую речь <b>косвенной</b>: told / asked + кого + (not) to + глагол.',
+    writes:[
+      { label:'“Take me to the captain,” the blind man said to Jim.', model:'The blind man told Jim to take him to the captain.', minWords:6,
+        checks:[{ re:/\b(told|asked|ordered)\b/, miss:'нет told или asked' }, { re:/\bto take\b/, miss:'нет to take' }] },
+      { label:'“Don’t drink rum,” the doctor said to the captain.', model:'The doctor told the captain not to drink rum.', minWords:6,
+        checks:[{ re:/\b(told|asked|ordered)\b/, miss:'нет told или asked' }, { re:/\bnot to drink\b/, miss:'нужно not to drink' }] }
+    ],
+    teach:'Цель узкая: просьбы и приказы в косвенной речи (ask / tell somebody to do). Сдвиг времён в утверждениях здесь не трогаем. Устный дрилл: вы говорите приказ («Close the door!»), студент пересказывает: “You told me to close the door.”'
+  },
+  talk:{
+    intro:'Капитан умоляет Джима принести ром, хотя доктор сказал, что ром его убьёт. <b>Как поступить Джиму?</b>',
+    votes:[['yes','Принести ром','капитану плохо и страшно'],['no','Отказать','доктор сказал, что ром его убьёт'],['one','Только один стакан','так и сделал Джим']],
+    qs:[
+      'Should Jim bring the captain rum? Prove your answer with one detail from the chapter.',
+      'Why does the captain trust Jim and not the adults?',
+      'Why is the blind man so frightening, even though he can’t see?',
+      'Should Jim have refused to lead the blind man to the captain? Could he refuse?',
+      'How does Jim feel at the end of the chapter, after two deaths?'
+    ],
+    tw:['Ответь за 30 секунд.','Используй три выражения из задания 2.','Говори от лица капитана.','Перескажи чужие слова: “He asked me to…”','Поспорь со своим первым ответом.'],
+    frame:'<b>A2:</b> “I think Jim should … because …” · <b>B1:</b> “Even though the doctor told him not to …, Jim …”',
+    checks:['решение названо прямо','деталь из главы','три выражения из задания 2','одна просьба в косвенной речи: asked / told … to …'],
+    teach:'Дилемма «помочь или навредить» естественно раскрывается через косвенную речь: “The doctor told him… but the captain begged him…”. Сначала беглость, потом один комментарий по содержанию и один по языку.'
+  },
+  diary:{
+    task:'Ты — Джим. Вечером, когда приходил слепой, ты пишешь в дневник. <b>50–90 слов</b>, минимум <b>четыре выражения</b> из задания 2 и <b>одна просьба или приказ в косвенной речи</b> (asked / told … to …). Подсветка ниже загорается сама.',
+    placeholder:'Dear diary, today was the worst day of my life…',
+    targets:[
+      { id:'beg',    label:'begged',           re:/\bbeg(ged|s|ging)?\b/ },
+      { id:'refuse', label:'refused',          re:/\brefus(e|ed|es|ing)\b/ },
+      { id:'after',  label:'be after',         re:/\b(is|are|was|were|'re|'s) after\b/ },
+      { id:'die',    label:'died suddenly',    re:/\bdied suddenly\b|\bsuddenly died\b/ },
+      { id:'lead',   label:'lead / led',       re:/\b(lead|led|leads|leading)\b/ },
+      { id:'grip',   label:'gripped',          re:/\bgrip(ped|s|ping)?\b/ },
+      { id:'letgo',  label:'let go of',        re:/\blet(s)? go\b/ },
+      { id:'tears',  label:'burst into tears', re:/\bburst into tears\b/ }
+    ],
+    hits:4, min:50, max:90,
+    extra:{ re:REPORTED, label:'asked / told … to', miss:'нет просьбы в косвенной речи (asked / told … to …)' },
+    model:'Dear diary, today was the worst day of my life. The captain begged me for some rum. At first I refused, because the doctor had told him not to drink. The captain said that Flint’s old crew was after his sea-chest. Then a blind man came along the road. He gripped my hand and told me to lead him to the captain. He didn’t let go of my hand. When the captain fell dead, I burst into tears.',
+    teach:'Устное обсуждение (задание 7) лучше провести до письма. При проверке смотрите на связность (first / then / suddenly / in the end) и на косвенную речь.'
+  },
+  exit:{
+    gaps:[
+      { pre:'The sick captain ', post:' Jim for a glass of rum.', ok:['begged','asked'] },
+      { pre:'At first Jim ', post:' to bring him any rum.', ok:['refused'] },
+      { pre:'“It’s my old sea-chest they’re ', post:',” said the captain.', ok:['after'] },
+      { pre:'That evening Jim’s father died ', post:'.', ok:['suddenly'] },
+      { pre:'The blind man ', post:' Jim’s hand like a vice.', ok:['gripped','grabbed','held'] },
+      { pre:'He told Jim to ', post:' him to the captain.', ok:['take','lead','bring'] },
+      { pre:'When the captain fell dead, Jim burst into ', post:'.', ok:['tears'] }
+    ],
+    button:'Снять метку', idle:'Чёрная метка ещё не снята', passText:'Глава III пройдена!',
+    cando:['Я могу пересказать главу III по порядку.','Я могу описать слепого нищего.','Я могу передать чужую просьбу: He asked me to …'],
+    teach:'5 из 7 и выше — тема закрыта, можно переходить к главе IV. Меньше — повторите задание 2 через сутки и снова сделайте этот лист.'
+  },
+  home:{
+    tr:[
+      { ru:'Капитан умолял Джима принести ему рома.', must:[/\bbegged\b/], tip:'beg somebody to do / for something', model:'The captain begged Jim to bring him some rum.' },
+      { ru:'Сначала Джим отказался.', must:[/\brefused\b/], tip:'refuse → refused', model:'At first Jim refused.' },
+      { ru:'Пираты охотятся за сундуком капитана.', must:[/\bafter\b/, /\bchest\b/], tip:'be after something', model:'The pirates are after the captain’s chest.' },
+      { ru:'Слепой крепко схватил Джима за руку.', must:[/\b(gripped|grabbed)\b/], tip:'grip → gripped', model:'The blind man gripped Jim’s hand.' },
+      { ru:'Он велел Джиму отвести его к капитану.', must:[/\btold jim to (take|lead|bring)\b/], tip:'tell somebody to do', model:'He told Jim to take him to the captain.' },
+      { ru:'Джим расплакался.', must:[/\bburst into tears\b/], tip:'burst into tears', model:'Jim burst into tears.' }
+    ],
+    brTitle:'Просьбы и приказы в косвенной речи',
+    brNote:'Впиши глагол в нужной форме: <b>to + глагол</b> или <b>not to + глагол</b>.',
+    br:[
+      { pre:'The captain asked Jim', verb:'bring', post:'him some rum.', ok:['to bring'], why:'ask somebody to do' },
+      { pre:'The doctor told him', verb:'not / drink', post:'any rum.', ok:['not to drink'], why:'запрет: not to + глагол' },
+      { pre:'The blind man told Jim', verb:'take', post:'him inside.', ok:['to take'], why:'tell somebody to do' },
+      { pre:'Jim asked him', verb:'let', post:'go of his hand.', ok:['to let'], why:'ask somebody to do' },
+      { pre:'The captain asked Jim', verb:'not / tell', post:'anyone about the chest.', ok:['not to tell'], why:'запрет: not to + глагол' },
+      { pre:'My mum asked me', verb:'stay', post:'at home tonight.', ok:['to stay'], why:'ask somebody to do' }
+    ],
+    dict:[
+      'The captain asked Jim for a glass of rum.',
+      'Jim’s father died suddenly that evening.',
+      'The blind man tapped the road with his stick.',
+      'He fell to the floor and never got up again.'
+    ],
+    prompt:{ title:'Что сделают Джим и мама?',
+      html:'Капитан мёртв, в его комнате стоит сундук, а капитан был должен трактиру деньги. Напиши прогноз к главе IV: что сделают Джим и мама, кто им поможет, что случится в десять вечера.',
+      frames:'I think Jim and his mother will… · They might… · Somebody will probably… · At ten o’clock…',
+      placeholder:'I think Jim and his mother will…' },
+    checklist:['Прочитать главу IV «The Sea-Chest» и проверить свой прогноз из части D. <a href="chapter-4.html">задания к главе IV →</a>',
+      'Пройти тренажёр слов: любой набор, «Найди ошибку» хотя бы на две звезды. <a href="a2-words.html">открыть тренажёр →</a>',
+      'Рассказать вслух за одну минуту, что случилось в главе III, не глядя в текст.']
+  }
+};
+</script>
+<script src="chapter-kit.js"></script>
+</body>
+</html>
