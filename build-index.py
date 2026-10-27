@@ -57,7 +57,6 @@ def inline(html):
     sub(r'<link rel="stylesheet" href="chapter-kit\.css">', '<style>\n' + read('chapter-kit.css') + '\n</style>')
     sub(r'<script src="chapter-kit\.js"></script>', '<script>\n' + read('chapter-kit.js') + '\n</script>')
     sub(r'<script src="speech\.js"></script>', '<script>\n' + read('speech.js') + '\n</script>')
-    sub(r'<link rel="stylesheet" href="adventure-theme\\.css">', '<style>\\n' + read('adventure-theme.css') + '\\n</style>')
     html = re.sub(r"location\.href = '([\w-]+\.html)'", r"__tiGo('\1')", html)
     assert 'src="speech.js"' not in html and 'href="chapter-kit.css"' not in html
     return html.replace('</body>', BRIDGE + '\n</body>', 1)
