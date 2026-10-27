@@ -57,6 +57,10 @@ b,strong{font-weight:800}
 .tab.on .flag{background:#fff!important}
 .tab.on .flag::after{content:"⚓";font-size:13px;color:var(--accent)}
 .rail-tools{display:none}
+.more-ch{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:10px;padding-top:10px;border-top:2px dashed var(--line)}
+.more-ch span{grid-column:1/-1;font-family:var(--ui);font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--ink-soft)}
+.more-ch a{display:grid;place-items:center;min-height:42px;font-family:var(--ui);font-size:13px;font-weight:800;color:#fff;text-decoration:none;background:var(--accent);border-radius:12px;box-shadow:0 3px 0 color-mix(in srgb,var(--accent) 65%,#000)}
+.more-ch a.wide{grid-column:1/-1;color:var(--ink);background:var(--paper-2);border:2px solid var(--line);box-shadow:0 3px 0 var(--shadow)}
 
 /* ========== верхняя панель ========== */
 .sheet{min-width:0;padding:18px 26px 112px}
@@ -517,6 +521,7 @@ input,textarea,select{font-size:16px!important}
     <div class="ink-gauge"><i id="gauge"></i></div>
     <div class="gauge-copy"><span>журнал заполнен</span><span id="gaugeText">0%</span></div>
     <nav class="tabs" id="tabsDesktop" aria-label="Листы дела"></nav>
+    <div class="more-ch"><span>Дальше по книге</span><a href="chapter-3.html">Глава III</a><a href="chapter-4.html">Глава IV</a><a href="chapter-5.html">Глава V</a><a class="wide" href="a2-words.html">Тренажёр слов A2</a></div>
     <div class="rail-tools">
       <button class="switch" id="swA2" aria-pressed="false">Опоры A2</button>
       <button class="switch" id="swHard" aria-pressed="false">Hard mode</button>
@@ -532,6 +537,7 @@ input,textarea,select{font-size:16px!important}
   </div>
   <div class="mobnav" id="mobNav">
     <nav class="tabs" id="tabsMobile"></nav>
+    <div class="more-ch"><span>Дальше по книге</span><a href="chapter-3.html">Глава III</a><a href="chapter-4.html">Глава IV</a><a href="chapter-5.html">Глава V</a><a class="wide" href="a2-words.html">Тренажёр слов A2</a></div>
     <div class="mobtools">
       <button class="switch" id="swA2m">Опоры A2</button>
       <button class="switch" id="swHardm">Hard mode</button>
