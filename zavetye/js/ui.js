@@ -312,7 +312,7 @@ function showLang(){ $('titleScr').hidden = true; $('langScr').hidden = false; d
 $('bNew').onclick = () => { if(!LOAD.ready) return; audioInit(); const sv = loadSave(); if(sv && !(sv.flags && sv.flags.ended)) askConfirm('Начать историю заново?', 'Текущее сохранение будет удалено: улики, версия и всё, что изменилось в Заветье.', showLang); else showLang(); };
 $('bCont').onclick = () => { if(!LOAD.ready) return; const sv = loadSave(); if(sv) startGame(sv); };
 $('bBack').onclick = () => { $('langScr').hidden = true; $('titleScr').hidden = false; };
-$('bGo').onclick = () => { wipeSave(); try{ localStorage.setItem('zavetye.lang', pickDiff); }catch(e){} track('language_mode_selected', { mode:pickDiff }); startGame(fresh(pickDiff)); track('new_game_started', { mode:pickDiff }); };
+$('bGo').onclick = () => { wipeSave(); try{ localStorage.setItem('zavetye.lang', pickDiff); }catch(e){} track('language_mode_selected', { mode:pickDiff }); const go = () => { startGame(fresh(pickDiff)); track('new_game_started', { mode:pickDiff }); }; if(typeof playIntro === 'function') playIntro(go); else go(); };
 $('modePick').onclick = e => { const b = e.target.closest('.mode'); if(!b) return; pickDiff = b.dataset.d; document.querySelectorAll('#modePick .mode').forEach(x => x.setAttribute('aria-pressed', x === b)); };
 function setDiff(d){
   st.diff = d;

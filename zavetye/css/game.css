@@ -705,3 +705,18 @@ body.talk #cv{filter:brightness(.8) saturate(.9);transform:scale(1.03)}
 .book.spread .obj:has(> .photo,> .drawing) > .photo,.book.spread .obj:has(> .photo,> .drawing) > .drawing{grid-column:1;grid-row:1/span 5}
 .book.spread .obj:has(> .photo,> .drawing) > :not(.photo):not(.drawing){grid-column:2}
 .book.spread .obj .photo + .txt{margin-top:0}
+
+/* ---------- вступление: легенда о свадьбе 1962 года (js/intro.js) ---------- */
+.intro{position:fixed;inset:0;z-index:62;background:#050608;display:none}
+.intro.on{display:block}
+.in-cv{position:absolute;inset:0;width:100%;height:100%;display:block}
+.in-line{position:absolute;left:50%;bottom:calc(8vh + 30px);z-index:3;transform:translateX(-50%);width:max-content;max-width:min(760px,calc(100% - 32px));margin:0;text-align:center;font:400 calc(22px * var(--fs) * var(--vs))/1.45 var(--body);color:#f1e6cf;text-shadow:0 1px 3px rgba(0,0,0,.95),0 0 24px rgba(0,0,0,.85);opacity:0;transition:opacity .9s ease;text-wrap:balance}
+.in-line.on{opacity:1}
+.in-line.in-song{font-style:italic;color:#e9d6ad}
+.in-title{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;pointer-events:none;opacity:0;transition:opacity 1.6s ease}
+.in-title.on{opacity:1}
+.in-title b{font:400 clamp(44px,8vw,96px)/1 var(--display);letter-spacing:.05em;text-transform:uppercase;color:var(--milk);text-shadow:0 4px 30px rgba(0,0,0,.8)}
+.in-title i{font:italic 400 calc(20px * var(--fs) * var(--vs))/1.3 var(--body);color:var(--milk-2);text-shadow:0 2px 12px rgba(0,0,0,.9)}
+.in-fade{position:absolute;inset:0;z-index:5;background:#000;pointer-events:none;opacity:1}
+.in-skip{z-index:6}
+@media (max-width:760px){ .in-line{bottom:calc(5vh + 58px);font-size:calc(18px * var(--fs) * var(--vs))} }
