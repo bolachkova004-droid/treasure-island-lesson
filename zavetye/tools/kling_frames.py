@@ -56,4 +56,16 @@ def anna_frame(sprite, flip=False, W=1080, H=1920, fh=1480):
 save(anna_frame('s_anna.webp'), 'anna/anna_side_right.jpg')
 save(anna_frame('s_anna.webp', True), 'anna/anna_side_left.jpg')
 save(anna_frame('s_anna_front.webp'), 'anna/anna_front.jpg')
+# лист персонажа: спереди, сбоку, сзади и портрет — для референса героя в Kling (Elements / Subject)
+sheet = Image.new('RGB', (1920, 1080), (196, 192, 186))
+for i, (f, fl) in enumerate([('s_anna_front.webp', False), ('s_anna.webp', False), ('s_anna_back.webp', False)]):
+    im = Image.open(A(f)).convert('RGBA'); im = im.resize((round(im.width * 980 / im.height), 980), Image.LANCZOS)
+    c = sheet.convert('RGBA'); c.alpha_composite(im, (60 + i * 330 + (300 - im.width) // 2, 60)); sheet = c.convert('RGB')
+pt = Image.open(A('p_anna_neutral.webp')).convert('RGBA'); pt = pt.resize((round(pt.width * 980 / pt.height), 980), Image.LANCZOS)
+c = sheet.convert('RGBA'); c.alpha_composite(pt, (1920 - pt.width - 40, 60)); sheet = c.convert('RGB'); save(sheet, 'anna/anna_sheet.jpg')
+# кат-сцены с Анной: фон игры + Анна в нужной позе
+flat, *_ = cover(A('bg_city_flat.jpg')); save(put(flat, 's_anna.webp', 960, 1000, 640, flip=True), 'scenes/c_anna_parcel.jpg')
+busf = put(road, 's_bus.webp', 1420, 900, 520); save(put(busf, 's_anna_back.webp', 620, 1010, 560), 'scenes/c_anna_bus.jpg')
+save(put(street, 's_anna_back.webp', 1180, 1030, 470), 'scenes/c_anna_door.jpg')
+river, *_ = cover(A('bg_river.jpg')); save(put(river, 's_anna.webp', 1040, 652, 270), 'scenes/c_anna_river.jpg')
 print('ok', len(os.listdir(os.path.join(OUT, 'portraits'))), len(os.listdir(os.path.join(OUT, 'scenes'))))

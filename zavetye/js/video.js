@@ -13,8 +13,12 @@
 const VIDEOS = {
   p_grunya_warm: 'video/p_grunya_warm',
 };
+/* играют те ролики из списка, что уже есть; нет ни одного — сцена идёт без кат-сцены */
 const VCUTS = {
-  p_road:       { key:'v_arrive', title:'Заветье', clips:['c_arrive_1', 'c_arrive_2'] },
+  p_flat:       { key:'v_parcel', clips:['c_anna_parcel'] },                                   // Анна находит посылку в мамином шкафу
+  p_road:       { key:'v_arrive', title:'Заветье', clips:['c_anna_bus', 'c_arrive_1', 'c_arrive_2'] },
+  p_house_out:  { key:'v_door', clips:['c_anna_door'] },                                       // седьмой дом, ключ в замке
+  river_look:   { key:'v_reflection', clips:['c_anna_river'] },                                // отражение опаздывает на полсекунды
   p_house_in:   { key:'v_house', clips:['c_house'] },
   noon:         { key:'v_noon', title:'Полдень', clips:['c_noon'] },
   leshy:        { key:'v_leshy', clips:['c_leshy'] },
@@ -50,18 +54,18 @@ function stopPortraitVideos(){ document.querySelectorAll('.portrait video.pv').f
 /* ---------- кат-сцены ---------- */
 function vcutFor(id){
   const c = VCUTS[id]; if(!c || !vidOK || !st || window.NOCUT || (st.tut && st.tut[c.key])) return null;
-  return c.clips.every(k => VIDEOS[k]) ? c : null;
+  return c.clips.some(k => VIDEOS[k]) ? c : null;
 }
 function playVCut(id, done){
-  const C = VCUTS[id]; let finished = false, i = -1;
+  const C = VCUTS[id], clips = C.clips.filter(k => VIDEOS[k]); let finished = false, i = -1;
   const el = cutUI(); let v = el.querySelector('video.cut-vid');
   if(!v){ v = document.createElement('video'); v.className = 'cut-vid'; v.playsInline = true; v.setAttribute('playsinline', ''); el.insertBefore(v, el.firstChild); }
   const fade = el.querySelector('.cut-fade'), title = el.querySelector('.cut-title');
   const finish = () => { if(finished) return; finished = true; st.tut[C.key] = 1; save(); CUT.on = false; ui.cut = false; clearTimeout(CUT.tt);
     el.classList.add('out'); setTimeout(() => { el.classList.remove('on', 'out', 'vmode'); v.pause(); v.removeAttribute('src'); v.load(); }, 700); done(); };
-  const next = () => { if(finished) return; i++; if(i >= C.clips.length) return finish();
+  const next = () => { if(finished) return; i++; if(i >= clips.length) return finish();
     fade.style.transition = 'opacity .5s ease'; fade.style.opacity = 1;
-    setTimeout(() => { if(finished) return; v.src = vsrc(C.clips[i]); v.currentTime = 0; v.muted = false; v.volume = Math.min(1, (SET.amb ?? 70) / 100);
+    setTimeout(() => { if(finished) return; v.src = vsrc(clips[i]); v.currentTime = 0; v.muted = false; v.volume = Math.min(1, (SET.amb ?? 70) / 100);
       v.play().catch(() => { v.muted = true; v.play().catch(() => next()); }); }, i ? 450 : 0); };
   v.onplaying = () => { fade.style.opacity = 0; };
   v.onended = next; v.onerror = next;
